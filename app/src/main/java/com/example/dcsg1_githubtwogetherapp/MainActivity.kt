@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             LoginScreen(
-                                onLoginClick = { email, password ->
+                                onLoginSuccess = {
                                     isLoggedIn = true
                                     navController.popBackStack("home", inclusive = false)
                                 },
