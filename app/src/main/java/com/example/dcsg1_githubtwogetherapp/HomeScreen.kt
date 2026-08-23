@@ -2,8 +2,6 @@ package com.example.dcsg1_githubtwogetherapp
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,7 +63,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.NotificationsNone
-
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.window.Dialog
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.foundation.shape.CircleShape
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
@@ -221,7 +223,7 @@ fun LocationSelector(
 }
 
 @Composable
-fun WeddingDateCard() {
+fun WeddingDateCard(onSetDateClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -260,7 +262,7 @@ fun WeddingDateCard() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { /* TODO: open date picker later */ },
+                onClick = onSetDateClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
             ) {
                 Text("Set Wedding Date", fontSize = 12.sp)
@@ -437,17 +439,28 @@ fun VendorCard(vendor: Vendor) {
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    isLoggedIn: Boolean,
+    onNavigateToLogin: () -> Unit
+) {
     var selectedArea by remember { mutableStateOf("George Town") }
     var selectedState by remember { mutableStateOf("Penang") }
     var selectedTab by remember { mutableStateOf(0) }
+    var showLoginDialog by remember { mutableStateOf(false) }
+
+    if (showLoginDialog) {
+        LoginRequiredDialog(
+            onDismiss = { showLoginDialog = false },
+            onLoginClick = {
+                showLoginDialog = false
+                onNavigateToLogin()
+            }
+        )
+    }
 
     Scaffold(
         bottomBar = {
-            BottomNavBar(
-                selectedIndex = selectedTab,
-                onItemSelected = { index -> selectedTab = index }
-            )
+            BottomNavBar(selectedIndex = selectedTab, onItemSelected = { selectedTab = it })
         }
     ) { innerPadding ->
         Column(
@@ -465,7 +478,15 @@ fun HomeScreen() {
                     selectedState = state
                 }
             )
-            WeddingDateCard()
+            WeddingDateCard(
+                onSetDateClick = {
+                    if (isLoggedIn) {
+                        // TODO: open real date picker later
+                    } else {
+                        showLoginDialog = true
+                    }
+                }
+            )
             QuickActionsGrid()
             FeaturedVendorsSection(currentArea = selectedArea)
         }
@@ -507,11 +528,91 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
     }
 }
 
+@Composable
+fun LoginRequiredDialog(
+    onDismiss: () -> Unit,
+    onLoginClick: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .padding(24.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFDECD8)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Lock,
+                    contentDescription = null,
+                    tint = Color(0xFFB5722C),
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Login Required",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Please login or register to set\nyour wedding date.",
+                fontSize = 13.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onDismiss,
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cancel", color = Color.Black)
+                }
+
+                Button(
+                    onClick = onLoginClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Login")
+                }
+            }
+        }
+    }
+}
+
 
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(
+        isLoggedIn = false,
+        onNavigateToLogin = {}
+    )
+}
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenLoggedInPreview() {
+    HomeScreen(isLoggedIn = true, onNavigateToLogin = {})
 }
 
