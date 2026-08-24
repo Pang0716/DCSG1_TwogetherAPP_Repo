@@ -97,6 +97,7 @@ val bottomNavItems = listOf(
 )
 
 
+
 @Composable
 fun HomeTopBar() {
     Row(
@@ -447,6 +448,20 @@ fun HomeScreen(
     var selectedState by remember { mutableStateOf("Penang") }
     var selectedTab by remember { mutableStateOf(0) }
     var showLoginDialog by remember { mutableStateOf(false) }
+    var showWelcomeBack by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn && UserSession.currentUser.value != null) {
+            showWelcomeBack = true
+        }
+    }
+
+    if (showWelcomeBack) {
+        WelcomeBackDialog(
+            userName = UserSession.currentUser.value?.fullName ?: "there",
+            onDismiss = { showWelcomeBack = false }
+        )
+    }
 
     if (showLoginDialog) {
         LoginRequiredDialog(
@@ -598,6 +613,23 @@ fun LoginRequiredDialog(
             }
         }
     }
+}
+
+@Composable
+fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Welcome back, $userName! 🎉") },
+        text = { Text("Great to see you again — let's continue planning your dream wedding.") },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
+            ) {
+                Text("Continue")
+            }
+        }
+    )
 }
 
 

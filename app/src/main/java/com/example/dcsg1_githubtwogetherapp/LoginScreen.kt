@@ -69,7 +69,10 @@ fun LoginScreen(
                     val loginResult = signInWithGoogleToken(idToken)
                     isLoading = false
                     loginResult
-                        .onSuccess { onLoginSuccess() }
+                        .onSuccess {
+                            loadCurrentUserProfile()   // ← add this line
+                            onLoginSuccess()
+                        }
                         .onFailure { errorMessage = it.message }
                 }
             } else {

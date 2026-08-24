@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import android.content.Intent
+import io.github.jan.supabase.auth.auth
 
 suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
     return try {
@@ -67,5 +68,17 @@ suspend fun signInWithGoogleToken(idToken: String): Result<Unit> {
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
+    }
+}
+
+fun loadCurrentUserProfile() {
+    val user = supabase.auth.currentUserOrNull()
+    if (user != null) {
+        UserSession.currentUser.value = UserProfile(
+            id = user.id,
+            email = user.email,
+            fullName = user.userMetadata?.get("full_name")?.toString()?.trim('"'),
+            avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"')
+        )
     }
 }
