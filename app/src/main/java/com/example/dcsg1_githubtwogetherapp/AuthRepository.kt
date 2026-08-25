@@ -49,6 +49,7 @@ suspend fun loginUser(email: String, password: String): Result<Unit> {
 
 suspend fun logoutUser() {
     supabase.auth.signOut()
+    UserSession.currentUser.value = null
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {

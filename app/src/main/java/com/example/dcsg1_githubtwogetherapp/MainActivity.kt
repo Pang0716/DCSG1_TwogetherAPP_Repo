@@ -9,6 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dcsg1_githubtwogetherapp.ui.theme.DCSG1_GithubTwogetherAPPTheme
+import androidx.compose.runtime.LaunchedEffect
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.status.SessionStatus
 
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +22,26 @@ class MainActivity : ComponentActivity() {
             DCSG1_GithubTwogetherAPPTheme {
                 var showSplash by remember { mutableStateOf(true) }
                 var isLoggedIn by remember { mutableStateOf(false) }
+                var sessionChecked by remember { mutableStateOf(false) }
 
-                if (showSplash) {
+                LaunchedEffect(Unit) {
+                    supabase.auth.sessionStatus.collect { status ->
+                        when (status) {
+                            is SessionStatus.Authenticated -> {
+                                loadCurrentUserProfile()
+                                isLoggedIn = true
+                                sessionChecked = true
+                            }
+                            is SessionStatus.NotAuthenticated -> {
+                                isLoggedIn = false
+                                sessionChecked = true
+                            }
+                            else -> { /* still loading, do nothing yet */ }
+                        }
+                    }
+                }
+
+                if (showSplash || !sessionChecked) {
                     SplashScreen(onTimeout = { showSplash = false })
                 } else {
                     val navController = rememberNavController()
@@ -35,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
-                                    loadCurrentUserProfile()   // ← add this line
+                                    loadCurrentUserProfile()
                                     isLoggedIn = true
                                     navController.popBackStack("home", inclusive = false)
                                 },
@@ -46,7 +67,6 @@ class MainActivity : ComponentActivity() {
                             RegisterScreen(
                                 onBackClick = { navController.popBackStack() },
                                 onRegisterClick = { name, email, phone, password ->
-                                    // TODO: real Supabase account creation later
                                     isLoggedIn = true
                                     navController.popBackStack("home", inclusive = false)
                                 }
