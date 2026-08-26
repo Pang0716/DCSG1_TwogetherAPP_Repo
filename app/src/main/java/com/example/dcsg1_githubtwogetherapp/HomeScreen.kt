@@ -68,6 +68,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.clickable
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
@@ -442,7 +443,8 @@ fun VendorCard(vendor: Vendor) {
 @Composable
 fun HomeScreen(
     isLoggedIn: Boolean,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onLogout: () -> Unit
 ) {
     var selectedArea by remember { mutableStateOf("George Town") }
     var selectedState by remember { mutableStateOf("Penang") }
@@ -485,6 +487,16 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             HomeTopBar()
+            if (isLoggedIn) {
+                Text(
+                    text = "Logout (temporary for testing)",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { onLogout() }
+                )
+            }
             LocationSelector(
                 selectedArea = selectedArea,
                 selectedState = selectedState,
@@ -634,17 +646,25 @@ fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
 
 
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
         isLoggedIn = false,
-        onNavigateToLogin = {}
+        onNavigateToLogin = {},
+        onLogout = {}
     )
 }
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenLoggedInPreview() {
-    HomeScreen(isLoggedIn = true, onNavigateToLogin = {})
+    HomeScreen(
+        isLoggedIn = true,
+        onNavigateToLogin = {},
+        onLogout = {}
+    )
 }
 

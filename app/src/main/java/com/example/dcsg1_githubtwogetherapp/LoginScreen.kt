@@ -40,6 +40,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 
 @Composable
 fun LoginScreen(
@@ -55,6 +60,7 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val googleSignInClient = remember { getGoogleSignInClient(context) }
+    val callbackManager = remember { FacebookAuthManager.callbackManager }
 
     val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -259,27 +265,52 @@ fun LoginScreen(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "G", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFDB4437))
+                    Text(
+                        text = "G",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFDB4437)
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(20.dp))
 
-                SocialCircleButton(text = "f", textColor = Color(0xFF1877F2)) // Facebook - next step
-            }
+                SocialCircleButton(
+                    text = "f",
+                    textColor = Color(0xFF1877F2),
+                    onClick = {
+                        LoginManager.getInstance().logInWithReadPermissions(
+                            context as android.app.Activity,
+                            listOf("email", "public_profile")
+                        )
+                        LoginManager.getInstance().registerCallback(
+                            callbackManager,
+                            object : FacebookCallback<LoginResult> {
+                                override fun onSuccess(result: LoginResult) {
+                                    val token = result.accessToken.token
+                                    scope.launch {
+                                        isLoading = true
+                                        val loginResult = signInWithFacebookToken(token)
+                                        isLoading = false
+                                        loginResult
+                                            .onSuccess {
+                                                loadCurrentUserProfile()
+                                                onLoginSuccess()
+                                            }
+                                            .onFailure { errorMessage = it.message }
+                                    }
+                                }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                                override fun onCancel() {
+                                    errorMessage = "Facebook login cancelled"
+                                }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text("Don't have an account yet? ", fontSize = 13.sp, color = Color.Gray)
-                Text(
-                    text = "Register",
-                    fontSize = 13.sp,
-                    color = Color(0xFFB5722C),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onRegisterClick() }
+                                override fun onError(error: FacebookException) {
+                                    errorMessage = "Facebook login failed: ${error.message}"
+                                }
+                            }
+                        )
+                    }
                 )
             }
         }
@@ -287,13 +318,13 @@ fun LoginScreen(
 }
 
 @Composable
-fun SocialCircleButton(text: String, textColor: Color) {
+fun SocialCircleButton(text: String, textColor: Color, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
             .background(Color.White)
-            .clickable { /* TODO: real social login later */ },
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(text = text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = textColor)

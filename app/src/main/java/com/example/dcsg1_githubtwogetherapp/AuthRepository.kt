@@ -15,6 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import android.content.Intent
 import io.github.jan.supabase.auth.auth
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 
 suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
     return try {
@@ -65,6 +70,18 @@ suspend fun signInWithGoogleToken(idToken: String): Result<Unit> {
         supabase.auth.signInWith(IDToken) {
             this.idToken = idToken
             provider = Google
+        }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
+
+suspend fun signInWithFacebookToken(accessToken: String): Result<Unit> {
+    return try {
+        supabase.auth.signInWith(io.github.jan.supabase.auth.providers.builtin.IDToken) {
+            idToken = accessToken
+            provider = io.github.jan.supabase.auth.providers.Facebook
         }
         Result.success(Unit)
     } catch (e: Exception) {

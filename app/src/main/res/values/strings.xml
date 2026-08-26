@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DCSG1_GithubTwogetherAPP</string>
+    <string name="facebook_app_id">905985392175863</string>
+    <string name="fb_login_protocol_scheme">fb905985392175863</string>
 </resources>

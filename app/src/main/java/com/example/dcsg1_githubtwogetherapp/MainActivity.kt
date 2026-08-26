@@ -1,5 +1,6 @@
 package com.example.dcsg1_githubtwogetherapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,12 +10,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dcsg1_githubtwogetherapp.ui.theme.DCSG1_GithubTwogetherAPPTheme
-import androidx.compose.runtime.LaunchedEffect
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
                 var showSplash by remember { mutableStateOf(true) }
                 var isLoggedIn by remember { mutableStateOf(false) }
                 var sessionChecked by remember { mutableStateOf(false) }
+                val scope = rememberCoroutineScope()
 
                 LaunchedEffect(Unit) {
                     supabase.auth.sessionStatus.collect { status ->
@@ -36,7 +38,7 @@ class MainActivity : ComponentActivity() {
                                 isLoggedIn = false
                                 sessionChecked = true
                             }
-                            else -> { /* still loading, do nothing yet */ }
+                            else -> { /* still loading */ }
                         }
                     }
                 }
@@ -50,7 +52,13 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             HomeScreen(
                                 isLoggedIn = isLoggedIn,
-                                onNavigateToLogin = { navController.navigate("login") }
+                                onNavigateToLogin = { navController.navigate("login") },
+                                onLogout = {
+                                    scope.launch {
+                                        logoutUser()
+                                        isLoggedIn = false
+                                    }
+                                }
                             )
                         }
                         composable("login") {
@@ -77,5 +85,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        FacebookAuthManager.callbackManager.onActivityResult(requestCode, resultCode, data)
+    }
+}
