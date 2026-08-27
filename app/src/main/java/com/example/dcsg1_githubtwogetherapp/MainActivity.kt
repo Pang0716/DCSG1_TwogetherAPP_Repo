@@ -13,11 +13,13 @@ import com.example.dcsg1_githubtwogetherapp.ui.theme.DCSG1_GithubTwogetherAPPThe
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.launch
+import com.facebook.FacebookSdk
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FacebookSdk.sdkInitialize(applicationContext)
         enableEdgeToEdge()
         setContent {
             DCSG1_GithubTwogetherAPPTheme {

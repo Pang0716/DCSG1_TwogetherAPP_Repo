@@ -45,6 +45,7 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import androidx.compose.ui.platform.LocalView
 
 @Composable
 fun LoginScreen(
@@ -61,6 +62,8 @@ fun LoginScreen(
     val context = LocalContext.current
     val googleSignInClient = remember { getGoogleSignInClient(context) }
     val callbackManager = remember { FacebookAuthManager.callbackManager }
+    val view = LocalView.current
+    val activity = view.context as? android.app.Activity
 
     val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -279,37 +282,21 @@ fun LoginScreen(
                     text = "f",
                     textColor = Color(0xFF1877F2),
                     onClick = {
-                        LoginManager.getInstance().logInWithReadPermissions(
-                            context as android.app.Activity,
-                            listOf("email", "public_profile")
-                        )
-                        LoginManager.getInstance().registerCallback(
-                            callbackManager,
-                            object : FacebookCallback<LoginResult> {
-                                override fun onSuccess(result: LoginResult) {
-                                    val token = result.accessToken.token
-                                    scope.launch {
-                                        isLoading = true
-                                        val loginResult = signInWithFacebookToken(token)
-                                        isLoading = false
-                                        loginResult
-                                            .onSuccess {
-                                                loadCurrentUserProfile()
-                                                onLoginSuccess()
-                                            }
-                                            .onFailure { errorMessage = it.message }
-                                    }
-                                }
-
-                                override fun onCancel() {
-                                    errorMessage = "Facebook login cancelled"
-                                }
-
-                                override fun onError(error: FacebookException) {
-                                    errorMessage = "Facebook login failed: ${error.message}"
-                                }
+                        android.util.Log.d("FacebookTest", "Button tapped, activity = $activity")
+                        if (activity != null) {
+                            try {
+                                LoginManager.getInstance().logInWithReadPermissions(
+                                    activity,
+                                    listOf("email", "public_profile")
+                                )
+                                android.util.Log.d("FacebookTest", "logInWithReadPermissions called successfully")
+                            } catch (e: Exception) {
+                                android.util.Log.e("FacebookTest", "Crash caught: ${e.message}", e)
+                                errorMessage = "Facebook error: ${e.message}"
                             }
-                        )
+                        } else {
+                            android.util.Log.e("FacebookTest", "Activity was null")
+                        }
                     }
                 )
             }
