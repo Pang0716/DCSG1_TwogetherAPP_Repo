@@ -22,11 +22,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
-    onBackClick: () -> Unit,
-    onRegisterClick: (String, String, String, String) -> Unit
+    onBackClick: () -> Unit
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -36,6 +36,30 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var agreedToTerms by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+
+    // Validation function — checks everything before allowing submission
+    fun validateForm(): String? {
+        if (fullName.isBlank()) return "Please enter your full name."
+        if (fullName.length < 2) return "Full name is too short."
+
+        val emailPattern = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+        if (!emailPattern.matches(email)) return "Please enter a valid email address."
+
+        val phonePattern = Regex("^[0-9]{9,11}$")
+        if (!phonePattern.matches(phoneNumber.replace(" ", "").replace("-", "")))
+            return "Please enter a valid phone number (9-11 digits)."
+
+        if (password.length < 6) return "Password must be at least 6 characters."
+        if (password != confirmPassword) return "Passwords do not match."
+        if (!agreedToTerms) return "Please agree to the Terms of Service to continue."
+
+        return null // null means "no problems found"
+    }
 
     Column(
         modifier = Modifier
@@ -83,6 +107,14 @@ fun RegisterScreen(
             onValueChange = { email = it },
             placeholder = "Enter your email",
             keyboardType = KeyboardType.Email
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = "Already have an account with Google or Facebook? Just log in using that instead.",
+            fontSize = 11.sp,
+            color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -154,19 +186,67 @@ fun RegisterScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        errorMessage?.let {
+            Text(text = it, color = Color.Red, fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         Button(
-            onClick = { onRegisterClick(fullName, email, phoneNumber, password) },
+            onClick = {
+                val validationError = validateForm()
+                if (validationError != null) {
+                    errorMessage = validationError
+                    return@Button
+                }
+
+                errorMessage = null
+                isLoading = true
+                scope.launch {
+                    val result = registerUser(email, password, fullName)
+                    isLoading = false
+                    result
+                        .onSuccess {
+                            showSuccessDialog = true   // ← changed: show confirmation message instead of instant login
+                        }
+                        .onFailure { errorMessage = it.message }
+                }
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
             shape = RoundedCornerShape(10.dp),
-            enabled = agreedToTerms,
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
         ) {
-            Text("Create Account", fontSize = 15.sp)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+            } else {
+                Text("Create Account", fontSize = 15.sp)
+            }
         }
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = { Text("Check Your Email") },
+                text = {
+                    Text("We've sent a confirmation link to $email. Please verify your email, then log in.")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showSuccessDialog = false
+                            onBackClick() // returns to Login screen
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
+                    ) {
+                        Text("Go to Login")
+                    }
+                }
+            )
+        }
+
     }
 }
 

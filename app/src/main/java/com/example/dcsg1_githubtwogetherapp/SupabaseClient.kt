@@ -8,6 +8,9 @@ val supabase = createSupabaseClient(
     supabaseUrl = "https://tqexlhzvlgcvtpiffzeb.supabase.co",
     supabaseKey = "sb_publishable_hqGPlhF4zTuiSK6JN2xQYA_bC5RYQR4"
 ) {
-    install(Auth)
+    install(Auth) {
+        host = "login-callback"
+        scheme = "twogether"
+    }
     install(Postgrest)
 }

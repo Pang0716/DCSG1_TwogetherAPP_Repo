@@ -88,7 +88,11 @@ fun LoginScreen(
                 errorMessage = "Google sign-in failed: no token received"
             }
         } catch (e: ApiException) {
-            errorMessage = "Google sign-in failed: ${e.statusCode}"
+            errorMessage = when (e.statusCode) {
+                12501 -> null // user cancelled — don't show an error at all
+                7 -> "No internet connection. Please check your network and try again."
+                else -> "Google sign-in failed. Please try again."
+            }
         }
     }
 
@@ -264,7 +268,9 @@ fun LoginScreen(
                         .clip(CircleShape)
                         .background(Color.White)
                         .clickable {
-                            googleLauncher.launch(googleSignInClient.signInIntent)
+                            googleSignInClient.signOut().addOnCompleteListener {
+                                googleLauncher.launch(googleSignInClient.signInIntent)
+                            }
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -282,22 +288,30 @@ fun LoginScreen(
                     text = "f",
                     textColor = Color(0xFF1877F2),
                     onClick = {
-                        android.util.Log.d("FacebookTest", "Button tapped, activity = $activity")
-                        if (activity != null) {
+                        scope.launch {
                             try {
-                                LoginManager.getInstance().logInWithReadPermissions(
-                                    activity,
-                                    listOf("email", "public_profile")
-                                )
-                                android.util.Log.d("FacebookTest", "logInWithReadPermissions called successfully")
+                                signInWithFacebookOAuth()
                             } catch (e: Exception) {
-                                android.util.Log.e("FacebookTest", "Crash caught: ${e.message}", e)
-                                errorMessage = "Facebook error: ${e.message}"
+                                errorMessage = "Facebook login failed. Please check your internet connection and try again."
                             }
-                        } else {
-                            android.util.Log.e("FacebookTest", "Activity was null")
                         }
                     }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Don't have an account yet? ", fontSize = 13.sp, color = Color.Gray)
+                Text(
+                    text = "Register",
+                    fontSize = 13.sp,
+                    color = Color(0xFFB5722C),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onRegisterClick() }
                 )
             }
         }
