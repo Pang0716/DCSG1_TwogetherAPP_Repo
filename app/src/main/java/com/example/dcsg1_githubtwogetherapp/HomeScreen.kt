@@ -68,7 +68,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.clickable
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
