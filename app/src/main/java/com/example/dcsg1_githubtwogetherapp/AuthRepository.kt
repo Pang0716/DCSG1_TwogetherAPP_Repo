@@ -14,12 +14,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import android.content.Intent
-import io.github.jan.supabase.auth.auth
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import io.github.jan.supabase.auth.providers.Facebook
 
 suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
     return try {
@@ -32,9 +32,16 @@ suspend fun registerUser(email: String, password: String, fullName: String): Res
         }
         Result.success(Unit)
     } catch (e: RestException) {
-        Result.failure(Exception(e.message ?: "Registration failed"))
+        val friendlyMessage = when {
+            e.message?.contains("already registered", ignoreCase = true) == true ->
+                "This email is already registered. Try logging in instead."
+            e.message?.contains("Password should be", ignoreCase = true) == true ->
+                "Password is too weak. Use at least 6 characters."
+            else -> "Registration failed. Please try again."
+        }
+        Result.failure(Exception(friendlyMessage))
     } catch (e: Exception) {
-        Result.failure(e)
+        Result.failure(Exception("Something went wrong. Please check your internet connection and try again."))
     }
 }
 
@@ -46,9 +53,16 @@ suspend fun loginUser(email: String, password: String): Result<Unit> {
         }
         Result.success(Unit)
     } catch (e: RestException) {
-        Result.failure(Exception(e.message ?: "Login failed"))
+        val friendlyMessage = when {
+            e.message?.contains("Invalid login credentials", ignoreCase = true) == true ->
+                "Incorrect email or password. Please try again."
+            e.message?.contains("Email not confirmed", ignoreCase = true) == true ->
+                "Please verify your email before logging in."
+            else -> "Login failed. Please try again."
+        }
+        Result.failure(Exception(friendlyMessage))
     } catch (e: Exception) {
-        Result.failure(e)
+        Result.failure(Exception("Something went wrong. Please check your internet connection and try again."))
     }
 }
 
@@ -77,16 +91,8 @@ suspend fun signInWithGoogleToken(idToken: String): Result<Unit> {
     }
 }
 
-suspend fun signInWithFacebookToken(accessToken: String): Result<Unit> {
-    return try {
-        supabase.auth.signInWith(io.github.jan.supabase.auth.providers.builtin.IDToken) {
-            idToken = accessToken
-            provider = io.github.jan.supabase.auth.providers.Facebook
-        }
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Result.failure(e)
-    }
+suspend fun signInWithFacebookOAuth() {
+    supabase.auth.signInWith(Facebook, redirectUrl = "twogether://login-callback")
 }
 
 fun loadCurrentUserProfile() {
