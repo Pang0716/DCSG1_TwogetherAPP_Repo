@@ -41,9 +41,8 @@ class MainActivity : ComponentActivity() {
                                 isLoggedIn = true
                                 sessionChecked = true
 
-                                // If we're past the initial load and currently on the login screen,
-                                // this means a fresh login just completed (e.g. Facebook OAuth) — navigate home
-                                if (wasAlreadyChecked && navController.currentDestination?.route == "login") {
+                                val currentRoute = navController.currentDestination?.route
+                                if (wasAlreadyChecked && (currentRoute == "login" || currentRoute == "register")) {
                                     navController.popBackStack("home", inclusive = false)
                                 }
                             }
