@@ -179,6 +179,8 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Back",

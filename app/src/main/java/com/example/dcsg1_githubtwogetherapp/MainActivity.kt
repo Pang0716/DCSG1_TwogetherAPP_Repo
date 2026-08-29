@@ -95,7 +95,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("forgot_password") {
                             ForgotPasswordScreen(
-                                onBackClick = { navController.popBackStack() }
+                                onBackClick = { navController.popBackStack() },
+                                onResetComplete = {
+                                    isLoggedIn = false
+                                    navController.popBackStack("home", inclusive = false)
+                                }
                             )
                         }
                         composable("reset_password") {
@@ -125,14 +129,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?) {
-        intent?.data?.let { uri ->
-            val isPasswordReset = uri.host == "reset-password"
+        intent?.data?.let {
             lifecycleScope.launch {
                 try {
                     supabase.handleDeeplinks(intent)
-                    if (isPasswordReset) {
-                        PasswordResetState.isPendingReset.value = true
-                    }
                 } catch (e: Exception) {
                     android.util.Log.e("DeepLinkTest", "handleDeeplinks failed: ${e.message}", e)
                 }

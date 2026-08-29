@@ -13,7 +13,6 @@ import io.github.jan.supabase.auth.providers.Google
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import android.content.Intent
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -21,6 +20,7 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import io.github.jan.supabase.auth.providers.Facebook
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
+import io.github.jan.supabase.auth.OtpType
 
 suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
     return try {
@@ -130,6 +130,21 @@ suspend fun updatePassword(newPassword: String): Result<Unit> {
         Result.success(Unit)
     } catch (e: RestException) {
         Result.failure(Exception("Failed to update password. Please try again."))
+    } catch (e: Exception) {
+        Result.failure(Exception("Something went wrong. Please try again."))
+    }
+}
+
+suspend fun verifyPasswordResetCode(email: String, code: String): Result<Unit> {
+    return try {
+        supabase.auth.verifyEmailOtp(
+            type = OtpType.Email.RECOVERY,
+            email = email,
+            token = code
+        )
+        Result.success(Unit)
+    } catch (e: RestException) {
+        Result.failure(Exception("Invalid or expired code. Please try again."))
     } catch (e: Exception) {
         Result.failure(Exception("Something went wrong. Please try again."))
     }
