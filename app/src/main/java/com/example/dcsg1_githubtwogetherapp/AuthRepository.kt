@@ -149,3 +149,16 @@ suspend fun verifyPasswordResetCode(email: String, code: String): Result<Unit> {
         Result.failure(Exception("Something went wrong. Please try again."))
     }
 }
+
+suspend fun updateUserFullName(newName: String): Result<Unit> {
+    return try {
+        supabase.auth.updateUser {
+            data = kotlinx.serialization.json.buildJsonObject {
+                put("full_name", kotlinx.serialization.json.JsonPrimitive(newName))
+            }
+        }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(Exception("Failed to update profile. Please try again."))
+    }
+}

@@ -25,13 +25,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.TextStyle
 
 // ---- Validation logic, separated out so it's reusable and easy to read ----
 
@@ -74,7 +79,9 @@ private fun validateConfirmPassword(password: String, confirm: String): String? 
 
 @Composable
 fun RegisterScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToTerms: () -> Unit,
+    onNavigateToPrivacy: () -> Unit
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -268,9 +275,31 @@ fun RegisterScreen(
                     onCheckedChange = { agreedToTerms = it },
                     colors = CheckboxDefaults.colors(checkedColor = Color(0xFFB5722C))
                 )
-                Text(
-                    text = "I agree to the Terms of Service and Privacy Policy *",
-                    fontSize = 12.sp, color = Color.Gray
+                val annotatedText = buildAnnotatedString {
+                    append("I agree to the ")
+                    pushStringAnnotation(tag = "TERMS", annotation = "terms")
+                    withStyle(SpanStyle(color = Color(0xFFB5722C), fontWeight = FontWeight.Bold)) {
+                        append("Terms of Service")
+                    }
+                    pop()
+                    append(" and ")
+                    pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
+                    withStyle(SpanStyle(color = Color(0xFFB5722C), fontWeight = FontWeight.Bold)) {
+                        append("Privacy Policy")
+                    }
+                    pop()
+                    append(" *")
+                }
+
+                ClickableText(
+                    text = annotatedText,
+                    style = TextStyle(fontSize = 12.sp, color = Color.Gray),
+                    onClick = { offset ->
+                        annotatedText.getStringAnnotations(tag = "TERMS", start = offset, end = offset)
+                            .firstOrNull()?.let { onNavigateToTerms() }
+                        annotatedText.getStringAnnotations(tag = "PRIVACY", start = offset, end = offset)
+                            .firstOrNull()?.let { onNavigateToPrivacy() }
+                    }
                 )
             }
 

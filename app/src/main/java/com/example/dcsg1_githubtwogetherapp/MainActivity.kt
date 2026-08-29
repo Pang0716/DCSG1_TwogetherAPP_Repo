@@ -74,9 +74,13 @@ class MainActivity : ComponentActivity() {
                                         logoutUser()
                                         isLoggedIn = false
                                     }
-                                }
+                                },
+                                onEditProfile = { navController.navigate("edit_profile") },
+                                onHelpSupport = { navController.navigate("help_support") },
+                                onLanguage = { navController.navigate("language") }
                             )
                         }
+
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
@@ -90,8 +94,16 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("register") {
                             RegisterScreen(
-                                onBackClick = { navController.popBackStack() }
+                                onBackClick = { navController.popBackStack() },
+                                onNavigateToTerms = { navController.navigate("terms") },
+                                onNavigateToPrivacy = { navController.navigate("privacy") }
                             )
+                        }
+                        composable("terms") {
+                            TermsOfServiceScreen(onBackClick = { navController.popBackStack() })
+                        }
+                        composable("privacy") {
+                            PrivacyPolicyScreen(onBackClick = { navController.popBackStack() })
                         }
                         composable("forgot_password") {
                             ForgotPasswordScreen(
@@ -110,6 +122,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        // MainActivity.kt additions inside NavHost
+                        composable("edit_profile") { EditProfileScreen(onBackClick = { navController.popBackStack() }) }
+                        composable("help_support") { HelpSupportScreen(onBackClick = { navController.popBackStack() }) }
+                        composable("language") { LanguageScreen(onBackClick = { navController.popBackStack() }) }
                     }
                 }
             }

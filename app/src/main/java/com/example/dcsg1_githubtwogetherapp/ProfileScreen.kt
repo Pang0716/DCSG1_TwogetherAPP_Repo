@@ -24,7 +24,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 @Composable
-fun ProfileScreen(onLogout: () -> Unit) {
+fun ProfileScreen(
+    onLogout: () -> Unit,
+    onEditProfile: () -> Unit,
+    onHelpSupport: () -> Unit,
+    onLanguage: () -> Unit
+) {
     val user = UserSession.currentUser.value
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
@@ -112,8 +117,8 @@ fun ProfileScreen(onLogout: () -> Unit) {
 
         ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { }
         ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { }
-        ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { }
-        ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { }
+        ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { onHelpSupport() }
+        ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { onLanguage() }
         ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") {
             showLogoutConfirm = true   // ← changed: opens confirmation instead of logging out directly
         }
