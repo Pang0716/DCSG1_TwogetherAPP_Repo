@@ -20,6 +20,7 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import io.github.jan.supabase.auth.providers.Facebook
+import io.github.jan.supabase.auth.user.UserUpdateBuilder
 
 suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
     return try {
@@ -104,5 +105,32 @@ fun loadCurrentUserProfile() {
             fullName = user.userMetadata?.get("full_name")?.toString()?.trim('"'),
             avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"')
         )
+    }
+}
+
+suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+    return try {
+        supabase.auth.resetPasswordForEmail(
+            email = email,
+            redirectUrl = "twogether://reset-password"
+        )
+        Result.success(Unit)
+    } catch (e: RestException) {
+        Result.failure(Exception("Failed to send reset email. Please check the address and try again."))
+    } catch (e: Exception) {
+        Result.failure(Exception("Something went wrong. Please check your internet connection and try again."))
+    }
+}
+
+suspend fun updatePassword(newPassword: String): Result<Unit> {
+    return try {
+        supabase.auth.updateUser {
+            password = newPassword
+        }
+        Result.success(Unit)
+    } catch (e: RestException) {
+        Result.failure(Exception("Failed to update password. Please try again."))
+    } catch (e: Exception) {
+        Result.failure(Exception("Something went wrong. Please try again."))
     }
 }

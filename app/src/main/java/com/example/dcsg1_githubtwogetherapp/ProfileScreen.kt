@@ -8,6 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +26,31 @@ import coil.compose.AsyncImage
 @Composable
 fun ProfileScreen(onLogout: () -> Unit) {
     val user = UserSession.currentUser.value
+    var showLogoutConfirm by remember { mutableStateOf(false) }
+
+    if (showLogoutConfirm) {
+        AlertDialog(
+            onDismissRequest = { showLogoutConfirm = false },
+            title = { Text("Log Out") },
+            text = { Text("Are you sure you want to log out?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutConfirm = false
+                        onLogout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
+                ) {
+                    Text("Log Out")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutConfirm = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -85,7 +114,9 @@ fun ProfileScreen(onLogout: () -> Unit) {
         ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { }
         ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { }
         ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { }
-        ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") { onLogout() }
+        ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") {
+            showLogoutConfirm = true   // ← changed: opens confirmation instead of logging out directly
+        }
     }
 }
 

@@ -50,7 +50,8 @@ import androidx.compose.ui.platform.LocalView
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -210,7 +211,9 @@ fun LoginScreen(
                 text = "Forgot Password?",
                 fontSize = 12.sp,
                 color = Color(0xFFB5722C),
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable { onForgotPasswordClick() }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -288,11 +291,16 @@ fun LoginScreen(
                     text = "f",
                     textColor = Color(0xFF1877F2),
                     onClick = {
-                        scope.launch {
-                            try {
-                                signInWithFacebookOAuth()
-                            } catch (e: Exception) {
-                                errorMessage = "Facebook login failed. Please check your internet connection and try again."
+                        if (!isLoading) {
+                            isLoading = true
+                            scope.launch {
+                                try {
+                                    signInWithFacebookOAuth()
+                                } catch (e: Exception) {
+                                    errorMessage = "Facebook login failed. Please check your internet connection and try again."
+                                } finally {
+                                    isLoading = false
+                                }
                             }
                         }
                     }
@@ -330,10 +338,4 @@ fun SocialCircleButton(text: String, textColor: Color, onClick: () -> Unit) {
     ) {
         Text(text = text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = textColor)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(onLoginSuccess = {}, onRegisterClick = {})
 }

@@ -52,6 +52,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="twogether" android:host="login-callback" />
+                <data android:scheme="twogether" android:host="reset-password" />
             </intent-filter>
         </activity>
     </application>

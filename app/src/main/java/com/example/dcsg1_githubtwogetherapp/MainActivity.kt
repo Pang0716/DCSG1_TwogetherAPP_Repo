@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
-                    supabase.auth.sessionStatus.collect { status ->
+                supabase.auth.sessionStatus.collect { status ->
                         when (status) {
                             is SessionStatus.Authenticated -> {
                                 loadCurrentUserProfile()
@@ -58,6 +58,12 @@ class MainActivity : ComponentActivity() {
                 if (showSplash || !sessionChecked) {
                     SplashScreen(onTimeout = { showSplash = false })
                 } else {
+                    LaunchedEffect(PasswordResetState.isPendingReset.value) {
+                        if (PasswordResetState.isPendingReset.value) {
+                            navController.navigate("reset_password")
+                            PasswordResetState.isPendingReset.value = false
+                        }
+                    }
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") {
                             HomeScreen(
@@ -78,7 +84,8 @@ class MainActivity : ComponentActivity() {
                                     isLoggedIn = true
                                     navController.popBackStack("home", inclusive = false)
                                 },
-                                onRegisterClick = { navController.navigate("register") }
+                                onRegisterClick = { navController.navigate("register") },
+                                onForgotPasswordClick = { navController.navigate("forgot_password") }
                             )
                         }
                         composable("register") {
@@ -86,7 +93,19 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = { navController.popBackStack() }
                             )
                         }
-
+                        composable("forgot_password") {
+                            ForgotPasswordScreen(
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+                        composable("reset_password") {
+                            ResetPasswordScreen(
+                                onDone = {
+                                    isLoggedIn = false
+                                    navController.popBackStack("home", inclusive = false)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -107,11 +126,13 @@ class MainActivity : ComponentActivity() {
 
     private fun handleDeepLink(intent: Intent?) {
         intent?.data?.let { uri ->
-            android.util.Log.d("DeepLinkTest", "Received URI: $uri")
+            val isPasswordReset = uri.host == "reset-password"
             lifecycleScope.launch {
                 try {
                     supabase.handleDeeplinks(intent)
-                    android.util.Log.d("DeepLinkTest", "handleDeeplinks completed successfully")
+                    if (isPasswordReset) {
+                        PasswordResetState.isPendingReset.value = true
+                    }
                 } catch (e: Exception) {
                     android.util.Log.e("DeepLinkTest", "handleDeeplinks failed: ${e.message}", e)
                 }

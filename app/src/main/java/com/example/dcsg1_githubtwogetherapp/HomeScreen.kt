@@ -510,16 +510,6 @@ fun HomeScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 HomeTopBar()
-                if (isLoggedIn) {
-                    Text(
-                        text = "Logout (temporary for testing)",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .clickable { onLogout() }
-                    )
-                }
                 LocationSelector(
                     selectedArea = selectedArea,
                     selectedState = selectedState,
@@ -537,14 +527,14 @@ fun HomeScreen(
                         }
                     }
                 )
+                QuickActionsGrid()
+                FeaturedVendorsSection(currentArea = selectedArea)
                 if (isLoggedIn) {
                     BudgetPlannerCard(
                         onSetBudgetClick = { showSetBudgetDialog = true },
                         onViewDetailsClick = { /* TODO: full budget page later */ }
                     )
                 }
-                QuickActionsGrid()
-                FeaturedVendorsSection(currentArea = selectedArea)
             }
         }
     }
