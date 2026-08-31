@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
-                    supabase.auth.sessionStatus.collect { status ->
+                supabase.auth.sessionStatus.collect { status ->
                         when (status) {
                             is SessionStatus.Authenticated -> {
                                 loadCurrentUserProfile()
@@ -41,9 +41,8 @@ class MainActivity : ComponentActivity() {
                                 isLoggedIn = true
                                 sessionChecked = true
 
-                                // If we're past the initial load and currently on the login screen,
-                                // this means a fresh login just completed (e.g. Facebook OAuth) — navigate home
-                                if (wasAlreadyChecked && navController.currentDestination?.route == "login") {
+                                val currentRoute = navController.currentDestination?.route
+                                if (wasAlreadyChecked && (currentRoute == "login" || currentRoute == "register")) {
                                     navController.popBackStack("home", inclusive = false)
                                 }
                             }
@@ -59,6 +58,12 @@ class MainActivity : ComponentActivity() {
                 if (showSplash || !sessionChecked) {
                     SplashScreen(onTimeout = { showSplash = false })
                 } else {
+                    LaunchedEffect(PasswordResetState.isPendingReset.value) {
+                        if (PasswordResetState.isPendingReset.value) {
+                            navController.navigate("reset_password")
+                            PasswordResetState.isPendingReset.value = false
+                        }
+                    }
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") {
                             HomeScreen(
@@ -69,9 +74,13 @@ class MainActivity : ComponentActivity() {
                                         logoutUser()
                                         isLoggedIn = false
                                     }
-                                }
+                                },
+                                onEditProfile = { navController.navigate("edit_profile") },
+                                onHelpSupport = { navController.navigate("help_support") },
+                                onLanguage = { navController.navigate("language") }
                             )
                         }
+
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
@@ -79,15 +88,45 @@ class MainActivity : ComponentActivity() {
                                     isLoggedIn = true
                                     navController.popBackStack("home", inclusive = false)
                                 },
-                                onRegisterClick = { navController.navigate("register") }
+                                onRegisterClick = { navController.navigate("register") },
+                                onForgotPasswordClick = { navController.navigate("forgot_password") }
                             )
                         }
                         composable("register") {
                             RegisterScreen(
-                                onBackClick = { navController.popBackStack() }
+                                onBackClick = { navController.popBackStack() },
+                                onNavigateToTerms = { navController.navigate("terms") },
+                                onNavigateToPrivacy = { navController.navigate("privacy") }
+                            )
+                        }
+                        composable("terms") {
+                            TermsOfServiceScreen(onBackClick = { navController.popBackStack() })
+                        }
+                        composable("privacy") {
+                            PrivacyPolicyScreen(onBackClick = { navController.popBackStack() })
+                        }
+                        composable("forgot_password") {
+                            ForgotPasswordScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onResetComplete = {
+                                    isLoggedIn = false
+                                    navController.popBackStack("home", inclusive = false)
+                                }
+                            )
+                        }
+                        composable("reset_password") {
+                            ResetPasswordScreen(
+                                onDone = {
+                                    isLoggedIn = false
+                                    navController.popBackStack("home", inclusive = false)
+                                }
                             )
                         }
 
+                        // MainActivity.kt additions inside NavHost
+                        composable("edit_profile") { EditProfileScreen(onBackClick = { navController.popBackStack() }) }
+                        composable("help_support") { HelpSupportScreen(onBackClick = { navController.popBackStack() }) }
+                        composable("language") { LanguageScreen(onBackClick = { navController.popBackStack() }) }
                     }
                 }
             }
@@ -107,12 +146,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?) {
-        intent?.data?.let { uri ->
-            android.util.Log.d("DeepLinkTest", "Received URI: $uri")
+        intent?.data?.let {
             lifecycleScope.launch {
                 try {
                     supabase.handleDeeplinks(intent)
-                    android.util.Log.d("DeepLinkTest", "handleDeeplinks completed successfully")
                 } catch (e: Exception) {
                     android.util.Log.e("DeepLinkTest", "handleDeeplinks failed: ${e.message}", e)
                 }

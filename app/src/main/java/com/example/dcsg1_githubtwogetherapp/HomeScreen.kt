@@ -68,6 +68,22 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.rememberDatePickerState
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
@@ -224,11 +240,13 @@ fun LocationSelector(
 }
 
 @Composable
-fun WeddingDateCard(onSetDateClick: () -> Unit) {
+fun WeddingDateCard(onSetDateClick: () -> Unit, onGuestListClick: () -> Unit) {
+    val dateMillis = WeddingSession.weddingDateMillis.value
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)   // was 200.dp — taller card
+            .height(220.dp)
             .padding(16.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFFFDECD8))
@@ -240,37 +258,38 @@ fun WeddingDateCard(onSetDateClick: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .width(180.dp)   // was 150.dp — wider image
+                .width(180.dp)
                 .clip(RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
         )
 
-        // Text + button — top left, stacked
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Set your wedding date",
-                fontSize = 18.sp,
-                color = Color(0xFFB5722C)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Let's set your wedding date\nto see your countdown!",
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
+            if (dateMillis == null) {
+                Text("Set your wedding date", fontSize = 18.sp, color = Color(0xFFB5722C))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Let's set your wedding date\nto see your countdown!",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            } else {
+                Text("Your Wedding Day", fontSize = 18.sp, color = Color(0xFFB5722C))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(formatWeddingDate(dateMillis), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text("${daysUntil(dateMillis)} days to go!", fontSize = 12.sp, color = Color.Gray)
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onSetDateClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
             ) {
-                Text("Set Wedding Date", fontSize = 12.sp)
+                Text(if (dateMillis == null) "Set Wedding Date" else "Change Date", fontSize = 12.sp)
             }
         }
 
-        // Guestlist pill — floats near bottom right
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -278,6 +297,7 @@ fun WeddingDateCard(onSetDateClick: () -> Unit) {
                 .padding(end = 12.dp, bottom = 12.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color.White)
+                .clickable { onGuestListClick() }
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Icon(
@@ -289,7 +309,7 @@ fun WeddingDateCard(onSetDateClick: () -> Unit) {
             Spacer(modifier = Modifier.width(6.dp))
             Text(text = "Guestlist", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(6.dp))
-            Text(text = "0", fontSize = 12.sp, color = Color.Black)
+            Text(text = "${WeddingSession.guestList.value.size}", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
@@ -443,13 +463,43 @@ fun VendorCard(vendor: Vendor) {
 fun HomeScreen(
     isLoggedIn: Boolean,
     onNavigateToLogin: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onEditProfile: () -> Unit,
+    onHelpSupport: () -> Unit,
+    onLanguage: () -> Unit
 ) {
     var selectedArea by remember { mutableStateOf("George Town") }
     var selectedState by remember { mutableStateOf("Penang") }
     var selectedTab by remember { mutableStateOf(0) }
     var showLoginDialog by remember { mutableStateOf(false) }
     var showWelcomeBack by remember { mutableStateOf(false) }
+    var showSetBudgetDialog by remember { mutableStateOf(false) }
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    var showGuestListDialog by remember { mutableStateOf(false) }
+
+    if (showDatePickerDialog) {
+        SetWeddingDateDialog(
+            onDismiss = { showDatePickerDialog = false },
+            onConfirm = { millis ->
+                WeddingSession.weddingDateMillis.value = millis
+                showDatePickerDialog = false
+            }
+        )
+    }
+
+    if (showGuestListDialog) {
+        GuestListDialog(onDismiss = { showGuestListDialog = false })
+    }
+
+    if (showSetBudgetDialog) {
+        SetBudgetDialog(
+            onDismiss = { showSetBudgetDialog = false },
+            onConfirm = { amount ->
+                BudgetSession.totalBudget.value = amount
+                showSetBudgetDialog = false
+            }
+        )
+    }
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn && UserSession.currentUser.value != null) {
@@ -479,42 +529,56 @@ fun HomeScreen(
             BottomNavBar(selectedIndex = selectedTab, onItemSelected = { selectedTab = it })
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            HomeTopBar()
-            if (isLoggedIn) {
-                Text(
-                    text = "Logout (temporary for testing)",
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clickable { onLogout() }
+        if (selectedTab == 4) {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                ProfileScreen(
+                    onLogout = onLogout,
+                    onEditProfile = onEditProfile,
+                    onHelpSupport = onHelpSupport,
+                    onLanguage = onLanguage
                 )
             }
-            LocationSelector(
-                selectedArea = selectedArea,
-                selectedState = selectedState,
-                onLocationChosen = { area, state ->
-                    selectedArea = area
-                    selectedState = state
-                }
-            )
-            WeddingDateCard(
-                onSetDateClick = {
-                    if (isLoggedIn) {
-                        // TODO: open real date picker later
-                    } else {
-                        showLoginDialog = true
+        } else {
+            Column(
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                HomeTopBar()
+                LocationSelector(
+                    selectedArea = selectedArea,
+                    selectedState = selectedState,
+                    onLocationChosen = { area, state ->
+                        selectedArea = area
+                        selectedState = state
                     }
+                )
+                WeddingDateCard(
+                    onSetDateClick = {
+                        if (isLoggedIn) {
+                            showDatePickerDialog = true
+                        } else {
+                            showLoginDialog = true
+                        }
+                    },
+                    onGuestListClick = {
+                        if (isLoggedIn) {
+                            showGuestListDialog = true
+                        } else {
+                            showLoginDialog = true
+                        }
+                    }
+                )
+                QuickActionsGrid()
+                FeaturedVendorsSection(currentArea = selectedArea)
+                if (isLoggedIn) {
+                    BudgetPlannerCard(
+                        onSetBudgetClick = { showSetBudgetDialog = true },
+                        onViewDetailsClick = { /* TODO: full budget page later */ }
+                    )
                 }
-            )
-            QuickActionsGrid()
-            FeaturedVendorsSection(currentArea = selectedArea)
+            }
         }
     }
 }
@@ -628,24 +692,300 @@ fun LoginRequiredDialog(
 
 @Composable
 fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Welcome back, $userName! 🎉") },
-        text = { Text("Great to see you again — let's continue planning your dream wedding.") },
-        confirmButton = {
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .padding(28.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFDECD8)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = Color(0xFFB5722C),
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Login Successful",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "Welcome, $userName!",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFB5722C),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Your wedding journey starts here.",
+                fontSize = 13.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             Button(
                 onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Done")
+            }
+        }
+    }
+}
+
+@Composable
+fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .border(1.dp, Color(0xFFEFE0D0), RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Text("Budget Planner", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(
+            text = "Track your budget and plan smartly",
+            fontSize = 12.sp,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (BudgetSession.totalBudget.value <= 0) {
+            Text(
+                text = "You haven't set a budget yet.",
+                fontSize = 13.sp,
+                color = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(
+                onClick = onSetBudgetClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("Set Your Budget", fontSize = 13.sp)
+            }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(90.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Canvas(modifier = Modifier.size(90.dp)) {
+                        val strokeWidth = 10.dp.toPx()
+                        drawArc(
+                            color = Color(0xFFF0E4D8),
+                            startAngle = -90f,
+                            sweepAngle = 360f,
+                            useCenter = false,
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                            size = Size(size.width - strokeWidth, size.height - strokeWidth),
+                            topLeft = androidx.compose.ui.geometry.Offset(strokeWidth / 2, strokeWidth / 2)
+                        )
+                        drawArc(
+                            color = Color(0xFFB5722C),
+                            startAngle = -90f,
+                            sweepAngle = 360f * (BudgetSession.percentageUsed / 100f),
+                            useCenter = false,
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                            size = Size(size.width - strokeWidth, size.height - strokeWidth),
+                            topLeft = androidx.compose.ui.geometry.Offset(strokeWidth / 2, strokeWidth / 2)
+                        )
+                    }
+                    Text(
+                        text = "${BudgetSession.percentageUsed}%\nUsed",
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
+                    Text(
+                        text = "Total Budget",
+                        fontSize = 11.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "RM ${"%,.0f".format(BudgetSession.totalBudget.value)}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LegendDot(color = Color(0xFFB5722C), label = "Used: RM ${"%,.0f".format(BudgetSession.usedBudget.value)}")
+                    LegendDot(color = Color(0xFFF0E4D8), label = "Remaining: RM ${"%,.0f".format(BudgetSession.remainingBudget)}")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            OutlinedButton(
+                onClick = onViewDetailsClick,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("View Details", color = Color(0xFFB5722C))
+                Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = Color(0xFFB5722C))
+            }
+        }
+    }
+}
+
+@Composable
+fun LegendDot(color: Color, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(text = label, fontSize = 11.sp, color = Color.Gray)
+    }
+}
+
+@Composable
+fun SetBudgetDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
+    var budgetInput by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Set Your Wedding Budget") },
+        text = {
+            OutlinedTextField(
+                value = budgetInput,
+                onValueChange = { budgetInput = it },
+                placeholder = { Text("e.g. 70000") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val amount = budgetInput.toDoubleOrNull()
+                    if (amount != null && amount > 0) {
+                        onConfirm(amount)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
             ) {
-                Text("Continue")
+                Text("Confirm")
             }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
 }
 
+@Composable
+fun SetWeddingDateDialog(onDismiss: () -> Unit, onConfirm: (Long) -> Unit) {
+    val datePickerState = rememberDatePickerState()
 
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { onConfirm(it) }
+            }) { Text("Confirm", color = Color(0xFFB5722C)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
 
+fun formatWeddingDate(millis: Long): String {
+    val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+    return sdf.format(Date(millis))
+}
 
+fun daysUntil(millis: Long): Long {
+    val today = System.currentTimeMillis()
+    return ((millis - today) / (1000 * 60 * 60 * 24)).coerceAtLeast(0)
+}
+
+@Composable
+fun GuestListDialog(onDismiss: () -> Unit) {
+    var newGuestName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Guest List (${WeddingSession.guestList.value.size})") },
+        text = {
+            Column {
+                LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
+                    items(WeddingSession.guestList.value) { guest ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                        ) {
+                            Text(guest, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                            Icon(
+                                Icons.Filled.Close,
+                                contentDescription = "Remove",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(18.dp).clickable {
+                                    WeddingSession.guestList.value =
+                                        WeddingSession.guestList.value.filter { it != guest }
+                                }
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = newGuestName,
+                        onValueChange = { newGuestName = it },
+                        placeholder = { Text("Guest name") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = {
+                        if (newGuestName.isNotBlank()) {
+                            WeddingSession.guestList.value = WeddingSession.guestList.value + newGuestName.trim()
+                            newGuestName = ""
+                        }
+                    }) {
+                        Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color(0xFFB5722C))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))) {
+                Text("Done")
+            }
+        }
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -653,7 +993,10 @@ fun HomeScreenPreview() {
     HomeScreen(
         isLoggedIn = false,
         onNavigateToLogin = {},
-        onLogout = {}
+        onLogout = {},
+        onEditProfile = {},
+        onHelpSupport = {},
+        onLanguage = {}
     )
 }
 
@@ -663,7 +1006,16 @@ fun HomeScreenLoggedInPreview() {
     HomeScreen(
         isLoggedIn = true,
         onNavigateToLogin = {},
-        onLogout = {}
+        onLogout = {},
+        onEditProfile = {},
+        onHelpSupport = {},
+        onLanguage = {}
     )
 }
+
+
+
+
+
+
 
