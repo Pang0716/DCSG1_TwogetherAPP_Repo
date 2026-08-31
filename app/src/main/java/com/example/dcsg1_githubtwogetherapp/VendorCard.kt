@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
@@ -157,40 +158,51 @@ fun BrowseVendorsScreen(
     modifier: Modifier = Modifier
 ) {
     var query by remember { mutableStateOf("") }
-    val categories =
-        listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire")
+    val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire")
     var selectedCategory by remember { mutableStateOf("All") }
+    var selectedTab by remember { mutableStateOf(1) }
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .background(Color(0xFFFDF8F3))
-    ) {
-        BrowseVendorsTopBar(onBackClick = onBackClick)
-        VendorSearchBar(query = query, onQueryChange = { query = it })
-
-        Spacer(Modifier.height(8.dp))
-
-        LocationAndFilterRow(
-            location = "George Town, Penang",
-            onLocationClick = { },
-            onFilterClick = { }
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        CategoryFilterRow(
-            categories = categories,
-            selectedCategory = selectedCategory,
-            onCategorySelected = { selectedCategory = it }
-        )
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(
+                selectedIndex = selectedTab,
+                onItemSelected = { selectedTab = it }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Color(0xFFFDF8F3))
         ) {
-            items(vendors, key = { it.name }) { vendor ->
-                VendorCard(vendor = vendor, onClick = { onVendorClick(vendor) })
+            BrowseVendorsTopBar(onBackClick = onBackClick)
+            VendorSearchBar(query = query, onQueryChange = { query = it })
+
+            Spacer(Modifier.height(8.dp))
+
+            LocationAndFilterRow(
+                location = "George Town, Penang",
+                onLocationClick = { },
+                onFilterClick = { }
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            CategoryFilterRow(
+                categories = categories,
+                selectedCategory = selectedCategory,
+                onCategorySelected = { selectedCategory = it }
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(vendors, key = { it.name }) { vendor ->
+                    VendorCard(vendor = vendor, onClick = { onVendorClick(vendor) })
+                }
             }
         }
     }
@@ -209,14 +221,6 @@ fun BrowseVendorsTopBar(onBackClick: () -> Unit) {
             fontSize = 17.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
-        )
-
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .clickable { onBackClick() }
         )
     }
 }
