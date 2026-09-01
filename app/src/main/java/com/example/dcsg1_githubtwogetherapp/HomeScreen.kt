@@ -412,7 +412,8 @@ fun HomeScreen(
     onEditProfile: () -> Unit,
     onHelpSupport: () -> Unit,
     onLanguage: () -> Unit,
-    onVendorClick: (Vendor) -> Unit
+    onVendorClick: (Vendor) -> Unit,
+    onProceedToPayment: () -> Unit          // ← new
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -482,13 +483,13 @@ fun HomeScreen(
                 )
             }
         } else if (selectedTab == 3) {
-        Box(modifier = Modifier.padding(innerPadding)) {
-            CartScreen(
-                onBackClick = { onTabSelected(0) },
-                onProceedToPayment = { /* TODO: next step — Payment screen */ }
-            )
-        }
-    } else if (selectedTab == 4) {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                CartScreen(
+                    onBackClick = { onTabSelected(0) },
+                    onProceedToPayment = onProceedToPayment   // ← was the TODO lambda
+                )
+            }
+        } else if (selectedTab == 4) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 ProfileScreen(
                     isLoggedIn = isLoggedIn,
@@ -965,7 +966,8 @@ fun HomeScreenPreview() {
         onEditProfile = {},
         onHelpSupport = {},
         onLanguage = {},
-        onVendorClick = {}
+        onVendorClick = {},
+        onProceedToPayment = {}          // ← new
     )
 }
 
@@ -981,7 +983,8 @@ fun HomeScreenLoggedInPreview() {
         onEditProfile = {},
         onHelpSupport = {},
         onLanguage = {},
-        onVendorClick = {}
+        onVendorClick = {},
+        onProceedToPayment = {}          // ← new
     )
 }
 

@@ -24,6 +24,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FacebookSdk.sdkInitialize(applicationContext)
+
+        // Apply saved language on every app launch
+        val savedLangCode = LanguagePreferences.getSavedLanguage(this)
+        val locale = java.util.Locale(savedLangCode)
+        java.util.Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
         enableEdgeToEdge()
         handleDeepLink(intent)
         setContent {
@@ -74,20 +83,15 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             HomeScreen(
                                 isLoggedIn = isLoggedIn,
-                                selectedTab = selectedHomeTab,                        // ← 新加
-                                onTabSelected = { selectedHomeTab = it },              // ← 新加
+                                selectedTab = selectedHomeTab,
+                                onTabSelected = { selectedHomeTab = it },
                                 onNavigateToLogin = { navController.navigate("login") },
-                                onLogout = {
-                                    scope.launch {
-                                        logoutUser()
-                                        isLoggedIn = false
-                                    }
-                                },
+                                onLogout = { scope.launch { logoutUser(); isLoggedIn = false } },
                                 onEditProfile = { navController.navigate("edit_profile") },
                                 onHelpSupport = { navController.navigate("help_support") },
                                 onLanguage = { navController.navigate("language") },
-                                onVendorClick = { vendor ->
-                                    navController.navigate("vendorDetail/${vendor.name}") }
+                                onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") },
+                                onProceedToPayment = { navController.navigate("payment") }
                             )
                         }
 
@@ -164,6 +168,13 @@ class MainActivity : ComponentActivity() {
                                     onBackClick = { navController.popBackStack() }
                                 )
                             }
+                        }
+
+                        composable("payment") {
+                            PaymentScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onPayNowClick = { /* TODO: next step — confirmation screen */ }
+                            )
                         }
                     }
                 }

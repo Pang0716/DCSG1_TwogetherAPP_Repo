@@ -25,6 +25,15 @@ fun LanguageScreen(onBackClick: () -> Unit) {
     val languages = listOf("English", "Bahasa Malaysia", "中文")
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        val savedCode = LanguagePreferences.getSavedLanguage(context)
+        AppLanguage.selected.value = when (savedCode) {
+            "zh" -> "中文"
+            "ms" -> "Bahasa Malaysia"
+            else -> "English"
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(Color.White).padding(24.dp)) {
         Spacer(modifier = Modifier.height(20.dp))
         Icon(Icons.Filled.ArrowBack, contentDescription = "Back", modifier = Modifier.size(24.dp).clickable { onBackClick() })
@@ -59,12 +68,13 @@ fun LanguageScreen(onBackClick: () -> Unit) {
 }
 
 fun setAppLocale(context: android.content.Context, languageCode: String) {
+    LanguagePreferences.saveLanguage(context, languageCode)   // ← save it first
+
     val locale = java.util.Locale(languageCode)
     java.util.Locale.setDefault(locale)
     val config = context.resources.configuration
     config.setLocale(locale)
     context.resources.updateConfiguration(config, context.resources.displayMetrics)
 
-    // Force the screen to rebuild with the new language
     (context as? android.app.Activity)?.recreate()
 }
