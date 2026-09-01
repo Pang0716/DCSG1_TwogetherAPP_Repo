@@ -189,7 +189,7 @@ fun VendorDetailScreen(
                     Text("Chat", fontSize = 16.sp)
                 }
                 Button(
-                    onClick = {},
+                    onClick = { CartSession.addVendor(vendor) },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),

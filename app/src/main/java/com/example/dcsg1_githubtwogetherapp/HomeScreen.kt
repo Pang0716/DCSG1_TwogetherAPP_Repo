@@ -519,7 +519,21 @@ fun HomeScreen(
                     onBackClick = { onTabSelected(0) }
                 )
             }
-        } else if (selectedTab == 4) {
+        } else if (selectedTab == 2) {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                DesignScreen(
+                    onBackClick = { onTabSelected(0) },
+                    onCreateNowClick = { /* TODO: next step — invitation templates/editor */ }
+                )
+            }
+        } else if (selectedTab == 3) {
+        Box(modifier = Modifier.padding(innerPadding)) {
+            CartScreen(
+                onBackClick = { onTabSelected(0) },
+                onProceedToPayment = { /* TODO: next step — Payment screen */ }
+            )
+        }
+    } else if (selectedTab == 4) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 ProfileScreen(
                     isLoggedIn = isLoggedIn,
