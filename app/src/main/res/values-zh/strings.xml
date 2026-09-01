@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome">欢迎</string>
+    <string name="welcome_subtitle">让我们实现你的梦想婚礼 ✨</string>
+    <string name="email_label">电子邮件</string>
+    <string name="email_placeholder">请输入您的电子邮件</string>
+    <string name="password_label">密码</string>
+    <string name="password_placeholder">请输入您的密码</string>
+    <string name="forgot_password">忘记密码？</string>
+    <string name="login_button">登录</string>
+    <string name="or_continue_with">或使用以下方式继续</string>
+    <string name="no_account_yet">还没有账户？</string>
+    <string name="register_link">注册</string>
+</resources>

@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
                                 onLoginSuccess = {
                                     loadCurrentUserProfile()
                                     isLoggedIn = true
+                                    LoginEventState.showWelcomeMessage.value = true   // ← add this line
                                     navController.popBackStack("home", inclusive = false)
                                 },
                                 onRegisterClick = { navController.navigate("register") },

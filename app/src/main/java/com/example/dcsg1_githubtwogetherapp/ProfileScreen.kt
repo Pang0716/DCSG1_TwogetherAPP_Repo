@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -25,7 +26,9 @@ import coil.compose.AsyncImage
 
 @Composable
 fun ProfileScreen(
+    isLoggedIn: Boolean,
     onLogout: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onEditProfile: () -> Unit,
     onHelpSupport: () -> Unit,
     onLanguage: () -> Unit
@@ -40,19 +43,12 @@ fun ProfileScreen(
             text = { Text("Are you sure you want to log out?") },
             confirmButton = {
                 Button(
-                    onClick = {
-                        showLogoutConfirm = false
-                        onLogout()
-                    },
+                    onClick = { showLogoutConfirm = false; onLogout() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                ) {
-                    Text("Log Out")
-                }
+                ) { Text("Log Out") }
             },
             dismissButton = {
-                TextButton(onClick = { showLogoutConfirm = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showLogoutConfirm = false }) { Text("Cancel") }
             }
         )
     }
@@ -71,7 +67,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (user?.avatarUrl != null) {
+            if (isLoggedIn && user?.avatarUrl != null) {
                 AsyncImage(
                     model = user.avatarUrl,
                     contentDescription = "Profile photo",
@@ -89,38 +85,46 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = user?.fullName ?: "Guest",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Text(
-                text = user?.email ?: "",
-                fontSize = 13.sp,
-                color = Color.Gray
-            )
+            if (isLoggedIn) {
+                Text(user?.fullName ?: "User", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(user?.email ?: "", fontSize = 13.sp, color = Color.Gray)
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { /* TODO: edit profile later */ }
-            ) {
-                Icon(Icons.Filled.Edit, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(14.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Edit", fontSize = 12.sp, color = Color(0xFFB5722C))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onEditProfile() }
+                ) {
+                    Icon(Icons.Filled.Edit, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Edit", fontSize = 12.sp, color = Color(0xFFB5722C))
+                }
+            } else {
+                Text("Guest", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text("Not logged in", fontSize = 13.sp, color = Color.Gray)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = onNavigateToLogin,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text("Login / Register", fontSize = 13.sp)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { }
-        ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { }
+        if (isLoggedIn) {
+            ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { }
+            ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { }
+        }
         ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { onHelpSupport() }
         ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { onLanguage() }
-        ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") {
-            showLogoutConfirm = true   // ← changed: opens confirmation instead of logging out directly
+        if (isLoggedIn) {
+            ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") { showLogoutConfirm = true }
         }
     }
 }

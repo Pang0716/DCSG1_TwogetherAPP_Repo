@@ -84,6 +84,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.material3.SelectableDates
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
@@ -472,7 +473,6 @@ fun HomeScreen(
     var selectedState by remember { mutableStateOf("Penang") }
     var selectedTab by remember { mutableStateOf(0) }
     var showLoginDialog by remember { mutableStateOf(false) }
-    var showWelcomeBack by remember { mutableStateOf(false) }
     var showSetBudgetDialog by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showGuestListDialog by remember { mutableStateOf(false) }
@@ -501,16 +501,10 @@ fun HomeScreen(
         )
     }
 
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn && UserSession.currentUser.value != null) {
-            showWelcomeBack = true
-        }
-    }
-
-    if (showWelcomeBack) {
+    if (LoginEventState.showWelcomeMessage.value) {
         WelcomeBackDialog(
             userName = UserSession.currentUser.value?.fullName ?: "there",
-            onDismiss = { showWelcomeBack = false }
+            onDismiss = { LoginEventState.showWelcomeMessage.value = false }
         )
     }
 
@@ -532,7 +526,9 @@ fun HomeScreen(
         if (selectedTab == 4) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 ProfileScreen(
+                    isLoggedIn = isLoggedIn,
                     onLogout = onLogout,
+                    onNavigateToLogin = onNavigateToLogin,
                     onEditProfile = onEditProfile,
                     onHelpSupport = onHelpSupport,
                     onLanguage = onLanguage
@@ -903,7 +899,15 @@ fun SetBudgetDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
 
 @Composable
 fun SetWeddingDateDialog(onDismiss: () -> Unit, onConfirm: (Long) -> Unit) {
-    val datePickerState = rememberDatePickerState()
+    val today = System.currentTimeMillis()
+
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= today
+            }
+        }
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,

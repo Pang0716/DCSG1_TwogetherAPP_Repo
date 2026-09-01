@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome">Selamat Datang</string>
+    <string name="welcome_subtitle">Mari wujudkan perkahwinan impian anda ✨</string>
+    <string name="email_label">Emel</string>
+    <string name="email_placeholder">Masukkan emel anda</string>
+    <string name="password_label">Kata Laluan</string>
+    <string name="password_placeholder">Masukkan kata laluan anda</string>
+    <string name="forgot_password">Lupa Kata Laluan?</string>
+    <string name="login_button">Log Masuk</string>
+    <string name="or_continue_with">atau teruskan dengan</string>
+    <string name="no_account_yet">Belum ada akaun? </string>
+    <string name="register_link">Daftar</string>
+</resources>

@@ -46,6 +46,7 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LoginScreen(
@@ -143,13 +144,13 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(80.dp))  // was 80.dp
 
             Text(
-                text = "Welcome",
+                text = stringResource(R.string.welcome),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
             Text(
-                text = "Let's make your dream\nwedding come true ✨",
+                text = stringResource(R.string.welcome_subtitle),
                 fontSize = 13.sp,
                 color = Color.Gray,
                 lineHeight = 18.sp
@@ -157,12 +158,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))  // was 32.dp
 
-            Text(text = "Email", fontSize = 13.sp, color = Color.Black)
+            Text(text = stringResource(R.string.email_label), fontSize = 13.sp, color = Color.Black)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Enter your email") },
+                placeholder = { Text(stringResource(R.string.email_placeholder)) },
                 leadingIcon = {
                     Icon(Icons.Filled.Email, contentDescription = null, tint = Color(0xFFB5722C))
                 },
@@ -178,12 +179,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Password", fontSize = 13.sp, color = Color.Black)
+            Text(text = stringResource(R.string.password_label), fontSize = 13.sp, color = Color.Black)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("Enter your password") },
+                placeholder = { Text(stringResource(R.string.password_placeholder)) },
                 leadingIcon = {
                     Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C))
                 },
@@ -208,7 +209,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Forgot Password?",
+                text = stringResource(R.string.forgot_password),
                 fontSize = 12.sp,
                 color = Color(0xFFB5722C),
                 modifier = Modifier
@@ -243,7 +244,7 @@ fun LoginScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
                 } else {
-                    Text("Login", fontSize = 16.sp)
+                    Text(stringResource(R.string.login_button), fontSize = 16.sp)
                 }
             }
 
@@ -252,7 +253,7 @@ fun LoginScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
                 Text(
-                    text = "  or continue with  ",
+                    text = "  " + stringResource(R.string.or_continue_with) + "  ",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
@@ -313,9 +314,9 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Don't have an account yet? ", fontSize = 13.sp, color = Color.Gray)
+                Text(stringResource(R.string.no_account_yet), fontSize = 13.sp, color = Color.Gray)
                 Text(
-                    text = "Register",
+                    text = stringResource(R.string.register_link),
                     fontSize = 13.sp,
                     color = Color(0xFFB5722C),
                     fontWeight = FontWeight.Bold,

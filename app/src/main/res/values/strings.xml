@@ -1,6 +1,18 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">DCSG1_GithubTwogetherAPP</string>
     <string name="facebook_app_id">905985392175863</string>
     <string name="fb_login_protocol_scheme">fb905985392175863</string>
     <string name="facebook_client_token">c730909ffcf2a078f8ce5e7890d4f1a7</string>
+    <string name="welcome">Welcome</string>
+    <string name="welcome_subtitle">Let\'s make your dream wedding come true ✨</string>
+    <string name="email_label">Email</string>
+    <string name="email_placeholder">Enter your email</string>
+    <string name="password_label">Password</string>
+    <string name="password_placeholder">Enter your password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login_button">Login</string>
+    <string name="or_continue_with">or continue with</string>
+    <string name="no_account_yet">Don\'t have an account yet? </string>
+    <string name="register_link">Register</string>
 </resources>
