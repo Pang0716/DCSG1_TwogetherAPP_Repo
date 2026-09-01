@@ -33,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,9 +42,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -157,7 +153,7 @@ fun BrowseVendorsScreen(
     modifier: Modifier = Modifier
 ) {
     var query by remember { mutableStateOf("") }
-    val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire")
+    val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire","Deco")
     var selectedCategory by remember { mutableStateOf("All") }
     var selectedState by remember { mutableStateOf("Penang") }
     val filteredVendors = vendors.filter { vendor ->

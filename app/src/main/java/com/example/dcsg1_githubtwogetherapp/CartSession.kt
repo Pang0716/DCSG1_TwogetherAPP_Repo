@@ -3,6 +3,7 @@ package com.example.dcsg1_githubtwogetherapp
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
+
 data class CartItem(
     val vendor: Vendor,
     val isChecked: MutableState<Boolean> = mutableStateOf(true)

@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.WorkspacePremium
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -40,8 +41,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,16 +53,55 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+
+// ===== 套餐数据结构 =====
+data class PackageOption(
+    val name: String,
+    val price: String,
+    val items: List<String>
+)
+
+fun generatePackages(vendor: Vendor): List<PackageOption> {
+    val basePrice = vendor.priceFrom.filter { it.isDigit() }.toIntOrNull() ?: 1000
+    return listOf(
+        PackageOption(
+            name = "Basic",
+            price = "RM$basePrice",
+            items = listOf("Standard service", "Basic consultation", "1 revision")
+        ),
+        PackageOption(
+            name = "Standard",
+            price = "RM${(basePrice * 1.5).toInt()}",
+            items = listOf("Extended service", "Priority consultation", "3 revisions", "Extra add-ons")
+        ),
+        PackageOption(
+            name = "Premium",
+            price = "RM${(basePrice * 2).toInt()}",
+            items = listOf(
+                "Full premium service",
+                "Unlimited consultation",
+                "Unlimited revisions",
+                "All add-ons included",
+                "Priority support"
+            )
+        )
+    )
+}
+
+// ===== Reviews 数据结构 =====
+data class SampleReview(val name: String, val rating: Int, val comment: String)
 
 @Composable
 fun VendorInfoCard(
@@ -147,7 +189,7 @@ fun VendorDetailTopBar(onBackClick: () -> Unit) {
         Text("Vendor Details", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(Icons.Filled.Share, contentDescription = "Share")
-            Icon(Icons.Filled.FavoriteBorder, contentDescription = "Favorite")
+            Icon(Icons.Filled.FavoriteBorder, contentDescription = "Favorite")   // 加回这一行
         }
     }
 }
@@ -161,6 +203,10 @@ fun VendorDetailScreen(
     var selectedTab by remember { mutableStateOf("About") }
     val tabs = listOf("About", "Packages", "Photos", "Reviews")
 
+    var showPackageDialog by remember { mutableStateOf(false) }
+    var selectedPackage by remember { mutableStateOf<PackageOption?>(null) }
+    val packages = remember(vendor) { generatePackages(vendor) }
+
     Scaffold(
         containerColor = Color(0xFFFDF8F3),
         topBar = { VendorDetailTopBar(onBackClick = onBackClick) },
@@ -169,7 +215,7 @@ fun VendorDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFFDF8F3))
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedButton(
@@ -187,7 +233,7 @@ fun VendorDetailScreen(
                     Text("Chat", fontSize = 16.sp)
                 }
                 Button(
-                    onClick = { CartSession.addVendor(vendor) },
+                    onClick = { showPackageDialog = true },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),
@@ -211,101 +257,96 @@ fun VendorDetailScreen(
                 .background(Color(0xFFFDF8F3))
                 .verticalScroll(rememberScrollState())
         ) {
-            // 图片区域：只保留一个收藏按钮，返回按钮在topBar，这里不再重复
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
-                    .padding(horizontal = 16.dp)
+                    .padding(16.dp)
+                    .height(240.dp)
+                    .clip(RoundedCornerShape(24.dp))
             ) {
                 if (vendor.imageResId != null) {
                     Image(
                         painter = painterResource(id = vendor.imageResId),
                         contentDescription = vendor.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp))
+                        modifier = Modifier.fillMaxSize()
                     )
                 } else if (vendor.imageUrl != null) {
                     AsyncImage(
                         model = vendor.imageUrl,
                         contentDescription = vendor.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
+                        modifier = Modifier.fillMaxSize()
                     )
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFFF2F2F2)),
+                        modifier = Modifier.fillMaxSize().background(Color(0xFFF2F2F2)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(Icons.Filled.Image, contentDescription = null, tint = Color.Gray)
                     }
                 }
 
-                IconButton(
-                    onClick = {},
+                // 底部渐变，让文字更清晰
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(10.dp)
-                        .background(Color.White, CircleShape)
-                ) {
-                    Icon(Icons.Filled.FavoriteBorder, contentDescription = "Favorite")
-                }
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
+                                startY = 300f
+                            )
+                        )
+                )
 
                 Text(
-                    text = "1/20",
+                    text = "1/10",
                     fontSize = 11.sp,
                     color = Color.White,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.TopEnd)
                         .padding(10.dp)
                         .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        vendor.name,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = Color(0xFFF5A623),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            "${vendor.rating} (${vendor.reviewCount} reviews)",
+                            fontSize = 13.sp,
+                            color = Color.White
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "• ${vendor.locationArea}, ${vendor.locationState}",
+                            fontSize = 13.sp,
+                            color = Color.White
+                        )
+                    }
+                }
             }
 
             Column(modifier = Modifier.padding(16.dp)) {
-
-                Text(
-                    vendor.name,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFF5A623),
-                        modifier = Modifier.size(17.dp)
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "${vendor.rating} (${vendor.reviewCount} reviews)",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Icon(
-                        Icons.Filled.LocationOn,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(15.dp)
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    Text(
-                        "${vendor.locationArea}, ${vendor.locationState}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-                Text("From ${vendor.priceFrom}", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-
-                Spacer(Modifier.height(18.dp))
 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     tabs.forEach { tab ->
@@ -328,7 +369,7 @@ fun VendorDetailScreen(
                             Spacer(Modifier.height(4.dp))
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxWidth()
                                     .height(2.dp)
                                     .background(if (tab == selectedTab) Color(0xFFB5722C) else Color.Transparent)
                             )
@@ -339,80 +380,216 @@ fun VendorDetailScreen(
 
                 Spacer(Modifier.height(18.dp))
 
-                //VendorInfoCard + About
-                if (selectedTab == "About") {
-                    VendorInfoCard(
-                        capacity = vendor.capacity,
-                        priceRange = vendor.priceFrom,
-                        highlights = vendor.highlights
-                    )
-
-                    Spacer(Modifier.height(22.dp))
-
-                    Text(
-                        "About ${vendor.name}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        "A luxurious wedding venue in the heart of Penang. We provide elegant settings, halal catering and customizable packages to make your big day unforgettable.",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        lineHeight = 22.sp
-                    )
-                } else {
-                    Text(
-                        "$selectedTab content coming soon",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-
-                //Location
-                Spacer(Modifier.height(22.dp))
-                Text("Location", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row {
-                        Icon(
-                            Icons.Filled.LocationOn,
-                            contentDescription = null,
-                            tint = Color(0xFFB5722C),
-                            modifier = Modifier.size(18.dp)
+                when (selectedTab) {
+                    "About" -> {
+                        VendorInfoCard(
+                            capacity = vendor.capacity,
+                            priceRange = vendor.priceFrom,
+                            highlights = vendor.highlights
                         )
-                        Spacer(Modifier.width(6.dp))
-                        Column {
-                            Text(
-                                vendor.name,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                "${vendor.locationArea}, ${vendor.locationState}",
-                                fontSize = 13.sp,
-                                color = Color.Gray
-                            )
+
+                        Spacer(Modifier.height(22.dp))
+
+                        Text(
+                            "About ${vendor.name}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "A luxurious wedding venue in the heart of Penang. We provide elegant settings, halal catering and customizable packages to make your big day unforgettable.",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            lineHeight = 22.sp
+                        )
+
+                        Spacer(Modifier.height(22.dp))
+                        Text("Location", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row {
+                                Icon(
+                                    Icons.Filled.LocationOn,
+                                    contentDescription = null,
+                                    tint = Color(0xFFB5722C),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Column {
+                                    Text(vendor.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        "${vendor.locationArea}, ${vendor.locationState}",
+                                        fontSize = 13.sp,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("View Map", fontSize = 13.sp, color = Color(0xFFB5722C))
+                                Icon(
+                                    Icons.Filled.ChevronRight,
+                                    contentDescription = null,
+                                    tint = Color(0xFFB5722C),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(18.dp))
+
+                        AmenitiesSection(amenities = defaultAmenities)
+                    }
+
+                    "Packages" -> {
+                        packages.forEach { pkg ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(Color(0xFFFDF8F3))
+                                    .padding(16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(pkg.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        pkg.price,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFB5722C)
+                                    )
+                                }
+                                Spacer(Modifier.height(8.dp))
+                                pkg.items.forEach { item ->
+                                    Text(
+                                        "• $item",
+                                        fontSize = 13.sp,
+                                        color = Color.Gray,
+                                        modifier = Modifier.padding(vertical = 2.dp)
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("View Map", fontSize = 13.sp, color = Color(0xFFB5722C))
+                    "Photos" -> {
+                        PhotosGrid()
+                    }
+
+                    "Reviews" -> {
+                        ReviewsSection()
+                    }
+                }
+            }
+        }
+    }
+
+    // ===== 选套餐弹窗 =====
+    if (showPackageDialog) {
+        AlertDialog(
+            onDismissRequest = { showPackageDialog = false },
+            title = { Text("Select a Package") },
+            text = {
+                Column {
+                    packages.forEach { pkg ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = (selectedPackage == pkg),
+                                    onClick = { selectedPackage = pkg },
+                                    role = Role.RadioButton
+                                )
+                                .padding(vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = (selectedPackage == pkg), onClick = null)
+                            Spacer(Modifier.width(8.dp))
+                            Column {
+                                Text("${pkg.name} - ${pkg.price}", fontWeight = FontWeight.SemiBold)
+                                Text(pkg.items.joinToString(", "), fontSize = 11.sp, color = Color.Gray)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPackageDialog = false
+                        selectedPackage = null
+                    },
+                    enabled = selectedPackage != null
+                ) {
+                    Text("Add to Cart")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPackageDialog = false; selectedPackage = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun PhotosGrid() {
+    val columns = 3
+    val photoCount = 9
+    Column {
+        for (row in 0 until (photoCount / columns)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                for (col in 0 until columns) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFF2F2F2)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Image, contentDescription = null, tint = Color.Gray)
+                    }
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+        }
+    }
+}
+
+@Composable
+fun ReviewsSection() {
+    val reviews = listOf(
+        SampleReview("Aisha R.", 5, "Amazing service, everything was exactly as promised. Highly recommend!"),
+        SampleReview("Wei Ming T.", 4, "Great experience overall, minor delays but staff were very responsive."),
+        SampleReview("Nur Hafiza", 5, "Absolutely loved working with them for our big day. Will recommend to friends.")
+    )
+    Column {
+        reviews.forEach { review ->
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(review.name, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    repeat(review.rating) {
                         Icon(
-                            Icons.Filled.ChevronRight,
+                            Icons.Filled.Star,
                             contentDescription = null,
-                            tint = Color(0xFFB5722C),
-                            modifier = Modifier.size(16.dp)
+                            tint = Color(0xFFF5A623),
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
-                Spacer(Modifier.height(18.dp))
-
-                AmenitiesSection(amenities = defaultAmenities)
+                Spacer(Modifier.height(4.dp))
+                Text(review.comment, fontSize = 13.sp, color = Color.Gray)
             }
+            HorizontalDivider(color = Color(0xFFE8DFD3))
         }
     }
 }

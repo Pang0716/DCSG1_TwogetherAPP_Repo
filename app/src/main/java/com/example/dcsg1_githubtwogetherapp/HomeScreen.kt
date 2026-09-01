@@ -41,10 +41,7 @@ import androidx.compose.material.icons.outlined.Checkroom
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.foundation.layout.PaddingValues
-import coil.compose.AsyncImage
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -85,6 +82,7 @@ import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.SelectableDates
+
 
 data class QuickAction(val label: String, val icon: ImageVector)
 
@@ -362,7 +360,10 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FeaturedVendorsSection(currentArea: String) {
+fun FeaturedVendorsSection(
+    currentArea: String,
+    onVendorClick: (Vendor) -> Unit = {}
+) {
     val filteredVendors = sampleVendors.filter { it.locationState == currentArea }
 
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
@@ -391,62 +392,16 @@ fun FeaturedVendorsSection(currentArea: String) {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(filteredVendors) { vendor -> VendorCard(vendor) }
+                items(filteredVendors) { vendor ->
+                    VendorCard(
+                        vendor = vendor,
+                        onClick = { onVendorClick(vendor) }
+                    )
+                }
             }
         }
     }
 }
-
-@Composable
-fun VendorCard(vendor: Vendor) {
-    Column(
-        modifier = Modifier
-            .width(150.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .border(1.dp, Color(0xFFEFE0D0), RoundedCornerShape(12.dp))
-    ) {
-        if (vendor.imageUrl != null) {
-            AsyncImage(
-                model = vendor.imageUrl,
-                contentDescription = vendor.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                    .background(Color(0xFFFDECD8)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Image,
-                    contentDescription = null,
-                    tint = Color(0xFFB5722C)
-                )
-            }
-        }
-
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(vendor.name, fontSize = 12.sp, color = Color.Black, maxLines = 1)
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Star, contentDescription = null, tint = Color(0xFFF5A623), modifier = Modifier.size(12.dp))
-                Spacer(modifier = Modifier.width(2.dp))
-                Text("${vendor.rating} (${vendor.reviewCount})", fontSize = 10.sp, color = Color.Gray)
-            }
-            Spacer(modifier = Modifier.height(2.dp))
-            Text("From ${vendor.priceFrom}", fontSize = 11.sp, color = Color(0xFFB5722C))
-        }
-    }
-}
-
 @Composable
 fun HomeScreen(
     isLoggedIn: Boolean,
