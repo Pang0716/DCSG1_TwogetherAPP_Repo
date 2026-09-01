@@ -246,16 +246,6 @@ fun VendorDetailScreen(
                 }
 
                 IconButton(
-                    onClick = onBackClick,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(10.dp)
-                        .background(Color.White, CircleShape)
-                ) {
-                    Icon(Icons.Filled.ChevronLeft, contentDescription = "Back")
-                }
-
-                IconButton(
                     onClick = {},
                     modifier = Modifier
                         .align(Alignment.TopEnd)

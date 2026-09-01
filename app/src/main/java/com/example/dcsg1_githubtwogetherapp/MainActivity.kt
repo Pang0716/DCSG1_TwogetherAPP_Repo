@@ -7,9 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.dcsg1_githubtwogetherapp.ui.theme.DCSG1_GithubTwogetherAPPTheme
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -29,11 +31,12 @@ class MainActivity : ComponentActivity() {
                 var showSplash by remember { mutableStateOf(true) }
                 var isLoggedIn by remember { mutableStateOf(false) }
                 var sessionChecked by remember { mutableStateOf(false) }
+                var selectedHomeTab by remember { mutableStateOf(0) }
                 val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
-                supabase.auth.sessionStatus.collect { status ->
+                    supabase.auth.sessionStatus.collect { status ->
                         when (status) {
                             is SessionStatus.Authenticated -> {
                                 loadCurrentUserProfile()
@@ -46,11 +49,14 @@ class MainActivity : ComponentActivity() {
                                     navController.popBackStack("home", inclusive = false)
                                 }
                             }
+
                             is SessionStatus.NotAuthenticated -> {
                                 isLoggedIn = false
                                 sessionChecked = true
                             }
-                            else -> { /* still loading */ }
+
+                            else -> { /* still loading */
+                            }
                         }
                     }
                 }
@@ -68,6 +74,8 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             HomeScreen(
                                 isLoggedIn = isLoggedIn,
+                                selectedTab = selectedHomeTab,                        // ← 新加
+                                onTabSelected = { selectedHomeTab = it },              // ← 新加
                                 onNavigateToLogin = { navController.navigate("login") },
                                 onLogout = {
                                     scope.launch {
@@ -77,16 +85,20 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onEditProfile = { navController.navigate("edit_profile") },
                                 onHelpSupport = { navController.navigate("help_support") },
-                                onLanguage = { navController.navigate("language") }
+                                onLanguage = { navController.navigate("language") },
+                                onVendorClick = { vendor ->
+                                    navController.navigate("vendorDetail/${vendor.name}") }
                             )
                         }
+
 
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
                                     loadCurrentUserProfile()
                                     isLoggedIn = true
-                                    LoginEventState.showWelcomeMessage.value = true   // ← add this line
+                                    LoginEventState.showWelcomeMessage.value =
+                                        true   // ← add this line
                                     navController.popBackStack("home", inclusive = false)
                                 },
                                 onRegisterClick = { navController.navigate("register") },
@@ -128,16 +140,48 @@ class MainActivity : ComponentActivity() {
                         composable("edit_profile") { EditProfileScreen(onBackClick = { navController.popBackStack() }) }
                         composable("help_support") { HelpSupportScreen(onBackClick = { navController.popBackStack() }) }
                         composable("language") { LanguageScreen(onBackClick = { navController.popBackStack() }) }
+
+                        composable("browseVendors") {
+                            BrowseVendorsScreen(
+                                vendors = sampleVendors,
+                                onVendorClick = { vendor ->
+                                    navController.navigate("vendorDetail/${vendor.name}")
+                                },
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+                        composable(
+                            route = "vendorDetail/{vendorName}",
+                            arguments = listOf(navArgument("vendorName") {
+                                type = NavType.StringType
+                            })
+                        ) { backStackEntry ->
+                            val vendorName = backStackEntry.arguments?.getString("vendorName") ?: ""
+                            val vendor = sampleVendors.find { it.name == vendorName }
+                            if (vendor != null) {
+                                VendorDetailScreen(
+                                    vendor = vendor,
+                                    onBackClick = { navController.popBackStack() }
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
-        FacebookAuthManager.callbackManager.onActivityResult(requestCode, resultCode, data)
+        FacebookAuthManager.callbackManager.onActivityResult(
+            requestCode,
+            resultCode,
+            data
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -152,7 +196,11 @@ class MainActivity : ComponentActivity() {
                 try {
                     supabase.handleDeeplinks(intent)
                 } catch (e: Exception) {
-                    android.util.Log.e("DeepLinkTest", "handleDeeplinks failed: ${e.message}", e)
+                    android.util.Log.e(
+                        "DeepLinkTest",
+                        "handleDeeplinks failed: ${e.message}",
+                        e
+                    )
                 }
             }
         }

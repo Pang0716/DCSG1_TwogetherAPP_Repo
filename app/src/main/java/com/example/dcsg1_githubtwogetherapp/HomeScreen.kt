@@ -169,12 +169,10 @@ fun HomeTopBar() {
 
 @Composable
 fun LocationSelector(
-    selectedArea: String,
     selectedState: String,
-    onLocationChosen: (String, String) -> Unit
+    onStateChosen: (String) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var tempSelectedState by remember { mutableStateOf<WeddingState?>(null) }
 
     Row(
         modifier = Modifier
@@ -193,46 +191,33 @@ fun LocationSelector(
                 tint = Color.Gray,
                 modifier = Modifier.size(18.dp).padding(end = 6.dp)
             )
-            Text(text = "$selectedArea, $selectedState", fontSize = 14.sp, color = Color.Black)
+            Text(text = selectedState, fontSize = 14.sp, color = Color.Black)
         }
         Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Expand", tint = Color.Gray)
     }
 
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false; tempSelectedState = null },
-            title = { Text(tempSelectedState?.stateName ?: "Select a State") },
+            onDismissRequest = { showDialog = false },
+            title = { Text("Select a State") },
             text = {
                 LazyColumn {
-                    if (tempSelectedState == null) {
-                        items(malaysiaWeddingLocations) { state ->
-                            Text(
-                                text = state.stateName,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { tempSelectedState = state }
-                                    .padding(vertical = 12.dp)
-                            )
-                        }
-                    } else {
-                        items(tempSelectedState!!.areas) { area ->
-                            Text(
-                                text = area,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onLocationChosen(area, tempSelectedState!!.stateName)
-                                        showDialog = false
-                                        tempSelectedState = null
-                                    }
-                                    .padding(vertical = 12.dp)
-                            )
-                        }
+                    items(malaysiaWeddingLocations) { state ->
+                        Text(
+                            text = state.stateName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onStateChosen(state.stateName)
+                                    showDialog = false
+                                }
+                                .padding(vertical = 12.dp)
+                        )
                     }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showDialog = false; tempSelectedState = null }) {
+                TextButton(onClick = { showDialog = false }) {
                     Text("Cancel")
                 }
             }
@@ -378,11 +363,13 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
 
 @Composable
 fun FeaturedVendorsSection(currentArea: String) {
-    val filteredVendors = sampleVendors.filter { it.locationArea == currentArea }
+    val filteredVendors = sampleVendors.filter { it.locationState == currentArea }
 
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -463,15 +450,16 @@ fun VendorCard(vendor: Vendor) {
 @Composable
 fun HomeScreen(
     isLoggedIn: Boolean,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
     onNavigateToLogin: () -> Unit,
     onLogout: () -> Unit,
     onEditProfile: () -> Unit,
     onHelpSupport: () -> Unit,
-    onLanguage: () -> Unit
+    onLanguage: () -> Unit,
+    onVendorClick: (Vendor) -> Unit
 ) {
-    var selectedArea by remember { mutableStateOf("George Town") }
     var selectedState by remember { mutableStateOf("Penang") }
-    var selectedTab by remember { mutableStateOf(0) }
     var showLoginDialog by remember { mutableStateOf(false) }
     var showSetBudgetDialog by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -520,10 +508,18 @@ fun HomeScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavBar(selectedIndex = selectedTab, onItemSelected = { selectedTab = it })
+            BottomNavBar(selectedIndex = selectedTab, onItemSelected = onTabSelected)
         }
     ) { innerPadding ->
-        if (selectedTab == 4) {
+        if (selectedTab == 1) {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                BrowseVendorsScreen(
+                    vendors = sampleVendors,
+                    onVendorClick = onVendorClick,
+                    onBackClick = { onTabSelected(0) }
+                )
+            }
+        } else if (selectedTab == 4) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 ProfileScreen(
                     isLoggedIn = isLoggedIn,
@@ -543,35 +539,25 @@ fun HomeScreen(
             ) {
                 HomeTopBar()
                 LocationSelector(
-                    selectedArea = selectedArea,
                     selectedState = selectedState,
-                    onLocationChosen = { area, state ->
-                        selectedArea = area
+                    onStateChosen = { state ->
                         selectedState = state
                     }
                 )
                 WeddingDateCard(
                     onSetDateClick = {
-                        if (isLoggedIn) {
-                            showDatePickerDialog = true
-                        } else {
-                            showLoginDialog = true
-                        }
+                        if (isLoggedIn) showDatePickerDialog = true else showLoginDialog = true
                     },
                     onGuestListClick = {
-                        if (isLoggedIn) {
-                            showGuestListDialog = true
-                        } else {
-                            showLoginDialog = true
-                        }
+                        if (isLoggedIn) showGuestListDialog = true else showLoginDialog = true
                     }
                 )
                 QuickActionsGrid()
-                FeaturedVendorsSection(currentArea = selectedArea)
+                FeaturedVendorsSection(currentArea = selectedState)
                 if (isLoggedIn) {
                     BudgetPlannerCard(
                         onSetBudgetClick = { showSetBudgetDialog = true },
-                        onViewDetailsClick = { /* TODO: full budget page later */ }
+                        onViewDetailsClick = { }
                     )
                 }
             }
@@ -856,7 +842,10 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
 @Composable
 fun LegendDot(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Box(modifier = Modifier
+            .size(8.dp)
+            .clip(CircleShape)
+            .background(color))
         Spacer(modifier = Modifier.width(6.dp))
         Text(text = label, fontSize = 11.sp, color = Color.Gray)
     }
@@ -947,17 +936,21 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                     items(WeddingSession.guestList.value) { guest ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
                         ) {
                             Text(guest, fontSize = 14.sp, modifier = Modifier.weight(1f))
                             Icon(
                                 Icons.Filled.Close,
                                 contentDescription = "Remove",
                                 tint = Color.Gray,
-                                modifier = Modifier.size(18.dp).clickable {
-                                    WeddingSession.guestList.value =
-                                        WeddingSession.guestList.value.filter { it != guest }
-                                }
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clickable {
+                                        WeddingSession.guestList.value =
+                                            WeddingSession.guestList.value.filter { it != guest }
+                                    }
                             )
                         }
                     }
@@ -996,11 +989,14 @@ fun GuestListDialog(onDismiss: () -> Unit) {
 fun HomeScreenPreview() {
     HomeScreen(
         isLoggedIn = false,
+        selectedTab = 0,
+        onTabSelected = {},
         onNavigateToLogin = {},
         onLogout = {},
         onEditProfile = {},
         onHelpSupport = {},
-        onLanguage = {}
+        onLanguage = {},
+        onVendorClick = {}
     )
 }
 
@@ -1009,11 +1005,14 @@ fun HomeScreenPreview() {
 fun HomeScreenLoggedInPreview() {
     HomeScreen(
         isLoggedIn = true,
+        selectedTab = 0,
+        onTabSelected = {},
         onNavigateToLogin = {},
         onLogout = {},
         onEditProfile = {},
         onHelpSupport = {},
-        onLanguage = {}
+        onLanguage = {},
+        onVendorClick = {}
     )
 }
 

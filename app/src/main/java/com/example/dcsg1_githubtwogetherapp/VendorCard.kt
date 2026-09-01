@@ -47,7 +47,6 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
@@ -160,49 +159,45 @@ fun BrowseVendorsScreen(
     var query by remember { mutableStateOf("") }
     val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire")
     var selectedCategory by remember { mutableStateOf("All") }
-    var selectedTab by remember { mutableStateOf(1) }
+    var selectedState by remember { mutableStateOf("Penang") }
+    val filteredVendors = vendors.filter { vendor ->
+        val matchesState = vendor.locationState == selectedState
+        val matchesCategory = selectedCategory == "All" || vendor.category == selectedCategory
+        val matchesSearch = query.isBlank() || vendor.name.contains(query, ignoreCase = true)
+        matchesState && matchesCategory && matchesSearch
+    }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFFDF8F3))
+    ) {
+        BrowseVendorsTopBar(onBackClick = onBackClick)
+        VendorSearchBar(query = query, onQueryChange = { query = it })
 
-    Scaffold(
-        bottomBar = {
-            BottomNavBar(
-                selectedIndex = selectedTab,
-                onItemSelected = { selectedTab = it }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color(0xFFFDF8F3))
+        Spacer(Modifier.height(8.dp))
+
+        LocationSelector(
+            selectedState = selectedState,
+            onStateChosen = { state ->
+                selectedState = state
+            }
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        CategoryFilterRow(
+            categories = categories,
+            selectedCategory = selectedCategory,
+            onCategorySelected = { selectedCategory = it }
+        )
+
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            BrowseVendorsTopBar(onBackClick = onBackClick)
-            VendorSearchBar(query = query, onQueryChange = { query = it })
-
-            Spacer(Modifier.height(8.dp))
-
-            LocationAndFilterRow(
-                location = "George Town, Penang",
-                onLocationClick = { },
-                onFilterClick = { }
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            CategoryFilterRow(
-                categories = categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it }
-            )
-
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(vendors, key = { it.name }) { vendor ->
-                    VendorCard(vendor = vendor, onClick = { onVendorClick(vendor) })
-                }
+            items(filteredVendors, key = { it.name }) { vendor ->
+                VendorCard(vendor = vendor, onClick = { onVendorClick(vendor) })
             }
         }
     }
@@ -215,7 +210,6 @@ fun BrowseVendorsTopBar(onBackClick: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-
         Text(
             text = "Browse Vendors",
             fontSize = 17.sp,
@@ -275,74 +269,6 @@ fun VendorSearchBar(
     }
 }
 
-@Composable
-fun LocationAndFilterRow(
-    location: String,
-    onLocationClick: () -> Unit,
-    onFilterClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .clickable { onLocationClick() }
-                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = null,
-                    tint = Color(0xFFB5722C),
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = location,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
-            }
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .border(1.dp, Color(0xFFB5722C), RoundedCornerShape(12.dp))
-                .clickable { onFilterClick() }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.FilterList,
-                contentDescription = null,
-                tint = Color(0xFFB5722C),
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(text = "Filter", fontSize = 12.sp, color = Color(0xFFB5722C))
-        }
-    }
-}
 @Composable
 fun CategoryChip(
     label: String,
