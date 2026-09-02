@@ -4,11 +4,13 @@ import androidx.compose.runtime.mutableStateOf
 
 object BudgetSession {
     val totalBudget = mutableStateOf(0.0)
-    val usedBudget = mutableStateOf(0.0)
+
+    val usedBudget: Double
+        get() = CartSession.totalCart
 
     val remainingBudget: Double
-        get() = totalBudget.value - usedBudget.value
+        get() = totalBudget.value - usedBudget
 
     val percentageUsed: Int
-        get() = if (totalBudget.value <= 0) 0 else ((usedBudget.value / totalBudget.value) * 100).toInt()
+        get() = if (totalBudget.value <= 0) 0 else ((usedBudget / totalBudget.value) * 100).toInt()
 }

@@ -67,9 +67,11 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
@@ -82,6 +84,12 @@ import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.SelectableDates
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import kotlinx.coroutines.launch
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 
 
 data class QuickAction(val label: String, val icon: ImageVector)
@@ -224,53 +232,126 @@ fun LocationSelector(
 }
 
 @Composable
-fun WeddingDateCard(onSetDateClick: () -> Unit, onGuestListClick: () -> Unit) {
+fun WeddingDateCard(
+    onSetDateClick: () -> Unit,
+    onGuestListClick: () -> Unit,
+    context: android.content.Context,
+    weddingSaveScope: kotlinx.coroutines.CoroutineScope
+) {
     val dateMillis = WeddingSession.weddingDateMillis.value
+    val hasArrived = dateMillis != null && daysUntil(dateMillis) <= 0
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(if (hasArrived) 230.dp else 200.dp)
             .padding(16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFFDECD8))
+            .clip(RoundedCornerShape(20.dp))
+            .background(
+                if (hasArrived)
+                    Brush.horizontalGradient(listOf(Color(0xFFB5722C), Color(0xFFE0A868)))
+                else
+                    Brush.horizontalGradient(listOf(Color(0xFFFDECD8), Color(0xFFFDECD8)))
+            )
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.wedding_flowers),
-            contentDescription = "Wedding flowers",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .width(180.dp)
-                .clip(RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
-        )
+        if (!hasArrived) {
+            Image(
+                painter = painterResource(id = R.drawable.wedding_flowers),
+                contentDescription = "Wedding flowers",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .width(150.dp)
+                    .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
+            )
+        }
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-        ) {
-            if (dateMillis == null) {
-                Text("Set your wedding date", fontSize = 18.sp, color = Color(0xFFB5722C))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Let's set your wedding date\nto see your countdown!",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-            } else {
-                Text("Your Wedding Day", fontSize = 18.sp, color = Color(0xFFB5722C))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(formatWeddingDate(dateMillis), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text("${daysUntil(dateMillis)} days to go!", fontSize = 12.sp, color = Color.Gray)
+        when {
+            dateMillis == null -> {
+                Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
+                    Text("Set your wedding date", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Let's set your wedding date\nto see your countdown!",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = onSetDateClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text("Set Wedding Date", fontSize = 12.sp)
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onSetDateClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-            ) {
-                Text(if (dateMillis == null) "Set Wedding Date" else "Change Date", fontSize = 12.sp)
+            hasArrived -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("🎉", fontSize = 26.sp)
+                    Text(
+                        text = "Congratulations!",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Wishing you a lifetime of happiness together 💍",
+                        fontSize = 11.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color.White)
+                            .clickable {
+                                WeddingSession.weddingDateMillis.value = null
+                                val userId = UserSession.currentUser.value?.id
+                                if (userId != null) {
+                                    weddingSaveScope.launch {
+                                        WeddingRepository.saveWedding(context, userId, null, WeddingSession.guestList.value)
+                                    }
+                                }
+                            }
+                            .padding(horizontal = 28.dp, vertical = 8.dp)
+                    ) {
+                        Text("OK", color = Color(0xFFB5722C), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            else -> {
+                val days = daysUntil(dateMillis)
+                Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
+                    Text("Wedding Countdown", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+                    Text(formatWeddingDate(dateMillis), fontSize = 12.sp, color = Color.Gray)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(text = "$days", fontSize = 44.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (days == 1L) "day to go" else "days to go",
+                            fontSize = 13.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Change Date",
+                        fontSize = 12.sp,
+                        color = Color(0xFFB5722C),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { onSetDateClick() }
+                    )
+                }
             }
         }
 
@@ -413,7 +494,8 @@ fun HomeScreen(
     onHelpSupport: () -> Unit,
     onLanguage: () -> Unit,
     onVendorClick: (Vendor) -> Unit,
-    onProceedToPayment: () -> Unit          // ← new
+    onProceedToPayment: () -> Unit,
+    onViewBudgetDetails: () -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -421,12 +503,31 @@ fun HomeScreen(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showGuestListDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(isLoggedIn) {
+        val userId = UserSession.currentUser.value?.id
+        if (isLoggedIn && userId != null) {
+            BudgetSession.totalBudget.value = BudgetRepository.loadBudget(context, userId)
+            val (date, guests) = WeddingRepository.loadWedding(context, userId)
+            WeddingSession.weddingDateMillis.value = date
+            WeddingSession.guestList.value = guests
+        }
+    }
+
     if (showDatePickerDialog) {
         SetWeddingDateDialog(
             onDismiss = { showDatePickerDialog = false },
             onConfirm = { millis ->
                 WeddingSession.weddingDateMillis.value = millis
                 showDatePickerDialog = false
+                val userId = UserSession.currentUser.value?.id
+                if (userId != null) {
+                    coroutineScope.launch {
+                        WeddingRepository.saveWedding(context, userId, millis, WeddingSession.guestList.value)
+                    }
+                }
             }
         )
     }
@@ -437,10 +538,17 @@ fun HomeScreen(
 
     if (showSetBudgetDialog) {
         SetBudgetDialog(
+            initialAmount = BudgetSession.totalBudget.value,
             onDismiss = { showSetBudgetDialog = false },
             onConfirm = { amount ->
                 BudgetSession.totalBudget.value = amount
                 showSetBudgetDialog = false
+                val userId = UserSession.currentUser.value?.id
+                if (userId != null) {
+                    coroutineScope.launch {
+                        BudgetRepository.saveBudget(context, userId, amount)
+                    }
+                }
             }
         )
     }
@@ -520,14 +628,16 @@ fun HomeScreen(
                     },
                     onGuestListClick = {
                         if (isLoggedIn) showGuestListDialog = true else showLoginDialog = true
-                    }
+                    },
+                    context = context,
+                    weddingSaveScope = coroutineScope
                 )
                 QuickActionsGrid()
                 FeaturedVendorsSection(currentArea = selectedState)
                 if (isLoggedIn) {
                     BudgetPlannerCard(
                         onSetBudgetClick = { showSetBudgetDialog = true },
-                        onViewDetailsClick = { }
+                        onViewDetailsClick = { onViewBudgetDetails() }
                     )
                 }
             }
@@ -717,12 +827,30 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
             .border(1.dp, Color(0xFFEFE0D0), RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
-        Text("Budget Planner", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-        Text(
-            text = "Track your budget and plan smartly",
-            fontSize = 12.sp,
-            color = Color.Gray
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Budget Planner", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(
+                    text = "Track your budget and plan smartly",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+            if (BudgetSession.totalBudget.value > 0) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit Budget",
+                    tint = Color(0xFFB5722C),
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onSetBudgetClick() }
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -790,7 +918,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
                         color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    LegendDot(color = Color(0xFFB5722C), label = "Used: RM ${"%,.0f".format(BudgetSession.usedBudget.value)}")
+                    LegendDot(color = Color(0xFFB5722C), label = "Used: RM ${"%,.0f".format(BudgetSession.usedBudget)}")
                     LegendDot(color = Color(0xFFF0E4D8), label = "Remaining: RM ${"%,.0f".format(BudgetSession.remainingBudget)}")
                 }
             }
@@ -822,29 +950,56 @@ fun LegendDot(color: Color, label: String) {
 }
 
 @Composable
-fun SetBudgetDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
-    var budgetInput by remember { mutableStateOf("") }
+fun SetBudgetDialog(
+    initialAmount: Double = 0.0,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit
+) {
+    var budgetInput by remember {
+        mutableStateOf(if (initialAmount > 0) initialAmount.toInt().toString() else "")
+    }
+    var showConfirmWarningDialog by remember { mutableStateOf(false) }
+
+    val amount = budgetInput.toDoubleOrNull()
+    val errorMessage = when {
+        budgetInput.isBlank() -> null
+        amount == null -> "Please enter a valid number."
+        amount <= 0 -> "Budget must be more than RM 0."
+        else -> null
+    }
+    val warningMessage = if (amount != null && amount > 0 && amount < CartSession.totalCart) {
+        "This is less than what you've already added to Cart (RM ${"%,.0f".format(CartSession.totalCart)})."
+    } else null
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Set Your Wedding Budget") },
+        title = { Text(if (initialAmount > 0) "Edit Your Wedding Budget" else "Set Your Wedding Budget") },
         text = {
-            OutlinedTextField(
-                value = budgetInput,
-                onValueChange = { budgetInput = it },
-                placeholder = { Text("e.g. 70000") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
-            )
+            Column {
+                OutlinedTextField(
+                    value = budgetInput,
+                    onValueChange = { budgetInput = it },
+                    placeholder = { Text("e.g. 70000") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    isError = errorMessage != null
+                )
+                if (errorMessage != null) {
+                    Text(errorMessage, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                } else if (warningMessage != null) {
+                    Text(warningMessage, color = Color(0xFFB5722C), fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                }
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    val amount = budgetInput.toDoubleOrNull()
                     if (amount != null && amount > 0) {
-                        onConfirm(amount)
+                        if (warningMessage != null) showConfirmWarningDialog = true
+                        else onConfirm(amount)
                     }
                 },
+                enabled = amount != null && amount > 0,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
             ) {
                 Text("Confirm")
@@ -854,6 +1009,28 @@ fun SetBudgetDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
             TextButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
+
+    if (showConfirmWarningDialog && amount != null) {
+        AlertDialog(
+            onDismissRequest = { showConfirmWarningDialog = false },
+            title = { Text("Are you sure?") },
+            text = {
+                Text("Your budget (RM ${"%,.0f".format(amount)}) is less than the RM ${"%,.0f".format(CartSession.totalCart)} already in your Cart. You may go over budget.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showConfirmWarningDialog = false
+                        onConfirm(amount)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
+                ) { Text("Yes, Confirm") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmWarningDialog = false }) { Text("Go Back") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -896,52 +1073,115 @@ fun daysUntil(millis: Long): Long {
 @Composable
 fun GuestListDialog(onDismiss: () -> Unit) {
     var newGuestName by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
+    fun addGuest() {
+        if (newGuestName.isNotBlank()) {
+            WeddingSession.guestList.value = WeddingSession.guestList.value + newGuestName.trim()
+            newGuestName = ""
+            focusManager.clearFocus()
+            val userId = UserSession.currentUser.value?.id
+            if (userId != null) {
+                coroutineScope.launch {
+                    WeddingRepository.saveWedding(context, userId, WeddingSession.weddingDateMillis.value, WeddingSession.guestList.value)
+                }
+            }
+        }
+    }
+
+    fun removeGuest(guest: String) {
+        WeddingSession.guestList.value = WeddingSession.guestList.value.filter { it != guest }
+        val userId = UserSession.currentUser.value?.id
+        if (userId != null) {
+            coroutineScope.launch {
+                WeddingRepository.saveWedding(context, userId, WeddingSession.weddingDateMillis.value, WeddingSession.guestList.value)
+            }
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Guest List (${WeddingSession.guestList.value.size})") },
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Group, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Guest List (${WeddingSession.guestList.value.size})")
+            }
+        },
         text = {
             Column {
-                LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
-                    items(WeddingSession.guestList.value) { guest ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp)
-                        ) {
-                            Text(guest, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                            Icon(
-                                Icons.Filled.Close,
-                                contentDescription = "Remove",
-                                tint = Color.Gray,
+                if (WeddingSession.guestList.value.isEmpty()) {
+                    Text(
+                        text = "No guests added yet.",
+                        fontSize = 13.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 220.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(WeddingSession.guestList.value) { guest ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .size(18.dp)
-                                    .clickable {
-                                        WeddingSession.guestList.value =
-                                            WeddingSession.guestList.value.filter { it != guest }
-                                    }
-                            )
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFFFAF7F2))
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(30.dp).clip(CircleShape).background(Color(0xFFFDECD8)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = guest.trim().firstOrNull()?.uppercase() ?: "?",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFB5722C)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(guest, fontSize = 14.sp, color = Color.Black, modifier = Modifier.weight(1f))
+                                Icon(
+                                    Icons.Filled.Close,
+                                    contentDescription = "Remove",
+                                    tint = Color.Gray,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .clickable { removeGuest(guest) }
+                                )
+                            }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(10.dp))
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(
                         value = newGuestName,
                         onValueChange = { newGuestName = it },
                         placeholder = { Text("Guest name") },
                         modifier = Modifier.weight(1f),
-                        singleLine = true
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { addGuest() })
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = {
-                        if (newGuestName.isNotBlank()) {
-                            WeddingSession.guestList.value = WeddingSession.guestList.value + newGuestName.trim()
-                            newGuestName = ""
-                        }
-                    }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color(0xFFB5722C))
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFB5722C))
+                            .clickable { addGuest() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color.White)
                     }
                 }
             }
@@ -967,7 +1207,8 @@ fun HomeScreenPreview() {
         onHelpSupport = {},
         onLanguage = {},
         onVendorClick = {},
-        onProceedToPayment = {}          // ← new
+        onProceedToPayment = {},
+        onViewBudgetDetails = { }// ← new
     )
 }
 
@@ -984,7 +1225,8 @@ fun HomeScreenLoggedInPreview() {
         onHelpSupport = {},
         onLanguage = {},
         onVendorClick = {},
-        onProceedToPayment = {}          // ← new
+        onProceedToPayment = {},
+        onViewBudgetDetails = { }// ← new
     )
 }
 

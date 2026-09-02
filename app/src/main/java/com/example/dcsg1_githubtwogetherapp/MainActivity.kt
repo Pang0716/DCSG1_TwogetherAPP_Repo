@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -91,7 +92,8 @@ class MainActivity : ComponentActivity() {
                                 onHelpSupport = { navController.navigate("help_support") },
                                 onLanguage = { navController.navigate("language") },
                                 onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") },
-                                onProceedToPayment = { navController.navigate("payment") }
+                                onProceedToPayment = { navController.navigate("payment") },
+                                onViewBudgetDetails = { navController.navigate("budgetDetails") }
                             )
                         }
 
@@ -165,16 +167,48 @@ class MainActivity : ComponentActivity() {
                             if (vendor != null) {
                                 VendorDetailScreen(
                                     vendor = vendor,
-                                    onBackClick = { navController.popBackStack() }
+                                    onBackClick = { navController.popBackStack() },
+                                    isLoggedIn = isLoggedIn,
+                                    onNavigateToLogin = { navController.navigate("login") }
                                 )
                             }
                         }
 
                         composable("payment") {
+                            val scope = rememberCoroutineScope()
+                            val context = LocalContext.current
                             PaymentScreen(
                                 onBackClick = { navController.popBackStack() },
-                                onPayNowClick = { /* TODO: next step — confirmation screen */ }
+                                onPayNowClick = {
+                                    val userId = UserSession.currentUser.value?.id
+                                    if (userId != null) {
+                                        scope.launch {
+                                            CartSession.items.value
+                                                .filter { it.isChecked.value }
+                                                .forEach { item ->
+                                                    BookingRepository.saveBooking(
+                                                        context, userId,
+                                                        item.vendor.name, item.vendor.category,
+                                                        item.vendor.priceFrom, "Selected method"
+                                                    )
+                                                }
+                                            CartSession.items.value = CartSession.items.value.filterNot { it.isChecked.value }
+                                            navController.navigate("bookingConfirmation")
+                                        }
+                                    }
+                                }
                             )
+                        }
+
+                        composable("bookingConfirmation") {
+                            BookingConfirmationScreen(
+                                onViewMyBookings = { navController.navigate("home") /* update later once My Bookings screen exists */ },
+                                onBackToHome = { navController.popBackStack("home", inclusive = false) }
+                            )
+                        }
+
+                        composable(route = "budgetDetails") {
+                            BudgetDetailsScreen(onBackClick = { navController.popBackStack() })
                         }
                     }
                 }
