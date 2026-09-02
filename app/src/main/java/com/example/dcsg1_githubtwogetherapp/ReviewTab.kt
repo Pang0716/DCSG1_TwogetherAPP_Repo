@@ -85,6 +85,7 @@ fun ReviewRow(review: Review, modifier: Modifier = Modifier) {
 fun AddReviewForm(
     reviewerName: String,
     onSubmit: (rating: Int, comment: String) -> Unit,
+    submitError: String? = null,
     modifier: Modifier = Modifier
 ) {
     var comment by remember { mutableStateOf("") }
@@ -129,13 +130,17 @@ fun AddReviewForm(
         )
         Spacer(Modifier.height(10.dp))
 
+        if (submitError != null) {
+            Text(submitError, fontSize = 12.sp, color = Color(0xFFC0392B))
+            Spacer(Modifier.height(6.dp))
+        }
+
         Button(
             onClick = {
                 onSubmit(rating, comment.trim())
                 comment = ""
                 rating = 5
             },
-            // Same validation logic as the Save button in Practical 6: content can't be blank
             enabled = comment.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {

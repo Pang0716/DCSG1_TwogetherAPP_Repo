@@ -171,7 +171,7 @@ fun VendorDetailTopBar(
                 Icon(
                     Icons.Filled.Share,
                     contentDescription = "Share",
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 3.dp)
                 )
             }
             IconButton(onClick = onFavoriteClick) {
@@ -198,6 +198,7 @@ fun VendorDetailScreen(
     val reviews = remember { mutableStateListOf<Review>() }
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
     var reviewsLoadFailed by remember { mutableStateOf(false) }
+    var reviewSubmitError by remember { mutableStateOf<String?>(null) }
     var favoriteRecord by remember { mutableStateOf<SupabaseFavorite?>(null) }
 
     val scope = rememberCoroutineScope()
@@ -547,13 +548,25 @@ fun VendorDetailScreen(
                 }
 
                 "Reviews" -> {
+                    if (reviewsLoadFailed) {
+                        item {
+                            Text(
+                                "Couldn't load the latest reviews — showing sample data. Check your connection and reopen this page.",
+                                fontSize = 12.sp,
+                                color = Color(0xFFB5722C),
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
                     item {
                         Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                             AddReviewForm(
                                 // Fallback name if not logged in, to avoid showing null
                                 reviewerName = UserSession.currentUser.value?.fullName ?: "Guest",
+                                submitError = reviewSubmitError,
                                 onSubmit = { rating, comment ->
                                     val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
+                                    reviewSubmitError = null
                                     scope.launch {
                                         try {
                                             // Same as addUser() in Practical 9:
@@ -569,8 +582,8 @@ fun VendorDetailScreen(
                                             }
                                             reviews.add(inserted)
                                         } catch (e: Exception) {
-                                            // Submit failed (e.g. no network) - not showing an error message for now,
-                                            // just doesn't add this review to the list
+                                            // Submit failed (e.g. no network) - show it instead of failing silently
+                                            reviewSubmitError = "Couldn't submit your review. Please check your connection and try again."
                                         }
                                     }
                                 }
