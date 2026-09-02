@@ -172,18 +172,6 @@ val PG = listOf(
         capacity = "Trilingual hosting",
         highlights = "English/Malay/Mandarin, formal & fun tone options, rehearsal included"
     ),
-    Vendor(
-        "Spotlight Host Services", "Emcee", 4.6, 62, "RM750", null,
-        null, "George Town", "Penang",
-        capacity = "Bilingual hosting",
-        highlights = "Energetic games, custom script writing, backup emcee available"
-    ),
-    Vendor(
-        "Charisma MC Studio", "Emcee", 4.9, 118, "RM1,200", null,
-        null, "Tanjung Bungah", "Penang",
-        capacity = "Trilingual hosting",
-        highlights = "Celebrity-style hosting, live entertainment coordination, premium packages"
-    ),
 
     // Attire
     Vendor(
@@ -229,29 +217,5 @@ val PG = listOf(
         null, "Bayan Lepas", "Penang",
         capacity = "Full event styling",
         highlights = "Modern minimalist decor, LED lighting design, backdrop customization"
-    ),
-    Vendor(
-        "Royal Blossom Decorations", "Deco", 4.9, 132, "RM4,200", null,
-        null, "Tanjung Bungah", "Penang",
-        capacity = "Full event styling",
-        highlights = "Luxury floral installations, crystal centerpieces, premium fabric draping"
-    ),
-    Vendor(
-        "Dreamscape Events Deco", "Deco", 4.7, 84, "RM3,100", null,
-        null, "Komtar", "Penang",
-        capacity = "Full event styling",
-        highlights = "Themed decor packages, fairy light canopy, DIY rustic style available"
-    ),
-    Vendor(
-        "Petal Perfect Studio", "Deco", 4.5, 47, "RM2,400", null,
-        null, "Butterworth", "Penang",
-        capacity = "Ceremony & reception styling",
-        highlights = "Budget-friendly packages, artificial floral options, quick turnaround"
-    ),
-    Vendor(
-        "Whimsy Wedding Decor", "Deco", 4.8, 103, "RM3,800", null,
-        null, "Air Itam", "Penang",
-        capacity = "Full event styling",
-        highlights = "Bohemian & garden themes, custom color palette consultation, on-site coordination"
     )
 )

@@ -4,7 +4,6 @@ data class WeddingState(
     val stateName: String,
     val areas: List<String>
 )
-
 val malaysiaWeddingLocations = listOf(
     WeddingState("Penang", listOf("George Town", "Komtar", "Bayan Lepas", "Butterworth")),
     WeddingState("Kuala Lumpur", listOf("Bukit Bintang", "KLCC", "Bangsar", "Mont Kiara")),
