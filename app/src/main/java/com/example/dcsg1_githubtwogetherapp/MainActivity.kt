@@ -93,7 +93,8 @@ class MainActivity : ComponentActivity() {
                                 onLanguage = { navController.navigate("language") },
                                 onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") },
                                 onProceedToPayment = { navController.navigate("payment") },
-                                onViewBudgetDetails = { navController.navigate("budgetDetails") }
+                                onViewBudgetDetails = { navController.navigate("budgetDetails") },
+                                onViewSavedVendors = { navController.navigate("savedVendors") }
                             )
                         }
 
@@ -209,6 +210,13 @@ class MainActivity : ComponentActivity() {
 
                         composable(route = "budgetDetails") {
                             BudgetDetailsScreen(onBackClick = { navController.popBackStack() })
+                        }
+
+                        composable(route = "savedVendors") {
+                            SavedVendorsScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") }
+                            )
                         }
                     }
                 }

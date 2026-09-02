@@ -691,10 +691,11 @@ fun VendorDetailScreen(
                         onNavigateToLogin()
                         showPackageSelection = false
                     } else {
-                        CartSession.addVendor(vendor)
-                        // Toast isn't from the Practicals but it's about as standard as Android
-                        // gets for a quick one-off confirmation, same idea as the
-                        // Intent.ACTION_SEND share sheet added earlier
+                        CartSession.addVendor(vendor, selectedPackage)
+                        val userId = UserSession.currentUser.value?.id
+                        if (userId != null) {
+                            scope.launch { CartRepository.saveCartItem(context, userId, vendor.name, selectedPackage.name, true) }
+                        }
                         android.widget.Toast.makeText(
                             context,
                             "${selectedPackage.name} added to cart",
