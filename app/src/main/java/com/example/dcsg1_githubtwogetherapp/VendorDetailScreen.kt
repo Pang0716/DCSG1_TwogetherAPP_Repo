@@ -36,13 +36,16 @@ import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -149,42 +152,56 @@ fun VendorDetailTopBar(
     isFavorited: Boolean,
     onFavoriteClick: () -> Unit
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFFDF8F3))
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .padding(top = 30.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(top = 30.dp)
     ) {
-        IconButton(onClick = onBackClick) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-        }
         Text(
             "Vendor Details",
             fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.align(Alignment.Center)
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            IconButton(onClick = onShareClick) {
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+        }
+        Row(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onShareClick,
+                modifier = Modifier.size(38.dp)
+            ) {
                 Icon(
                     Icons.Filled.Share,
                     contentDescription = "Share",
-                    modifier = Modifier.padding(top = 3.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
-            IconButton(onClick = onFavoriteClick) {
+            IconButton(
+                onClick = onFavoriteClick,
+                modifier = Modifier.size(38.dp)
+            ) {
                 Icon(
                     if (isFavorited) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = if (isFavorited) "Remove from favorites" else "Add to favorites",
-                    tint = if (isFavorited) Color(0xFFE24B4A) else Color.Black
+                    tint = if (isFavorited) Color(0xFFE24B4A) else Color.Black,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VendorDetailScreen(
     vendor: Vendor,
@@ -201,8 +218,8 @@ fun VendorDetailScreen(
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
     var reviewsLoadFailed by remember { mutableStateOf(false) }
     var reviewSubmitError by remember { mutableStateOf<String?>(null) }
+    var showPackageSelection by remember { mutableStateOf(false) }
     var favoriteRecord by remember { mutableStateOf<SupabaseFavorite?>(null) }
-    var showLoginDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -230,11 +247,14 @@ fun VendorDetailScreen(
             reviews.addAll(fetched)
             reviewsLoadFailed = false
         } catch (e: Exception) {
+            android.util.Log.e("VendorDetailScreen", "fetchReviews failed for ${vendor.name}", e)
             reviews.clear()
             reviews.addAll(generateReviews(vendor))
             reviewsLoadFailed = true
         }
     }
+
+    val sheetState = rememberModalBottomSheetState()
 
     Scaffold(
         containerColor = Color(0xFFFDF8F3),
@@ -253,26 +273,28 @@ fun VendorDetailScreen(
                 },
                 isFavorited = favoriteRecord != null,
                 onFavoriteClick = {
-                    val userId = UserSession.currentUser.value?.id
-                    if (userId != null) {
-                        val current = favoriteRecord
-                        scope.launch {
-                            try {
-                                if (current != null) {
-                                    // Already favorited -> unfavorite
-                                    withContext(Dispatchers.IO) { removeFavorite(current.id) }
-                                    favoriteRecord = null
-                                } else {
-                                    // Not favorited -> favorite it, then query again to get the database-generated id
-                                    withContext(Dispatchers.IO) { addFavorite(userId, vendor.name) }
-                                    favoriteRecord = withContext(Dispatchers.IO) { fetchFavorite(userId, vendor.name) }
+                    if (!isLoggedIn) {
+                        onNavigateToLogin()
+                    } else {
+                        val userId = UserSession.currentUser.value?.id
+                        if (userId != null) {
+                            val current = favoriteRecord
+                            scope.launch {
+                                try {
+                                    if (current != null) {
+                                        // Already favorited -> unfavorite
+                                        withContext(Dispatchers.IO) { removeFavorite(current.id) }
+                                        favoriteRecord = null
+                                    } else {
+                                        // Not favorited -> favorite it, then query again to get the database-generated id
+                                        withContext(Dispatchers.IO) { addFavorite(userId, vendor.name) }
+                                        favoriteRecord = withContext(Dispatchers.IO) { fetchFavorite(userId, vendor.name) }
+                                    }
+                                } catch (e: Exception) {
+                                    // Network failure - leave the state unchanged, heart icon stays as is
                                 }
-                            } catch (e: Exception) {
-                                // Network failure - leave the state unchanged, heart icon stays as is
                             }
                         }
-                    } else {
-                showLoginDialog = true
                     }
                 }
             )
@@ -301,7 +323,11 @@ fun VendorDetailScreen(
                 }
                 Button(
                     onClick = {
-                        if (isLoggedIn) CartSession.addVendor(vendor) else showLoginDialog = true
+                        if (isLoggedIn) {
+                            showPackageSelection = true
+                        } else {
+                            onNavigateToLogin()
+                        }
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -456,7 +482,7 @@ fun VendorDetailScreen(
                             )
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                "A luxurious wedding venue in the heart of Penang. We provide elegant settings, halal catering and customizable packages to make your big day unforgettable.",
+                                generateAboutDescription(vendor),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 lineHeight = 22.sp
@@ -490,7 +516,23 @@ fun VendorDetailScreen(
                                         )
                                     }
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable {
+                                        // Only search by area + state (real place names), not the
+                                        // vendor name itself — vendor names in this dataset are
+                                        // placeholder/demo data and searching a made-up business
+                                        // name could return "not found" or an unrelated real place
+                                        val query = "${vendor.locationArea}, ${vendor.locationState}"
+                                        val mapsIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            android.net.Uri.parse(
+                                                "https://www.google.com/maps/search/?api=1&query=${android.net.Uri.encode(query)}"
+                                            )
+                                        )
+                                        context.startActivity(mapsIntent)
+                                    }
+                                ) {
                                     Text("View Map", fontSize = 13.sp, color = Color(0xFFB5722C))
                                     Icon(
                                         Icons.Filled.ChevronRight,
@@ -502,7 +544,7 @@ fun VendorDetailScreen(
                             }
                             Spacer(Modifier.height(18.dp))
 
-                            AmenitiesSection(amenities = defaultAmenities)
+                            AmenitiesSection(amenities = generateAmenities(vendor))
                         }
                     }
                 }
@@ -572,28 +614,28 @@ fun VendorDetailScreen(
                                 submitError = reviewSubmitError,
                                 onSubmit = { rating, comment ->
                                     if (!isLoggedIn) {
-                                        showLoginDialog = true
-                                        return@AddReviewForm
-                                    }
-                                    val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
-                                    reviewSubmitError = null
-                                    scope.launch {
-                                        try {
-                                            // Same as addUser() in Practical 9:
-                                            // after inserting, the database sends back the row with its real id,
-                                            // use that directly as the new review to show, no need to compute nextId ourselves
-                                            val inserted = withContext(Dispatchers.IO) {
-                                                insertReview(
-                                                    vendorName = vendor.name,
-                                                    reviewerName = reviewerName,
-                                                    rating = rating,
-                                                    comment = comment
-                                                )
+                                        onNavigateToLogin()
+                                    } else {
+                                        val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
+                                        reviewSubmitError = null
+                                        scope.launch {
+                                            try {
+                                                // Same as addUser() in Practical 9:
+                                                // after inserting, the database sends back the row with its real id,
+                                                // use that directly as the new review to show, no need to compute nextId ourselves
+                                                val inserted = withContext(Dispatchers.IO) {
+                                                    insertReview(
+                                                        vendorName = vendor.name,
+                                                        reviewerName = reviewerName,
+                                                        rating = rating,
+                                                        comment = comment
+                                                    )
+                                                }
+                                                reviews.add(inserted)
+                                            } catch (e: Exception) {
+                                                // Submit failed (e.g. no network) - show it instead of failing silently
+                                                reviewSubmitError = "Couldn't submit your review. Please check your connection and try again."
                                             }
-                                            reviews.add(inserted)
-                                        } catch (e: Exception) {
-                                            // Submit failed (e.g. no network) - show it instead of failing silently
-                                            reviewSubmitError = "Couldn't submit your review. Please check your connection and try again."
                                         }
                                     }
                                 }
@@ -636,14 +678,33 @@ fun VendorDetailScreen(
         PhotoViewerDialog(photo = photo, onDismiss = { selectedPhoto = null })
     }
 
-    if (showLoginDialog) {
-        LoginRequiredDialog(
-            onDismiss = { showLoginDialog = false },
-            onLoginClick = {
-                showLoginDialog = false
-                onNavigateToLogin()
-            }
-        )
+    if (showPackageSelection) {
+        ModalBottomSheet(
+            onDismissRequest = { showPackageSelection = false },
+            sheetState = sheetState
+        ) {
+            SelectPackageSheetContent(
+                vendor = vendor,
+                packages = packages,
+                onContinueClick = { selectedPackage ->
+                    if (!isLoggedIn) {
+                        onNavigateToLogin()
+                        showPackageSelection = false
+                    } else {
+                        CartSession.addVendor(vendor)
+                        // Toast isn't from the Practicals but it's about as standard as Android
+                        // gets for a quick one-off confirmation, same idea as the
+                        // Intent.ACTION_SEND share sheet added earlier
+                        android.widget.Toast.makeText(
+                            context,
+                            "${selectedPackage.name} added to cart",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                        showPackageSelection = false
+                    }
+                }
+            )
+        }
     }
 }
 

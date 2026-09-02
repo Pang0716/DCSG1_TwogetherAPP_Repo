@@ -36,10 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-private val AccentColor = Color(0xFFB5722C)
-private val CardBorderColor = Color(0xFFE8DFD3)
-private val TagChipBg = Color(0xFFF5E9D9)
-private val TagChipText = Color(0xFF7A4E1D)
+// Not private anymore - SelectPackageScreen.kt (the "save to cart" package picker) reuses these
+val AccentColor = Color(0xFFB5722C)
+val CardBorderColor = Color(0xFFE8DFD3)
+val TagChipBg = Color(0xFFF5E9D9)
+val TagChipText = Color(0xFF7A4E1D)
 
 /**
  * Horizontal layout package card, display-only, not clickable.
@@ -153,7 +154,7 @@ fun PackageCard(
 }
 
 /** Picks a fitting icon based on keywords in the tag; falls back to a gift icon otherwise. */
-private fun tagIcon(tag: String): ImageVector {
+fun tagIcon(tag: String): ImageVector {
     val lower = tag.lowercase()
     return when {
         "catering" in lower || "food" in lower -> Icons.Outlined.Restaurant
@@ -163,7 +164,7 @@ private fun tagIcon(tag: String): ImageVector {
 }
 
 @Composable
-private fun PackageImage(pkg: PackageOption, modifier: Modifier = Modifier) {
+fun PackageImage(pkg: PackageOption, modifier: Modifier = Modifier) {
     when {
         pkg.imageResId != null -> {
             Image(
@@ -174,6 +175,7 @@ private fun PackageImage(pkg: PackageOption, modifier: Modifier = Modifier) {
             )
         }
         pkg.imageUrl != null -> {
+            // Basic AsyncImage, no loading/error state handling
             AsyncImage(
                 model = pkg.imageUrl,
                 contentDescription = pkg.name,
