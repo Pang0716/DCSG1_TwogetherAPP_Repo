@@ -189,6 +189,8 @@ fun VendorDetailTopBar(
 fun VendorDetailScreen(
     vendor: Vendor,
     onBackClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableStateOf("About") }
@@ -199,6 +201,7 @@ fun VendorDetailScreen(
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
     var reviewsLoadFailed by remember { mutableStateOf(false) }
     var favoriteRecord by remember { mutableStateOf<SupabaseFavorite?>(null) }
+    var showLoginDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -267,8 +270,9 @@ fun VendorDetailScreen(
                                 // Network failure - leave the state unchanged, heart icon stays as is
                             }
                         }
+                    } else {
+                showLoginDialog = true
                     }
-                    // userId == null (not logged in) - do nothing for now, could add a "please log in" prompt here later
                 }
             )
         },
@@ -295,7 +299,9 @@ fun VendorDetailScreen(
                     Text("Chat", fontSize = 16.sp)
                 }
                 Button(
-                    onClick = { },
+                    onClick = {
+                        if (isLoggedIn) CartSession.addVendor(vendor) else showLoginDialog = true
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),
@@ -553,6 +559,10 @@ fun VendorDetailScreen(
                                 // Fallback name if not logged in, to avoid showing null
                                 reviewerName = UserSession.currentUser.value?.fullName ?: "Guest",
                                 onSubmit = { rating, comment ->
+                                    if (!isLoggedIn) {
+                                        showLoginDialog = true
+                                        return@AddReviewForm
+                                    }
                                     val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
                                     scope.launch {
                                         try {
@@ -611,6 +621,16 @@ fun VendorDetailScreen(
 
     selectedPhoto?.let { photo ->
         PhotoViewerDialog(photo = photo, onDismiss = { selectedPhoto = null })
+    }
+
+    if (showLoginDialog) {
+        LoginRequiredDialog(
+            onDismiss = { showLoginDialog = false },
+            onLoginClick = {
+                showLoginDialog = false
+                onNavigateToLogin()
+            }
+        )
     }
 }
 
@@ -672,7 +692,9 @@ fun VendorDetailScreenPreview() {
     MaterialTheme {
         VendorDetailScreen(
             vendor = sampleVendors[0],
-            onBackClick = {}
+            onBackClick = {},
+            isLoggedIn = false,
+            onNavigateToLogin = {}
         )
     }
 }
