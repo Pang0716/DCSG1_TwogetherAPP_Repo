@@ -495,7 +495,8 @@ fun HomeScreen(
     onLanguage: () -> Unit,
     onVendorClick: (Vendor) -> Unit,
     onProceedToPayment: () -> Unit,
-    onViewBudgetDetails: () -> Unit
+    onViewBudgetDetails: () -> Unit,
+    onViewSavedVendors: () -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -513,6 +514,7 @@ fun HomeScreen(
             val (date, guests) = WeddingRepository.loadWedding(context, userId)
             WeddingSession.weddingDateMillis.value = date
             WeddingSession.guestList.value = guests
+            CartSession.items.value = CartRepository.loadCart(context, userId)
         }
     }
 
@@ -594,7 +596,9 @@ fun HomeScreen(
             Box(modifier = Modifier.padding(innerPadding)) {
                 CartScreen(
                     onBackClick = { onTabSelected(0) },
-                    onProceedToPayment = onProceedToPayment   // ← was the TODO lambda
+                    onProceedToPayment = onProceedToPayment,
+                    isLoggedIn = isLoggedIn,
+                    onNavigateToLogin = onNavigateToLogin
                 )
             }
         } else if (selectedTab == 4) {
@@ -605,7 +609,9 @@ fun HomeScreen(
                     onNavigateToLogin = onNavigateToLogin,
                     onEditProfile = onEditProfile,
                     onHelpSupport = onHelpSupport,
-                    onLanguage = onLanguage
+                    onLanguage = onLanguage,
+                    onViewBookings = { onTabSelected(3) },
+                    onViewSavedVendors = onViewSavedVendors
                 )
             }
         } else {
@@ -1208,7 +1214,8 @@ fun HomeScreenPreview() {
         onLanguage = {},
         onVendorClick = {},
         onProceedToPayment = {},
-        onViewBudgetDetails = { }// ← new
+        onViewBudgetDetails = { },
+        onViewSavedVendors = { }
     )
 }
 
@@ -1226,7 +1233,8 @@ fun HomeScreenLoggedInPreview() {
         onLanguage = {},
         onVendorClick = {},
         onProceedToPayment = {},
-        onViewBudgetDetails = { }// ← new
+        onViewBudgetDetails = { },
+        onViewSavedVendors = { }
     )
 }
 

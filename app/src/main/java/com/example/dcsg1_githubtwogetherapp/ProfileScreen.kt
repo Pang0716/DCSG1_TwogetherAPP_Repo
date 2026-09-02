@@ -31,7 +31,9 @@ fun ProfileScreen(
     onNavigateToLogin: () -> Unit,
     onEditProfile: () -> Unit,
     onHelpSupport: () -> Unit,
-    onLanguage: () -> Unit
+    onLanguage: () -> Unit,
+    onViewBookings: () -> Unit,
+    onViewSavedVendors: () -> Unit
 ) {
     val user = UserSession.currentUser.value
     var showLogoutConfirm by remember { mutableStateOf(false) }
@@ -118,8 +120,8 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isLoggedIn) {
-            ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { }
-            ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { }
+            ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { onViewBookings() }
+            ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { onViewSavedVendors() }
         }
         ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { onHelpSupport() }
         ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { onLanguage() }
