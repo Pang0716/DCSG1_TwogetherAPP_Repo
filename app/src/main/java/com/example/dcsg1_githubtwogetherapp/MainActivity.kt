@@ -91,7 +91,8 @@ class MainActivity : ComponentActivity() {
                                 onHelpSupport = { navController.navigate("help_support") },
                                 onLanguage = { navController.navigate("language") },
                                 onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") },
-                                onProceedToPayment = { navController.navigate("payment") }
+                                onProceedToPayment = { navController.navigate("payment") },
+                                onViewBudgetDetails = { navController.navigate("budgetDetails") }
                             )
                         }
 
@@ -175,6 +176,10 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = { navController.popBackStack() },
                                 onPayNowClick = { /* TODO: next step — confirmation screen */ }
                             )
+                        }
+
+                        composable(route = "budgetDetails") {
+                            BudgetDetailsScreen(onBackClick = { navController.popBackStack() })
                         }
                     }
                 }

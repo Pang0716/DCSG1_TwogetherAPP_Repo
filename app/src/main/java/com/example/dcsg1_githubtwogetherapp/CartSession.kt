@@ -33,4 +33,8 @@ object CartSession {
 
     val selectedCount: Int
         get() = items.value.count { it.isChecked.value }
+
+    val totalCart: Double
+        get() = items.value.sumOf { priceToDouble(it.vendor.priceFrom) }
+
 }
