@@ -13,6 +13,15 @@ data class Vendor(
     val capacity: String = "",
     val highlights: String = ""
 )
-
-
-val sampleVendors = PG
+val sampleVendors = PG +
+        kualaLumpurVendors +
+        selangorVendors +
+        johorVendors +
+        melakaVendors +
+        perakVendors +
+        negeriSembilanVendors +
+        kedahVendors +
+        pahangVendors +
+        terengganuVendors +
+        kelantanVendors +
+        perlisVendors
