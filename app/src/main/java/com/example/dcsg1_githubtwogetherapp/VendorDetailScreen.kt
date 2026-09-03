@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
@@ -149,6 +150,7 @@ fun InfoColumn(
 fun VendorDetailTopBar(
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    onCopyLinkClick: () -> Unit,
     isFavorited: Boolean,
     onFavoriteClick: () -> Unit
 ) {
@@ -176,6 +178,16 @@ fun VendorDetailTopBar(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = onCopyLinkClick,
+                modifier = Modifier.size(38.dp)
+            ) {
+                Icon(
+                    Icons.Filled.Link,
+                    contentDescription = "Copy link",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             IconButton(
                 onClick = onShareClick,
                 modifier = Modifier.size(38.dp)
@@ -231,6 +243,7 @@ fun VendorDetailScreen(
             try {
                 favoriteRecord = withContext(Dispatchers.IO) { fetchFavorite(userId, vendor.name) }
             } catch (e: Exception) {
+                android.util.Log.e("VendorDetailScreen", "fetchFavorite failed for ${vendor.name}", e)
                 favoriteRecord = null
             }
         }
@@ -271,6 +284,17 @@ fun VendorDetailScreen(
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "Share via"))
                 },
+                onCopyLinkClick = {
+                    // Real link now - points to the deployed vendor.html preview page.
+                    // Note: this doesn't auto-open the app even if it's installed (that
+                    // needs Android App Links domain verification, out of scope for now).
+                    // Anyone who clicks it just sees the web preview of this one vendor.
+                    val realLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
+                    val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    val clipData = android.content.ClipData.newPlainText("Vendor link", realLink)
+                    clipboardManager.setPrimaryClip(clipData)
+                    android.widget.Toast.makeText(context, "Link copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                },
                 isFavorited = favoriteRecord != null,
                 onFavoriteClick = {
                     if (!isLoggedIn) {
@@ -291,6 +315,7 @@ fun VendorDetailScreen(
                                         favoriteRecord = withContext(Dispatchers.IO) { fetchFavorite(userId, vendor.name) }
                                     }
                                 } catch (e: Exception) {
+                                    android.util.Log.e("VendorDetailScreen", "favorite toggle failed for ${vendor.name}", e)
                                     // Network failure - leave the state unchanged, heart icon stays as is
                                 }
                             }
@@ -692,10 +717,9 @@ fun VendorDetailScreen(
                         showPackageSelection = false
                     } else {
                         CartSession.addVendor(vendor, selectedPackage)
-                        val userId = UserSession.currentUser.value?.id
-                        if (userId != null) {
-                            scope.launch { CartRepository.saveCartItem(context, userId, vendor.name, selectedPackage.name, true) }
-                        }
+                        // Toast isn't from the Practicals but it's about as standard as Android
+                        // gets for a quick one-off confirmation, same idea as the
+                        // Intent.ACTION_SEND share sheet added earlier
                         android.widget.Toast.makeText(
                             context,
                             "${selectedPackage.name} added to cart",
