@@ -31,20 +31,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.outlined.LocationCity
-import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.MusicNote
-import androidx.compose.material.icons.outlined.Mic
-import androidx.compose.material.icons.outlined.LocalFlorist
-import androidx.compose.material.icons.outlined.Checkroom
-import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
@@ -79,7 +70,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
 import java.util.*
@@ -89,8 +79,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.foundation.clickable
 
 
 data class QuickAction(val label: String, val iconResId: Int)
@@ -127,7 +115,7 @@ fun HomeTopBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 5.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -148,16 +136,14 @@ fun HomeTopBar() {
         Row {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(end = 16.dp)
+                modifier = Modifier.padding(end = 18.dp)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ChatBubbleOutline,
                     contentDescription = "Chat",
                     tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(25.dp)
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(text = "Chat", fontSize = 10.sp, color = Color.Gray)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -165,10 +151,8 @@ fun HomeTopBar() {
                     imageVector = Icons.Outlined.NotificationsNone,
                     contentDescription = "Notifications",
                     tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(25.dp)
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(text = "Notifications", fontSize = 10.sp, color = Color.Gray)
             }
         }
     }
@@ -634,6 +618,7 @@ fun HomeScreen(
     }
 
     Scaffold(
+        containerColor = Color(0xFFFDF8F3),
         bottomBar = {
             BottomNavBar(selectedIndex = selectedTab, onItemSelected = onTabSelected)
         }
@@ -681,17 +666,20 @@ fun HomeScreen(
         } else {
             Column(
                 modifier = Modifier
-                    .statusBarsPadding()
+                    .background(Color(0xFFFDF8F3))
+                    .padding(top = 10.dp)
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
             ) {
                 HomeTopBar()
+                Spacer(Modifier.height(8.dp))
                 LocationSelector(
                     selectedState = selectedState,
                     onStateChosen = { state ->
                         selectedState = state
                     }
                 )
+                Spacer(Modifier.height(10.dp))
                 WeddingDateCard(
                     onSetDateClick = {
                         if (isLoggedIn) showDatePickerDialog = true else showLoginDialog = true
@@ -702,10 +690,12 @@ fun HomeScreen(
                     context = context,
                     weddingSaveScope = coroutineScope
                 )
+                Spacer(Modifier.height(12.dp))
                 QuickActionsGrid(onCategoryClick = { category ->
                     pendingCategory = category
                     onTabSelected(1)
                 })
+                Spacer(Modifier.height(12.dp))
                 FeaturedVendorsSection(
                     currentArea = selectedState,
                     isLoggedIn = isLoggedIn,
@@ -717,11 +707,13 @@ fun HomeScreen(
                     }
                 )
                 if (isLoggedIn) {
+                    Spacer(Modifier.height(12.dp))
                     BudgetPlannerCard(
                         onSetBudgetClick = { showSetBudgetDialog = true },
                         onViewDetailsClick = { onViewBudgetDetails() }
                     )
                 }
+                Spacer(Modifier.height(16.dp))
             }
         }
     }
@@ -1315,10 +1307,3 @@ fun HomeScreenLoggedInPreview() {
         onBrowseVendors = {}
     )
 }
-
-
-
-
-
-
-
