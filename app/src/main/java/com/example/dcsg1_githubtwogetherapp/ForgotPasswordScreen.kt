@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.foundation.clickable
 
 @Composable
 fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
@@ -45,9 +46,17 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var resendCooldown by remember { mutableStateOf(0) }
 
     val scope = rememberCoroutineScope()
     val emailPattern = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
+    LaunchedEffect(resendCooldown) {
+        if (resendCooldown > 0) {
+            kotlinx.coroutines.delay(1000)
+            resendCooldown--
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -150,7 +159,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                             val result = sendPasswordResetEmail(email.trim())
                             isLoading = false
                             result
-                                .onSuccess { step = 2 }
+                                .onSuccess { step = 2; resendCooldown = 30 }
                                 .onFailure { errorMessage = it.message }
                         }
                     },
@@ -172,7 +181,29 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                     fontSize = 13.sp, color = Color.Gray
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Didn't get it? ", fontSize = 12.sp, color = Color.Gray)
+                    if (resendCooldown > 0) {
+                        Text("Resend in ${resendCooldown}s", fontSize = 12.sp, color = Color.Gray)
+                    } else {
+                        Text(
+                            "Resend Code",
+                            fontSize = 12.sp,
+                            color = Color(0xFFB5722C),
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable {
+                                scope.launch {
+                                    val result = sendPasswordResetEmail(email.trim())
+                                    result.onSuccess { resendCooldown = 30 }
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Live validation, same pattern as Register page
                 var codeTouched by remember { mutableStateOf(false) }

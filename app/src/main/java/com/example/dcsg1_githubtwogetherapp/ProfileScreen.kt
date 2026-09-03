@@ -90,6 +90,17 @@ fun ProfileScreen(
             if (isLoggedIn) {
                 Text(user?.fullName ?: "User", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(user?.email ?: "", fontSize = 13.sp, color = Color.Gray)
+                if (!user?.phoneNumber.isNullOrBlank()) {
+                    Text(user?.phoneNumber ?: "", fontSize = 13.sp, color = Color.Gray)
+                }
+                if (!user?.gender.isNullOrBlank() || !user?.dateOfBirth.isNullOrBlank()) {
+                    Text(
+                        listOfNotNull(user?.gender?.takeIf { it.isNotBlank() }, user?.dateOfBirth?.takeIf { it.isNotBlank() })
+                            .joinToString(" • "),
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
 

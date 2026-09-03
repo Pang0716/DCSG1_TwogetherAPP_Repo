@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 
 // ---- Validation logic, separated out so it's reusable and easy to read ----
@@ -237,10 +238,11 @@ fun RegisterScreen(
                 label = "Phone Number *",
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it; phoneTouched = true },
-                placeholder = "e.g. 012-3456789",
+                placeholder = "e.g. 012-345 6789",
                 icon = Icons.Filled.Phone,
                 keyboardType = KeyboardType.Phone,
-                error = if (phoneTouched) phoneError else null
+                error = if (phoneTouched) phoneError else null,
+                onFocusLost = { phoneNumber = formatMalaysianPhone(phoneNumber) }
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -315,7 +317,7 @@ fun RegisterScreen(
                     errorMessage = null
                     isLoading = true
                     scope.launch {
-                        val result = registerUser(email, password, fullName)
+                        val result = registerUser(email, password, fullName, phoneNumber)
                         isLoading = false
                         result
                             .onSuccess { showSuccessDialog = true }
@@ -403,7 +405,8 @@ fun ValidatedField(
     placeholder: String,
     icon: ImageVector,
     keyboardType: KeyboardType = KeyboardType.Text,
-    error: String?
+    error: String?,
+    onFocusLost: (() -> Unit)? = null
 ) {
     Column {
         Text(text = label, fontSize = 13.sp, color = Color.Black)
@@ -420,7 +423,11 @@ fun ValidatedField(
             },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             isError = error != null,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused) onFocusLost?.invoke()
+                },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,

@@ -21,14 +21,16 @@ import com.facebook.login.LoginResult
 import io.github.jan.supabase.auth.providers.Facebook
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.auth.OtpType
+import kotlinx.coroutines.launch
 
-suspend fun registerUser(email: String, password: String, fullName: String): Result<Unit> {
+suspend fun registerUser(email: String, password: String, fullName: String, phoneNumber: String): Result<Unit> {
     return try {
         supabase.auth.signUpWith(Email) {
             this.email = email
             this.password = password
             data = kotlinx.serialization.json.buildJsonObject {
                 put("full_name", kotlinx.serialization.json.JsonPrimitive(fullName))
+                put("phone_number", kotlinx.serialization.json.JsonPrimitive(phoneNumber))
             }
         }
         Result.success(Unit)
@@ -69,7 +71,15 @@ suspend fun loginUser(email: String, password: String): Result<Unit> {
 
 suspend fun logoutUser() {
     supabase.auth.signOut()
+    clearAllSessions()
+}
+
+fun clearAllSessions() {
     UserSession.currentUser.value = null
+    BudgetSession.totalBudget.value = 0.0
+    WeddingSession.weddingDateMillis.value = null
+    WeddingSession.guestList.value = emptyList()
+    CartSession.items.value = emptyList()
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
@@ -99,12 +109,29 @@ suspend fun signInWithFacebookOAuth() {
 fun loadCurrentUserProfile() {
     val user = supabase.auth.currentUserOrNull()
     if (user != null) {
-        UserSession.currentUser.value = UserProfile(
+        val profile = UserProfile(
             id = user.id,
             email = user.email,
             fullName = user.userMetadata?.get("full_name")?.toString()?.trim('"'),
-            avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"')
+            avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"'),
+            phoneNumber = user.userMetadata?.get("phone_number")?.toString()?.trim('"'),
+            gender = user.userMetadata?.get("gender")?.toString()?.trim('"'),
+            dateOfBirth = user.userMetadata?.get("date_of_birth")?.toString()?.trim('"')
         )
+        UserSession.currentUser.value = profile
+
+        // Cache locally too, so Profile still shows something even offline
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            UserRepository.saveUser(AppContextHolder.appContext, profile)
+        }
+    } else {
+        // Supabase has no session right now (e.g. no internet) — fall back to last cached login
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val cached = UserRepository.loadLastUser(AppContextHolder.appContext)
+            if (cached != null) {
+                UserSession.currentUser.value = cached
+            }
+        }
     }
 }
 
@@ -150,15 +177,36 @@ suspend fun verifyPasswordResetCode(email: String, code: String): Result<Unit> {
     }
 }
 
-suspend fun updateUserFullName(newName: String): Result<Unit> {
+suspend fun updateUserProfile(
+    fullName: String,
+    phoneNumber: String,
+    gender: String,
+    dateOfBirth: String
+): Result<Unit> {
     return try {
         supabase.auth.updateUser {
             data = kotlinx.serialization.json.buildJsonObject {
-                put("full_name", kotlinx.serialization.json.JsonPrimitive(newName))
+                put("full_name", kotlinx.serialization.json.JsonPrimitive(fullName))
+                put("phone_number", kotlinx.serialization.json.JsonPrimitive(phoneNumber))
+                put("gender", kotlinx.serialization.json.JsonPrimitive(gender))
+                put("date_of_birth", kotlinx.serialization.json.JsonPrimitive(dateOfBirth))
             }
         }
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(Exception("Failed to update profile. Please try again."))
+    }
+}
+
+/** Re-verifies the current password before allowing a sensitive change like updating the password. */
+suspend fun reauthenticate(email: String, currentPassword: String): Result<Unit> {
+    return try {
+        supabase.auth.signInWith(Email) {
+            this.email = email
+            this.password = currentPassword
+        }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(Exception("Current password is incorrect."))
     }
 }

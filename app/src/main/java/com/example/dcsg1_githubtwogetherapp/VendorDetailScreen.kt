@@ -249,6 +249,7 @@ fun VendorDetailScreen(
     var reviewSubmitError by remember { mutableStateOf<String?>(null) }
     var showPackageSelection by remember { mutableStateOf(false) }
     var favoriteRecord by remember { mutableStateOf<SupabaseFavorite?>(null) }
+    var showLoginDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -316,7 +317,7 @@ fun VendorDetailScreen(
                 isFavorited = favoriteRecord != null,
                 onFavoriteClick = {
                     if (!isLoggedIn) {
-                        onNavigateToLogin()
+                        showLoginDialog = true
                     } else {
                         val userId = UserSession.currentUser.value?.id
                         if (userId != null) {
@@ -369,7 +370,7 @@ fun VendorDetailScreen(
                         if (isLoggedIn) {
                             showPackageSelection = true
                         } else {
-                            onNavigateToLogin()
+                            showLoginDialog = true
                         }
                     },
                     modifier = Modifier
@@ -657,7 +658,7 @@ fun VendorDetailScreen(
                                 submitError = reviewSubmitError,
                                 onSubmit = { rating, comment ->
                                     if (!isLoggedIn) {
-                                        onNavigateToLogin()
+                                        showLoginDialog = true
                                     } else {
                                         val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
                                         reviewSubmitError = null
@@ -721,6 +722,16 @@ fun VendorDetailScreen(
         PhotoViewerDialog(photo = photo, onDismiss = { selectedPhoto = null })
     }
 
+    if (showLoginDialog) {
+        LoginRequiredDialog(
+            onDismiss = { showLoginDialog = false },
+            onLoginClick = {
+                showLoginDialog = false
+                onNavigateToLogin()
+            }
+        )
+    }
+
     if (showPackageSelection) {
         ModalBottomSheet(
             onDismissRequest = { showPackageSelection = false },
@@ -731,7 +742,7 @@ fun VendorDetailScreen(
                 packages = packages,
                 onContinueClick = { selectedPackage ->
                     if (!isLoggedIn) {
-                        onNavigateToLogin()
+                        showLoginDialog = true
                         showPackageSelection = false
                     } else {
                         CartSession.addVendor(vendor, selectedPackage)

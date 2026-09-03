@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,8 +162,7 @@ fun VerticalDivider() {
 
 @Composable
 fun ExpenseItemCard(cartItem: CartItem) {
-    val icon = quickActions.find { it.label.equals(cartItem.vendor.category, ignoreCase = true) }?.icon
-        ?: Icons.Outlined.MoreHoriz
+    val iconResId = quickActions.find { it.label.equals(cartItem.vendor.category, ignoreCase = true) }?.iconResId
 
     Row(
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
@@ -172,14 +173,18 @@ fun ExpenseItemCard(cartItem: CartItem) {
             modifier = Modifier.size(44.dp).clip(CircleShape).background(Color(0xFFFDECD8)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(22.dp))
+            if (iconResId != null) {
+                Image(painter = painterResource(id = iconResId), contentDescription = null, modifier = Modifier.size(22.dp))
+            } else {
+                Icon(imageVector = Icons.Outlined.MoreHoriz, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(22.dp))
+            }
         }
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(cartItem.vendor.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Text(cartItem.vendor.category, fontSize = 12.sp, color = Color.Gray)
         }
-        Text(cartItem.vendor.priceFrom, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+        Text(cartItem.selectedPackage.price, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
     }
 }
 

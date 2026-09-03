@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppContextHolder.appContext = applicationContext
         FacebookSdk.sdkInitialize(applicationContext)
 
         // Apply saved language on every app launch
@@ -94,7 +95,10 @@ class MainActivity : ComponentActivity() {
                                 onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") },
                                 onProceedToPayment = { navController.navigate("payment") },
                                 onViewBudgetDetails = { navController.navigate("budgetDetails") },
-                                onViewSavedVendors = { navController.navigate("savedVendors") }
+                                onViewSavedVendors = { navController.navigate("savedVendors") },
+                                onBrowseVendors = { category ->
+                                    selectedHomeTab = 1
+                                }
                             )
                         }
 

@@ -14,6 +14,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +32,11 @@ import androidx.compose.ui.layout.ContentScale
 @Composable
 fun DesignScreen(
     onBackClick: () -> Unit,
-    onCreateNowClick: () -> Unit
+    onCreateNowClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onNavigateToLogin: () -> Unit
 ) {
+    var showLoginDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,7 +111,9 @@ fun DesignScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
-                onClick = onCreateNowClick,
+                onClick = {
+                    if (isLoggedIn) onCreateNowClick() else showLoginDialog = true
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -114,5 +123,15 @@ fun DesignScreen(
                 Text("Create Now", fontSize = 15.sp)
             }
         }
+    }
+
+    if (showLoginDialog) {
+        LoginRequiredDialog(
+            onDismiss = { showLoginDialog = false },
+            onLoginClick = {
+                showLoginDialog = false
+                onNavigateToLogin()
+            }
+        )
     }
 }
