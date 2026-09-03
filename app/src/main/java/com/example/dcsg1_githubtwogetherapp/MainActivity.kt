@@ -98,7 +98,8 @@ class MainActivity : ComponentActivity() {
                                 onViewSavedVendors = { navController.navigate("savedVendors") },
                                 onBrowseVendors = { category ->
                                     selectedHomeTab = 1
-                                }
+                                },
+                                onCreateDesignClick = { navController.navigate("choose_design") }
                             )
                         }
 
@@ -222,6 +223,36 @@ class MainActivity : ComponentActivity() {
                                 onVendorClick = { vendor -> navController.navigate("vendorDetail/${vendor.name}") }
                             )
                         }
+
+                        composable("design") {
+                            DesignScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onCreateNowClick = { navController.navigate("choose_design") },
+                                isLoggedIn = isLoggedIn,
+                                onNavigateToLogin = { navController.navigate("login") }
+                            )
+                        }
+
+                        composable("choose_design") {
+                            ChooseDesignScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onStyleSelected = { styleId ->
+                                    navController.navigate("design_editor/$styleId")
+                                }
+                            )
+                        }
+
+                        composable(
+                            route = "design_editor/{styleId}",
+                            arguments = listOf(navArgument("styleId") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val styleId = backStackEntry.arguments?.getString("styleId") ?: "Gold"
+                            DesignEditorScreen(
+                                initialStyle = styleId,
+                                onBackClick = { navController.popBackStack() },
+                                onSaveClick = { design -> /* Room + Supabase save later */ }
+                            )
+                        }
                     }
                 }
             }
@@ -263,4 +294,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

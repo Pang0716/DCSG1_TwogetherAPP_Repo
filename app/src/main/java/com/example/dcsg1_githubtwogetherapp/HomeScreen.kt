@@ -540,7 +540,8 @@ fun HomeScreen(
     onProceedToPayment: () -> Unit,
     onViewBudgetDetails: () -> Unit,
     onViewSavedVendors: () -> Unit,
-    onBrowseVendors: (String) -> Unit
+    onBrowseVendors: (String) -> Unit,
+    onCreateDesignClick: () -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -636,11 +637,12 @@ fun HomeScreen(
             Box(modifier = Modifier.padding(innerPadding)) {
                 DesignScreen(
                     onBackClick = { onTabSelected(0) },
-                    onCreateNowClick = { /* TODO: next step — invitation templates/editor */ },
+                    onCreateNowClick = onCreateDesignClick,
                     isLoggedIn = isLoggedIn,
                     onNavigateToLogin = onNavigateToLogin
                 )
             }
+
         } else if (selectedTab == 3) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 CartScreen(
@@ -1284,7 +1286,8 @@ fun HomeScreenPreview() {
         onProceedToPayment = {},
         onViewBudgetDetails = { },
         onViewSavedVendors = { },
-        onBrowseVendors = {}
+        onBrowseVendors = {},
+        onCreateDesignClick = {}
     )
 }
 
@@ -1304,6 +1307,7 @@ fun HomeScreenLoggedInPreview() {
         onProceedToPayment = {},
         onViewBudgetDetails = { },
         onViewSavedVendors = { },
-        onBrowseVendors = {}
+        onBrowseVendors = {},
+        onCreateDesignClick = {}
     )
 }
