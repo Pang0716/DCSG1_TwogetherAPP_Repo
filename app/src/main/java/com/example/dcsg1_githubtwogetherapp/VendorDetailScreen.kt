@@ -746,6 +746,25 @@ fun VendorDetailScreen(
                         showPackageSelection = false
                     } else {
                         CartSession.addVendor(vendor, selectedPackage)
+                        // This part (CartSession.addVendor) only updates the in-memory list -
+                        // it doesn't survive a reload from CartRepository (e.g. HomeScreen's
+                        // LaunchedEffect(isLoggedIn) calling CartRepository.loadCart). Need to
+                        // actually persist it too, same saveCartItem() the rest of the cart
+                        // flow uses (Supabase + local Room, handled inside that function).
+                        val userId = UserSession.currentUser.value?.id
+                        if (userId != null) {
+                            scope.launch {
+                                withContext(Dispatchers.IO) {
+                                    CartRepository.saveCartItem(
+                                        context = context,
+                                        userId = userId,
+                                        vendorName = vendor.name,
+                                        packageName = selectedPackage.name,
+                                        isChecked = true
+                                    )
+                                }
+                            }
+                        }
                         // Toast isn't from the Practicals but it's about as standard as Android
                         // gets for a quick one-off confirmation, same idea as the
                         // Intent.ACTION_SEND share sheet added earlier
