@@ -21,12 +21,6 @@ val PG = listOf(
         highlights = "Sea view ballroom, heritage architecture, in-house catering"
     ),
     Vendor(
-        "Royale Chulan Penang", "Venue", 4.8, 156, "RM48,500", null,
-        R.drawable.royalchulan, "George Town", "Penang",
-        capacity = "150 - 900 pax",
-        highlights = "Heritage ballroom, in-house catering, valet parking"
-    ),
-    Vendor(
         "Berjaya Penang Hotel", "Venue", 4.5, 64, "RM22,000", null,
         R.drawable.berjayapenang, "George Town", "Penang",
         capacity = "100 - 500 pax",
