@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.statusBarsPadding
 
 data class PaymentMethod(
     val id: String,
@@ -75,6 +76,7 @@ fun PaymentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFDF8F3))
+            .statusBarsPadding()
     ) {
         Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
             Icon(
