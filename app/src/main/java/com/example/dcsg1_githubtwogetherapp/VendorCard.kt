@@ -241,7 +241,12 @@ fun BrowseVendorsScreen(
     var query by remember { mutableStateOf("") }
     val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire","Deco")
     var selectedCategory by remember { mutableStateOf(initialCategory) }
-    var selectedState by remember { mutableStateOf("Penang") }
+    // Was: var selectedState by remember { mutableStateOf("Penang") } - that reset to
+    // "Penang" every time this screen got recreated (e.g. navigating into
+    // VendorDetailScreen and back). Now reads/writes VendorFilterSession instead, same
+    // "hold it in a global object" pattern as CartSession/BudgetSession/UserSession, so
+    // the selected state survives navigating away and back.
+    var selectedState by VendorFilterSession.selectedState
     val filteredVendors = vendors.filter { vendor ->
         val matchesState = vendor.locationState == selectedState
         val matchesCategory = selectedCategory == "All" || vendor.category == selectedCategory
