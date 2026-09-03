@@ -292,10 +292,10 @@ fun VendorDetailScreen(
             VendorDetailTopBar(
                 onBackClick = onBackClick,
                 onShareClick = {
-                    // Real link now - points to the deployed vendor.html preview page.
-                    // Note: this doesn't auto-open the app even if it's installed (that
-                    // needs Android App Links domain verification, out of scope for now).
-                    // Anyone who clicks it just sees the web preview of this one vendor.
+                    // Points to the deployed vendor.html preview page for this specific
+                    // vendor. Doesn't auto-open the app even if it's installed (that needs
+                    // Android App Links domain verification, out of scope for now) -
+                    // anyone who clicks it just sees the web preview of this one vendor.
                     val vendorLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
