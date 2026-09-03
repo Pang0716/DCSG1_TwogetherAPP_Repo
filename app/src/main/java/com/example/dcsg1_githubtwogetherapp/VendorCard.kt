@@ -299,7 +299,7 @@ fun BrowseVendorsTopBar(onBackClick: () -> Unit) {
     ) {
         Text(
             text = "Browse Vendors",
-            fontSize = 17.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
         )
