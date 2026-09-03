@@ -254,14 +254,14 @@ private fun decoPackages(basePrice: Int, variant: Int): List<PackageOption> {
             name = n[0],
             price = formatPrice(basePrice),
             capacity = "Up to 100 pax venue",
-            imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+            imageResId = R.drawable.elegancepackage,
             tags = listOf("Backdrop setup", "Basic floral", "Table centerpieces")
         ),
         PackageOption(
             name = n[1],
             price = formatPrice((basePrice * 1.4).toInt()),
             capacity = "Up to 300 pax venue",
-            imageUrl = "https://images.pexels.com/photos/265947/pexels-photo-265947.jpeg",
+            imageResId = R.drawable.signaturepackage,
             tags = listOf("Custom theme design", "Floral arch", "Ambient lighting"),
             isPopular = true
         ),
@@ -269,7 +269,7 @@ private fun decoPackages(basePrice: Int, variant: Int): List<PackageOption> {
             name = n[2],
             price = formatPrice((basePrice * 1.9).toInt()),
             capacity = "Up to 800 pax venue",
-            imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
+            imageResId = R.drawable.grandcelebrationpackage,
             tags = listOf("Full venue transformation", "Premium florals", "LED lighting design")
         )
     )
