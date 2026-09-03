@@ -38,6 +38,8 @@ import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -154,6 +156,8 @@ fun VendorDetailTopBar(
     isFavorited: Boolean,
     onFavoriteClick: () -> Unit
 ) {
+    var showShareMenu by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,25 +182,38 @@ fun VendorDetailTopBar(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onCopyLinkClick,
-                modifier = Modifier.size(38.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Link,
-                    contentDescription = "Copy link",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            IconButton(
-                onClick = onShareClick,
-                modifier = Modifier.size(38.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Share,
-                    contentDescription = "Share",
-                    modifier = Modifier.size(20.dp)
-                )
+            Box {
+                IconButton(
+                    onClick = { showShareMenu = true },
+                    modifier = Modifier.size(38.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Share,
+                        contentDescription = "Share",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showShareMenu,
+                    onDismissRequest = { showShareMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Share via...") },
+                        onClick = {
+                            showShareMenu = false
+                            onShareClick()
+                        },
+                        leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Copy link") },
+                        onClick = {
+                            showShareMenu = false
+                            onCopyLinkClick()
+                        },
+                        leadingIcon = { Icon(Icons.Filled.Link, contentDescription = null) }
+                    )
+                }
             }
             IconButton(
                 onClick = onFavoriteClick,
@@ -275,23 +292,24 @@ fun VendorDetailScreen(
             VendorDetailTopBar(
                 onBackClick = onBackClick,
                 onShareClick = {
+                    // Real link now - points to the deployed vendor.html preview page.
+                    // Note: this doesn't auto-open the app even if it's installed (that
+                    // needs Android App Links domain verification, out of scope for now).
+                    // Anyone who clicks it just sees the web preview of this one vendor.
+                    val vendorLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(
                             Intent.EXTRA_TEXT,
-                            "Check out ${vendor.name} on Twogether! From ${vendor.priceFrom}."
+                            "Check out ${vendor.name} on Twogether! From ${vendor.priceFrom}.\n$vendorLink"
                         )
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "Share via"))
                 },
                 onCopyLinkClick = {
-                    // Real link now - points to the deployed vendor.html preview page.
-                    // Note: this doesn't auto-open the app even if it's installed (that
-                    // needs Android App Links domain verification, out of scope for now).
-                    // Anyone who clicks it just sees the web preview of this one vendor.
-                    val realLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
+                    val vendorLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
                     val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                    val clipData = android.content.ClipData.newPlainText("Vendor link", realLink)
+                    val clipData = android.content.ClipData.newPlainText("Vendor link", vendorLink)
                     clipboardManager.setPrimaryClip(clipData)
                     android.widget.Toast.makeText(context, "Link copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
                 },
