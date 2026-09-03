@@ -191,7 +191,7 @@ class MainActivity : ComponentActivity() {
                             var isProcessing by remember { mutableStateOf(false) }
                             PaymentScreen(
                                 onBackClick = { navController.popBackStack() },
-                                onPayNowClick = {
+                                onPayNowClick = { methodLabel ->
                                     if (!isProcessing) {
                                         val userId = UserSession.currentUser.value?.id
                                         if (userId != null) {
@@ -202,7 +202,7 @@ class MainActivity : ComponentActivity() {
                                                     BookingRepository.saveBooking(
                                                         context, userId,
                                                         item.vendor.name, item.vendor.category,
-                                                        item.selectedPackage.price, "Selected method"
+                                                        item.selectedPackage.price, methodLabel
                                                     )
                                                     CartRepository.removeCartItem(context, userId, item.vendor.name)
                                                 }
@@ -296,10 +296,28 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("myBookings") {
-                            MyBookingsScreen(onBackClick = {
-                                selectedHomeTab = 4
-                                navController.popBackStack("home", inclusive = false)
-                            })
+                            var selectedBookingId by remember { mutableStateOf<Int?>(null) }
+                            var loadedBookings by remember { mutableStateOf<List<BookingEntity>>(emptyList()) }
+
+                            MyBookingsScreen(
+                                onBackClick = {
+                                    selectedHomeTab = 4
+                                    navController.popBackStack("home", inclusive = false)
+                                },
+                                onBookingClick = { booking ->
+                                    selectedBookingId = booking.localId
+                                    loadedBookings = loadedBookings + booking
+                                }
+                            )
+
+                            selectedBookingId?.let { id ->
+                                loadedBookings.find { it.localId == id }?.let { booking ->
+                                    BookingDetailScreen(
+                                        booking = booking,
+                                        onBackClick = { selectedBookingId = null }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.dcsg1_githubtwogetherapp
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,16 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyBookingsScreen(onBackClick: () -> Unit) {
+fun MyBookingsScreen(onBackClick: () -> Unit, onBookingClick: (BookingEntity) -> Unit) {
     val context = LocalContext.current
     var bookings by remember { mutableStateOf<List<BookingEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -74,7 +79,9 @@ fun MyBookingsScreen(onBackClick: () -> Unit) {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(bookings) { booking -> BookingRow(booking) }
+                    items(bookings, key = { it.localId }) { booking ->
+                        BookingRow(booking, onClick = { onBookingClick(booking) })
+                    }
                 }
             }
         }
@@ -82,27 +89,45 @@ fun MyBookingsScreen(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun BookingRow(booking: BookingEntity) {
-    Column(
+fun BookingRow(booking: BookingEntity, onClick: () -> Unit) {
+    val vendor = sampleVendors.find { it.name == booking.vendorName }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(Color.White)
-            .padding(14.dp)
+            .clickable { onClick() }
+            .padding(12.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFFFDECD8))
         ) {
-            Text(booking.vendorName, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Text(booking.price, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+            when {
+                vendor?.imageResId != null -> Image(
+                    painter = painterResource(id = vendor.imageResId), contentDescription = vendor.name,
+                    contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
+                )
+                vendor?.imageUrl != null -> AsyncImage(
+                    model = vendor.imageUrl, contentDescription = vendor.name,
+                    contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
+                )
+                else -> Icon(Icons.Filled.Image, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.align(Alignment.Center))
+            }
         }
-        Text(booking.category, fontSize = 12.sp, color = Color.Gray)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "Booked on ${SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(booking.bookedAt))}",
-            fontSize = 11.sp,
-            color = Color.Gray
-        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(booking.vendorName, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(booking.category, fontSize = 12.sp, color = Color.Gray)
+            Text(
+                "Booked on ${SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(booking.bookedAt))}",
+                fontSize = 11.sp, color = Color.Gray
+            )
+        }
+
+        Text(booking.price, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
     }
 }
