@@ -42,6 +42,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -146,15 +148,99 @@ fun VendorCard(
 }
 
 @Composable
+fun FeaturedVendorCard(
+    vendor: Vendor,
+    isFavorited: Boolean,
+    onClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .width(160.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .border(1.dp, Color(0xFFE8DFD3), RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(110.dp)
+        ) {
+            if (vendor.imageResId != null) {
+                Image(
+                    painter = painterResource(id = vendor.imageResId),
+                    contentDescription = vendor.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                )
+            } else if (vendor.imageUrl != null) {
+                AsyncImage(
+                    model = vendor.imageUrl,
+                    contentDescription = vendor.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize().background(Color(0xFFF2F2F2)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Filled.Image, contentDescription = null, tint = Color.Gray)
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+                    .size(26.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Color.White)
+                    .clickable { onFavoriteClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (isFavorited) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = if (isFavorited) "Remove from favorites" else "Add to favorites",
+                    tint = if (isFavorited) Color(0xFFE24B4A) else Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+        }
+
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(
+                text = vendor.name,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black,
+                maxLines = 1
+            )
+            Spacer(Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Star, contentDescription = null, tint = Color(0xFFF5A623), modifier = Modifier.size(12.dp))
+                Spacer(Modifier.width(3.dp))
+                Text("${vendor.rating} (${vendor.reviewCount} reviews)", fontSize = 11.sp, color = Color.Gray)
+            }
+            Spacer(Modifier.height(3.dp))
+            Text("From ${vendor.priceFrom}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        }
+    }
+}
+
+@Composable
 fun BrowseVendorsScreen(
     vendors: List<Vendor>,
     onVendorClick: (Vendor) -> Unit,
     onBackClick: () -> Unit,
+    initialCategory: String = "All",
     modifier: Modifier = Modifier
 ) {
     var query by remember { mutableStateOf("") }
     val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire","Deco")
-    var selectedCategory by remember { mutableStateOf("All") }
+    var selectedCategory by remember { mutableStateOf(initialCategory) }
     var selectedState by remember { mutableStateOf("Penang") }
     val filteredVendors = vendors.filter { vendor ->
         val matchesState = vendor.locationState == selectedState

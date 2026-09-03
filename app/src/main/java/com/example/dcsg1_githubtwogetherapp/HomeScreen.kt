@@ -90,19 +90,20 @@ import androidx.compose.ui.platform.LocalFocusManager
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.foundation.clickable
 
 
-data class QuickAction(val label: String, val icon: ImageVector)
+data class QuickAction(val label: String, val iconResId: Int)
 
 val quickActions = listOf(
-    QuickAction("Venue", Icons.Outlined.LocationCity),
-    QuickAction("Photographer", Icons.Outlined.CameraAlt),
-    QuickAction("Makeup", Icons.Outlined.Face),
-    QuickAction("Live Band", Icons.Outlined.MusicNote),
-    QuickAction("Emcee", Icons.Outlined.Mic),
-    QuickAction("Deco", Icons.Outlined.LocalFlorist),
-    QuickAction("Attire", Icons.Outlined.Checkroom),
-    QuickAction("More", Icons.Outlined.MoreHoriz)
+    QuickAction("Venue", R.drawable.icon_venue),
+    QuickAction("Photographer", R.drawable.icon_photographer),
+    QuickAction("Makeup", R.drawable.icon_makeup),
+    QuickAction("Live Band", R.drawable.icon_liveband),
+    QuickAction("Emcee", R.drawable.icon_emcee),
+    QuickAction("Deco", R.drawable.icon_deco),
+    QuickAction("Attire", R.drawable.icon_attire),
+    QuickAction("More", R.drawable.icon_more)
 )
 
 data class NavItem(
@@ -387,7 +388,7 @@ fun WeddingDateCard(
 }
 
 @Composable
-fun QuickActionsGrid() {
+fun QuickActionsGrid(onCategoryClick: (String) -> Unit) {
     val rows = quickActions.chunked(4)
 
     Column(
@@ -403,7 +404,11 @@ fun QuickActionsGrid() {
                 rowItems.forEach { action ->
                     QuickActionItem(
                         action = action,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                onCategoryClick(if (action.label == "More") "All" else action.label)
+                            }
                     )
                 }
             }
@@ -424,10 +429,9 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
             .border(1.dp, Color(0xFFEFE0D0), RoundedCornerShape(14.dp))
             .padding(6.dp)
     ) {
-        Icon(
-            imageVector = action.icon,
+        Image(
+            painter = painterResource(id = action.iconResId),
             contentDescription = action.label,
-            tint = Color(0xFFB5722C),
             modifier = Modifier.size(34.dp)
         )
         Spacer(modifier = Modifier.height(6.dp))
@@ -443,9 +447,25 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
 @Composable
 fun FeaturedVendorsSection(
     currentArea: String,
-    onVendorClick: (Vendor) -> Unit = {}
+    isLoggedIn: Boolean,
+    onNavigateToLogin: () -> Unit,
+    onVendorClick: (Vendor) -> Unit = {},
+    onSeeAllClick: () -> Unit = {}
 ) {
     val filteredVendors = sampleVendors.filter { it.locationState == currentArea }
+    var favoriteNames by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val scope = rememberCoroutineScope()
+    var showLoginDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    LaunchedEffect(isLoggedIn) {
+        val userId = UserSession.currentUser.value?.id
+        if (isLoggedIn && userId != null) {
+            favoriteNames = FavoriteRepository.loadFavoriteNames(context, userId)
+        } else {
+            favoriteNames = emptySet()
+        }
+    }
 
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
         Row(
@@ -456,7 +476,12 @@ fun FeaturedVendorsSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Featured Vendors", fontSize = 16.sp, color = Color.Black)
-            Text("See All >", fontSize = 12.sp, color = Color(0xFFB5722C))
+            Text(
+                "See All >",
+                fontSize = 12.sp,
+                color = Color(0xFFB5722C),
+                modifier = Modifier.clickable { onSeeAllClick() }
+            )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -474,13 +499,47 @@ fun FeaturedVendorsSection(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(filteredVendors) { vendor ->
-                    VendorCard(
+                    FeaturedVendorCard(
                         vendor = vendor,
-                        onClick = { onVendorClick(vendor) }
+                        isFavorited = favoriteNames.contains(vendor.name),
+                        onClick = { onVendorClick(vendor) },
+                        onFavoriteClick = {
+                            if (!isLoggedIn) {
+                                showLoginDialog = true
+                            } else {
+                                val userId = UserSession.currentUser.value?.id
+                                if (userId != null) {
+                                    scope.launch {
+                                        try {
+                                            if (favoriteNames.contains(vendor.name)) {
+                                                val record = fetchFavorite(userId, vendor.name)
+                                                if (record != null) removeFavorite(record.id)
+                                                FavoriteRepository.cacheRemove(context, userId, vendor.name)
+                                                favoriteNames = favoriteNames - vendor.name
+                                            } else {
+                                                addFavorite(userId, vendor.name)
+                                                FavoriteRepository.cacheAdd(context, userId, vendor.name)
+                                                favoriteNames = favoriteNames + vendor.name
+                                            }
+                                        } catch (e: Exception) { /* leave state unchanged on failure */ }
+                                    }
+                                }
+                            }
+                        }
                     )
                 }
             }
         }
+    }
+
+    if (showLoginDialog) {
+        LoginRequiredDialog(
+            onDismiss = { showLoginDialog = false },
+            onLoginClick = {
+                showLoginDialog = false
+                onNavigateToLogin()
+            }
+        )
     }
 }
 @Composable
@@ -496,13 +555,15 @@ fun HomeScreen(
     onVendorClick: (Vendor) -> Unit,
     onProceedToPayment: () -> Unit,
     onViewBudgetDetails: () -> Unit,
-    onViewSavedVendors: () -> Unit
+    onViewSavedVendors: () -> Unit,
+    onBrowseVendors: (String) -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
     var showSetBudgetDialog by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showGuestListDialog by remember { mutableStateOf(false) }
+    var pendingCategory by remember { mutableStateOf("All") }
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -582,14 +643,17 @@ fun HomeScreen(
                 BrowseVendorsScreen(
                     vendors = sampleVendors,
                     onVendorClick = onVendorClick,
-                    onBackClick = { onTabSelected(0) }
+                    onBackClick = { onTabSelected(0) },
+                    initialCategory = pendingCategory
                 )
             }
         } else if (selectedTab == 2) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 DesignScreen(
                     onBackClick = { onTabSelected(0) },
-                    onCreateNowClick = { /* TODO: next step — invitation templates/editor */ }
+                    onCreateNowClick = { /* TODO: next step — invitation templates/editor */ },
+                    isLoggedIn = isLoggedIn,
+                    onNavigateToLogin = onNavigateToLogin
                 )
             }
         } else if (selectedTab == 3) {
@@ -638,8 +702,20 @@ fun HomeScreen(
                     context = context,
                     weddingSaveScope = coroutineScope
                 )
-                QuickActionsGrid()
-                FeaturedVendorsSection(currentArea = selectedState)
+                QuickActionsGrid(onCategoryClick = { category ->
+                    pendingCategory = category
+                    onTabSelected(1)
+                })
+                FeaturedVendorsSection(
+                    currentArea = selectedState,
+                    isLoggedIn = isLoggedIn,
+                    onNavigateToLogin = onNavigateToLogin,
+                    onVendorClick = onVendorClick,
+                    onSeeAllClick = {
+                        pendingCategory = "All"
+                        onTabSelected(1)
+                    }
+                )
                 if (isLoggedIn) {
                     BudgetPlannerCard(
                         onSetBudgetClick = { showSetBudgetDialog = true },
@@ -1215,7 +1291,8 @@ fun HomeScreenPreview() {
         onVendorClick = {},
         onProceedToPayment = {},
         onViewBudgetDetails = { },
-        onViewSavedVendors = { }
+        onViewSavedVendors = { },
+        onBrowseVendors = {}
     )
 }
 
@@ -1234,7 +1311,8 @@ fun HomeScreenLoggedInPreview() {
         onVendorClick = {},
         onProceedToPayment = {},
         onViewBudgetDetails = { },
-        onViewSavedVendors = { }
+        onViewSavedVendors = { },
+        onBrowseVendors = {}
     )
 }
 
