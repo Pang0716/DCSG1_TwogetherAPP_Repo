@@ -99,7 +99,9 @@ class MainActivity : ComponentActivity() {
                                 onBrowseVendors = { category ->
                                     selectedHomeTab = 1
                                 },
-                                onCreateDesignClick = { navController.navigate("choose_design") }
+                                onCreateDesignClick = { navController.navigate("choose_design") },
+                                onOpenChatList = { navController.navigate("chatList") },
+                                onViewMyBookings = { navController.navigate("myBookings") }
                             )
                         }
 
@@ -175,7 +177,10 @@ class MainActivity : ComponentActivity() {
                                     vendor = vendor,
                                     onBackClick = { navController.popBackStack() },
                                     isLoggedIn = isLoggedIn,
-                                    onNavigateToLogin = { navController.navigate("login") }
+                                    onNavigateToLogin = { navController.navigate("login") },
+                                    onChatClick = { vendorUserId ->
+                                        navController.navigate("chat/$vendorUserId/${android.net.Uri.encode(vendor.name)}/${android.net.Uri.encode(vendor.name)}")
+                                    }
                                 )
                             }
                         }
@@ -183,23 +188,28 @@ class MainActivity : ComponentActivity() {
                         composable("payment") {
                             val scope = rememberCoroutineScope()
                             val context = LocalContext.current
+                            var isProcessing by remember { mutableStateOf(false) }
                             PaymentScreen(
                                 onBackClick = { navController.popBackStack() },
                                 onPayNowClick = {
-                                    val userId = UserSession.currentUser.value?.id
-                                    if (userId != null) {
-                                        scope.launch {
-                                            CartSession.items.value
-                                                .filter { it.isChecked.value }
-                                                .forEach { item ->
+                                    if (!isProcessing) {
+                                        val userId = UserSession.currentUser.value?.id
+                                        if (userId != null) {
+                                            isProcessing = true
+                                            scope.launch {
+                                                val paidItems = CartSession.items.value.filter { it.isChecked.value }
+                                                paidItems.forEach { item ->
                                                     BookingRepository.saveBooking(
                                                         context, userId,
                                                         item.vendor.name, item.vendor.category,
-                                                        item.vendor.priceFrom, "Selected method"
+                                                        item.selectedPackage.price, "Selected method"
                                                     )
+                                                    CartRepository.removeCartItem(context, userId, item.vendor.name)
                                                 }
-                                            CartSession.items.value = CartSession.items.value.filterNot { it.isChecked.value }
-                                            navController.navigate("bookingConfirmation")
+                                                CartSession.items.value = CartSession.items.value.filterNot { it.isChecked.value }
+                                                isProcessing = false
+                                                navController.navigate("bookingConfirmation")
+                                            }
                                         }
                                     }
                                 }
@@ -208,7 +218,7 @@ class MainActivity : ComponentActivity() {
 
                         composable("bookingConfirmation") {
                             BookingConfirmationScreen(
-                                onViewMyBookings = { navController.navigate("home") /* update later once My Bookings screen exists */ },
+                                onViewMyBookings = { navController.navigate("myBookings") },
                                 onBackToHome = { navController.popBackStack("home", inclusive = false) }
                             )
                         }
@@ -252,6 +262,44 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = { navController.popBackStack() },
                                 onSaveClick = { design -> /* Room + Supabase save later */ }
                             )
+                        }
+
+                        composable(
+                            route = "chat/{otherPartyId}/{otherPartyName}/{vendorName}",
+                            arguments = listOf(
+                                navArgument("otherPartyId") { type = NavType.StringType },
+                                navArgument("otherPartyName") { type = NavType.StringType },
+                                navArgument("vendorName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val otherPartyId = backStackEntry.arguments?.getString("otherPartyId") ?: ""
+                            val otherPartyName = backStackEntry.arguments?.getString("otherPartyName") ?: ""
+                            val vendorName = backStackEntry.arguments?.getString("vendorName") ?: ""
+                            ChatScreen(
+                                otherPartyId = otherPartyId,
+                                otherPartyName = otherPartyName,
+                                vendorName = vendorName,
+                                onBackClick = { navController.popBackStack() },
+                                onVendorClick = { navController.navigate("vendorDetail/${android.net.Uri.encode(vendorName)}") }
+                            )
+                        }
+
+                        composable("chatList") {
+                            ChatListScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onConversationClick = { convo ->
+                                    navController.navigate(
+                                        "chat/${convo.otherPartyId}/${android.net.Uri.encode(convo.otherPartyName)}/${android.net.Uri.encode(convo.vendorName)}"
+                                    )
+                                }
+                            )
+                        }
+
+                        composable("myBookings") {
+                            MyBookingsScreen(onBackClick = {
+                                selectedHomeTab = 4
+                                navController.popBackStack("home", inclusive = false)
+                            })
                         }
                     }
                 }

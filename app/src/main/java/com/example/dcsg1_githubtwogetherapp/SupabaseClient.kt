@@ -13,4 +13,5 @@ val supabase = createSupabaseClient(
         scheme = "twogether"
     }
     install(Postgrest)
+    install(io.github.jan.supabase.realtime.Realtime)
 }

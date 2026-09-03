@@ -116,7 +116,8 @@ fun loadCurrentUserProfile() {
             avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"'),
             phoneNumber = user.userMetadata?.get("phone_number")?.toString()?.trim('"'),
             gender = user.userMetadata?.get("gender")?.toString()?.trim('"'),
-            dateOfBirth = user.userMetadata?.get("date_of_birth")?.toString()?.trim('"')
+            dateOfBirth = user.userMetadata?.get("date_of_birth")?.toString()?.trim('"'),
+            role = user.userMetadata?.get("role")?.toString()?.trim('"') ?: "customer"
         )
         UserSession.currentUser.value = profile
 

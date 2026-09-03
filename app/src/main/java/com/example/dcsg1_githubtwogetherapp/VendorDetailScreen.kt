@@ -237,6 +237,7 @@ fun VendorDetailScreen(
     onBackClick: () -> Unit,
     isLoggedIn: Boolean,
     onNavigateToLogin: () -> Unit,
+    onChatClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableStateOf("About") }
@@ -352,7 +353,20 @@ fun VendorDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedButton(
-                    onClick = {},
+                    onClick = {
+                        if (!isLoggedIn) {
+                            showLoginDialog = true
+                        } else {
+                            scope.launch {
+                                val vendorUserId = ChatRepository.resolveVendorAccount(vendor.name)
+                                if (vendorUserId != null) {
+                                    onChatClick(vendorUserId)
+                                } else {
+                                    android.widget.Toast.makeText(context, "This vendor hasn't set up chat yet.", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
@@ -841,7 +855,8 @@ fun VendorDetailScreenPreview() {
             vendor = sampleVendors[0],
             onBackClick = {},
             isLoggedIn = false,
-            onNavigateToLogin = {}
+            onNavigateToLogin = {},
+            onChatClick = {}
         )
     }
 }
