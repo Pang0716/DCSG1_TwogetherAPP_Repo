@@ -11,8 +11,11 @@ data class Vendor(
     val locationArea: String,
     val locationState: String,
     val capacity: String = "",
-    val highlights: String = ""
+    val highlights: String = "",
+    val photoResIds: List<Int> = emptyList(),
+    val photoUrls: List<String> = emptyList()
 )
+
 val sampleVendors = PG +
         kualaLumpurVendors +
         selangorVendors +

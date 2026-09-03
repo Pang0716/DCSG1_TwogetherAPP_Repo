@@ -1,5 +1,6 @@
 package com.example.dcsg1_githubtwogetherapp
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,15 +13,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
-/**
- * One row of up to two thumbnails, giving a "grid" effect.
- * This is NOT wrapped in its own LazyColumn - it's a plain Composable, called row-by-row
- * by the outer LazyColumn (in VendorDetailScreen) via items(photos.chunked(2)).
- * This avoids nesting a LazyColumn inside another LazyColumn.
- */
+
+@Composable
+private fun PhotoImage(photo: Photo, modifier: Modifier = Modifier) {
+    if (photo.resId != null) {
+        Image(
+            painter = painterResource(id = photo.resId),
+            contentDescription = "Vendor photo ${photo.id}",
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+        )
+    } else {
+        AsyncImage(
+            model = photo.url,
+            contentDescription = "Vendor photo ${photo.id}",
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+        )
+    }
+}
+
+
 @Composable
 fun PhotoThumbnailRow(
     photos: List<Photo>,
@@ -32,10 +49,8 @@ fun PhotoThumbnailRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         photos.forEach { photo ->
-            AsyncImage(
-                model = photo.url,
-                contentDescription = "Vendor photo ${photo.id}",
-                contentScale = ContentScale.Crop,
+            PhotoImage(
+                photo = photo,
                 modifier = Modifier
                     .weight(1f)
                     .height(140.dp)
@@ -50,22 +65,14 @@ fun PhotoThumbnailRow(
     }
 }
 
-/**
- * Full-size preview shown after tapping a thumbnail.
- * AlertDialog + a nullable state controls visibility - same pattern as the delete
- * confirmation dialog in Practical 6: non-null selectedPhoto shows it, and
- * onDismissRequest sets it back to null to close it.
- */
 @Composable
 fun PhotoViewerDialog(photo: Photo, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Photo") },
         text = {
-            AsyncImage(
-                model = photo.url,
-                contentDescription = "Vendor photo ${photo.id}",
-                contentScale = ContentScale.Crop,
+            PhotoImage(
+                photo = photo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)

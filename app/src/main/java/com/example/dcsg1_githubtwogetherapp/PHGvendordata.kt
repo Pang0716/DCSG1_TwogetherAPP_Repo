@@ -4,15 +4,17 @@ package com.example.dcsg1_githubtwogetherapp
 // Swap these out for real vendor listings when available.
 val pahangVendors: List<Vendor> = listOf(
     Vendor(
-        name = "Kuantan Palace Hotel",
+        name = "Hyatt Regency Kuantan Resort",
         category = "Venue",
         rating = 4.7,
         reviewCount = 211,
         priceFrom = "RM61,400",
-        imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.hyattregencykuantanresort,
         locationArea = "Kuantan",
         locationState = "Pahang",
-        capacity = "200 - 500 pax"
+        capacity = "200 - 500 pax",
+        highlights = "Halal catering, elegant ballroom, resort setting"
     ),
     Vendor(
         name = "Moments by Cameron Highlands",
@@ -20,10 +22,12 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 4.8,
         reviewCount = 41,
         priceFrom = "RM4,500",
-        imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.momentbycameron,
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
-        capacity = "Pre-wedding + ROM"
+        capacity = "Pre-wedding + ROM",
+        highlights = "Cinematic editing, drone footage, same-day gallery preview"
     ),
     Vendor(
         name = "Genting Highlands Bridal Makeup",
@@ -31,10 +35,12 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 5.0,
         reviewCount = 121,
         priceFrom = "RM2,000",
-        imageUrl = "https://images.pexels.com/photos/3065171/pexels-photo-3065171.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.gentinghighlandsbridalmakeup,
         locationArea = "Genting Highlands",
         locationState = "Pahang",
-        capacity = "Bridal + family"
+        capacity = "Bridal + family",
+        highlights = "Airbrush makeup, hairstyling included, trial session available"
     ),
     Vendor(
         name = "Kuantan Wedding Musicians",
@@ -42,10 +48,12 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 40,
         priceFrom = "RM5,000",
-        imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kuantanweddingmusicians,
         locationArea = "Kuantan",
         locationState = "Pahang",
-        capacity = "Trio band"
+        capacity = "Trio band",
+        highlights = "Customisable song list, live sound system, formal attire"
     ),
     Vendor(
         name = "MC Cameron Highlands",
@@ -53,10 +61,12 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 99,
         priceFrom = "RM1,100",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.mccameronhighlands,
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
-        capacity = "Trilingual hosting"
+        capacity = "Trilingual hosting",
+        highlights = "Trilingual hosting, custom script, rehearsal included"
     ),
     Vendor(
         name = "Genting Highlands Couture House",
@@ -64,10 +74,12 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 198,
         priceFrom = "RM1,700",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.gentinghighlandscouturehouse,
         locationArea = "Genting Highlands",
         locationState = "Pahang",
-        capacity = "2 outfit rentals"
+        capacity = "2 outfit rentals",
+        highlights = "Custom tailoring, fitting sessions included, accessories rental"
     ),
     Vendor(
         name = "Kuantan Event Styling",
@@ -75,20 +87,24 @@ val pahangVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 161,
         priceFrom = "RM9,900",
-        imageUrl = "https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kuantaneventstyling,
         locationArea = "Kuantan",
         locationState = "Pahang",
-        capacity = "Up to 100 pax venue"
+        capacity = "Up to 100 pax venue",
+        highlights = "Floral arch specialist, backdrop customization, setup & teardown included"
     ),
     Vendor(
-        name = "Regal Cameron Highlands Banquet",
+        name = "Cameron Highlands Resort",
         category = "Venue",
         rating = 4.7,
         reviewCount = 175,
         priceFrom = "RM51,200",
-        imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.cameronhighlandsresort,
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
-        capacity = "100 - 300 pax"
+        capacity = "100 - 300 pax",
+        highlights = "Highland resort views, garden ceremony, in-house catering"
     )
 )

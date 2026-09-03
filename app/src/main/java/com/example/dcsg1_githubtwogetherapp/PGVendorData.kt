@@ -6,25 +6,19 @@ val PG = listOf(
         "The Light Hotel Penang", "Venue", 4.9, 128, "RM45,900", null,
         R.drawable.the_light_hotel_png, "George Town", "Penang",
         capacity = "100 - 800 pax",
-        highlights = "Elegant ballroom, halal catering, custom packages"
+        highlights = "Elegant ballroom, halal catering, custom packages",
+        photoResIds = listOf(
+            R.drawable.thelighthotelroom,
+            R.drawable.thelighthotellobby,
+            R.drawable.thelighthotelballroom,
+            R.drawable.thelighthotelswimming
+        )
     ),
     Vendor(
         "Eastern & Oriental Hotel", "Venue", 4.8, 176, "RM52,000", null,
         R.drawable.eastern_orientalhotel_png, "George Town", "Penang",
         capacity = "150 - 1000 pax",
         highlights = "Sea view ballroom, heritage architecture, in-house catering"
-    ),
-    Vendor(
-        "Blue Water Wedding Venue", "Venue", 4.7, 88, "RM38,000", null,
-        R.drawable.bluewater, "Tanjung Bungah", "Penang",
-        capacity = "80 - 500 pax",
-        highlights = "Seaside garden setting, sunset ceremony, outdoor & indoor options"
-    ),
-    Vendor(
-        "Sunset Bay Resort", "Venue", 4.6, 210, "RM60,000", null,
-        R.drawable.sunsetresort, "Batu Ferringhi", "Penang",
-        capacity = "200 - 1200 pax",
-        highlights = "Beachfront resort, full event planning support, accommodation packages"
     ),
     Vendor(
         "Royale Chulan Penang", "Venue", 4.8, 156, "RM48,500", null,
@@ -68,13 +62,24 @@ val PG = listOf(
         "Timeless Photography", "Photographer", 4.9, 230, "RM1,200", null,
         R.drawable.timeless_photography_logo_png, "George Town", "Penang",
         capacity = "Full day coverage",
-        highlights = "Candid shots, drone footage, same-day sneak peek"
+        highlights = "Candid shots, drone footage, same-day sneak peek",
+        photoResIds = listOf(
+            R.drawable.photo1,
+            R.drawable.photo2,
+            R.drawable.photo3
+        ),
+
     ),
     Vendor(
         "Aperture Studios", "Photographer", 4.7, 142, "RM1,500", null,
         R.drawable.aperture_studio_logo_png, "Bayan Lepas", "Penang",
         capacity = "Half / full day packages",
-        highlights = "Cinematic editing, studio pre-wedding shoots, printed album"
+        highlights = "Cinematic editing, studio pre-wedding shoots, printed album",
+        photoResIds = listOf(
+            R.drawable.photo4,
+            R.drawable.photo5,
+            R.drawable.photo6
+        ),
     ),
     Vendor(
         "Lumina Photography", "Photographer", 4.8, 165, "RM1,350", null,
@@ -168,7 +173,7 @@ val PG = listOf(
     ),
     Vendor(
         "Golden Voice Emcee", "Emcee", 4.8, 95, "RM950", null,
-        null, "Bayan Lepas", "Penang",
+        R.drawable.goldenvoice, "Bayan Lepas", "Penang",
         capacity = "Trilingual hosting",
         highlights = "English/Malay/Mandarin, formal & fun tone options, rehearsal included"
     ),
@@ -188,33 +193,27 @@ val PG = listOf(
     ),
     Vendor(
         "Heritage Bridal House", "Attire", 4.9, 143, "RM1,800", null,
-        null, "George Town", "Penang",
+        R.drawable.heritagebridal, "George Town", "Penang",
         capacity = "Bride & groom outfits",
         highlights = "Handmade beading, kebaya & baju melayu options, free fitting sessions"
     ),
     Vendor(
         "Ivory & Lace Bridal", "Attire", 4.7, 76, "RM1,400", null,
-        null, "Komtar", "Penang",
+        R.drawable.ivory_lacebridal, "Komtar", "Penang",
         capacity = "Bride & groom outfits",
         highlights = "Western gown collection, alterations included, accessories rental"
-    ),
-    Vendor(
-        "Royal Silk Boutique", "Attire", 4.8, 112, "RM2,100", null,
-        null, "Tanjung Bungah", "Penang",
-        capacity = "Bride & groom outfits",
-        highlights = "Premium silk cheongsam, custom tailoring, heirloom-style designs"
     ),
 
     //  Deco
     Vendor(
         "Bloom & Vine Decor", "Deco", 4.8, 96, "RM3,500", null,
-        null, "George Town", "Penang",
+        R.drawable.bloom_vinedeco, "George Town", "Penang",
         capacity = "Full event styling",
         highlights = "Floral arch specialist, romantic garden theme, setup & teardown included"
     ),
     Vendor(
         "Elegant Touch Styling", "Deco", 4.6, 58, "RM2,800", null,
-        null, "Bayan Lepas", "Penang",
+        R.drawable.eleganttouchstyling, "Bayan Lepas", "Penang",
         capacity = "Full event styling",
         highlights = "Modern minimalist decor, LED lighting design, backdrop customization"
     )
