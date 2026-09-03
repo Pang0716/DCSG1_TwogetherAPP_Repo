@@ -1,18 +1,24 @@
 package com.example.dcsg1_githubtwogetherapp
 
-// Auto-generated placeholder vendor data for Selangor.
-// Swap these out for real vendor listings when available.
 val selangorVendors: List<Vendor> = listOf(
     Vendor(
-        name = "Regal Petaling Jaya Banquet",
+        name = "Mardhiyyah Hotel and Suites",
         category = "Venue",
-        rating = 4.8,
-        reviewCount = 60,
-        priceFrom = "RM64,700",
-        imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
-        locationArea = "Petaling Jaya",
+        rating = 4.5,
+        reviewCount = 178,
+        priceFrom = "RM32,000",
+        imageUrl = null,
+        imageResId = R.drawable.mardhiyyahhotel_suites,
+        locationArea = "Shah Alam",
         locationState = "Selangor",
-        capacity = "100 - 300 pax"
+        capacity = "150 - 400 pax",
+        highlights = "Fully halal-certified, dedicated Muslimah-friendly facilities, in-house catering",
+        photoResIds = listOf(
+            R.drawable.mardhiyyahroom,
+            R.drawable.mardhiyyahlobby,
+            R.drawable.mardhiyyahbuffet,
+            R.drawable.mardhiyyahswimming,
+        )
     ),
     Vendor(
         name = "Shah Alam Lens Studio",
@@ -23,7 +29,13 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
         locationArea = "Shah Alam",
         locationState = "Selangor",
-        capacity = "Pre-wedding + ROM"
+        capacity = "Pre-wedding + ROM",
+        highlights = "Cinematic editing, studio pre-wedding shoots, printed album",
+        photoResIds = listOf(
+            R.drawable.photography1,
+            R.drawable.photography2,
+            R.drawable.photography3,
+        )
     ),
     Vendor(
         name = "Subang Jaya Beauty Bar",
@@ -34,7 +46,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
         locationArea = "Subang Jaya",
         locationState = "Selangor",
-        capacity = "Bridal + entourage"
+        capacity = "Bridal + entourage",
+        highlights = "Natural glam look, long-lasting makeup, on-site service"
     ),
     Vendor(
         name = "Klang Wedding Musicians",
@@ -45,7 +58,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
         locationArea = "Klang",
         locationState = "Selangor",
-        capacity = "Trio band"
+        capacity = "Trio band",
+        highlights = "Wide song repertoire, MC-band combo package, sound & lighting included"
     ),
     Vendor(
         name = "Puchong Emcee Services",
@@ -56,7 +70,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
         locationArea = "Puchong",
         locationState = "Selangor",
-        capacity = "Trilingual hosting"
+        capacity = "Trilingual hosting",
+        highlights = "Trilingual hosting, formal & fun tone options, rehearsal included"
     ),
     Vendor(
         name = "Cyberjaya Bridal Boutique",
@@ -67,7 +82,13 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
         locationArea = "Cyberjaya",
         locationState = "Selangor",
-        capacity = "2 outfit rentals"
+        capacity = "2 outfit rentals",
+        highlights = "Modern & traditional styles, rental & purchase options, accessories included",
+        photoResIds = listOf(
+            R.drawable.attire_1,
+            R.drawable.attire_11,
+            R.drawable.attire_12,
+        )
     ),
     Vendor(
         name = "Kajang Wedding Deco",
@@ -78,18 +99,32 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
         locationArea = "Kajang",
         locationState = "Selangor",
-        capacity = "Up to 100 pax venue"
+        capacity = "Up to 100 pax venue",
+        highlights = "Floral arch specialist, romantic theme, setup & teardown included",
+        photoResIds = listOf(
+            R.drawable.deco_7,
+            R.drawable.deco_8,
+            R.drawable.deco_9,
+        )
     ),
     Vendor(
-        name = "Petaling Jaya Palace Hotel",
+        name = "Concorde Hotel Shah Alam",
         category = "Venue",
-        rating = 4.5,
-        reviewCount = 174,
-        priceFrom = "RM49,700",
-        imageUrl = "https://images.pexels.com/photos/265947/pexels-photo-265947.jpeg",
-        locationArea = "Petaling Jaya",
+        rating = 4.6,
+        reviewCount = 261,
+        priceFrom = "RM55,000",
+        imageUrl = null,
+        imageResId = R.drawable.concordehotel,
+        locationArea = "Shah Alam",
         locationState = "Selangor",
-        capacity = "300 - 800 pax"
+        capacity = "400 - 1000 pax",
+        highlights = "Grand ballroom for large weddings, halal catering, ample parking for guests",
+        photoResIds = listOf(
+            R.drawable.concordehotelroom,
+            R.drawable.concordehotelballroom,
+            R.drawable.concordehotelpool,
+            R.drawable.concordehotelrestaurant,
+        )
     ),
     Vendor(
         name = "Shah Alam Lens Studio 2",
@@ -100,7 +135,13 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
         locationArea = "Shah Alam",
         locationState = "Selangor",
-        capacity = "Pre-wedding + ROM"
+        capacity = "Pre-wedding + ROM",
+        highlights = "Natural light specialist, documentary style, second shooter included",
+        photoResIds = listOf(
+            R.drawable.photography4,
+            R.drawable.photography5,
+            R.drawable.photography6,
+        )
     ),
     Vendor(
         name = "Glow Studio Subang Jaya",
@@ -111,7 +152,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
         locationArea = "Subang Jaya",
         locationState = "Selangor",
-        capacity = "Bridal package"
+        capacity = "Bridal package",
+        highlights = "Airbrush makeup, hairstyling included, trial session available"
     ),
     Vendor(
         name = "Harmony Band Klang",
@@ -122,7 +164,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
         locationArea = "Klang",
         locationState = "Selangor",
-        capacity = "Full band"
+        capacity = "Full band",
+        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire"
     ),
     Vendor(
         name = "Puchong Emcee Services 2",
@@ -133,7 +176,8 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
         locationArea = "Puchong",
         locationState = "Selangor",
-        capacity = "Full event hosting"
+        capacity = "Full event hosting",
+        highlights = "Energetic hosting style, custom script, games & icebreakers"
     ),
     Vendor(
         name = "Elegance Bridal Cyberjaya",
@@ -144,7 +188,13 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
         locationArea = "Cyberjaya",
         locationState = "Selangor",
-        capacity = "2 outfit rentals"
+        capacity = "2 outfit rentals",
+        highlights = "Custom tailoring, in-house alterations, fitting sessions included",
+        photoResIds = listOf(
+            R.drawable.attire_6,
+            R.drawable.attire_7,
+            R.drawable.attire_8,
+        )
     ),
     Vendor(
         name = "Kajang Design Studio",
@@ -155,17 +205,32 @@ val selangorVendors: List<Vendor> = listOf(
         imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
         locationArea = "Kajang",
         locationState = "Selangor",
-        capacity = "Up to 100 pax venue"
+        capacity = "Up to 100 pax venue",
+        highlights = "Modern minimalist decor, LED lighting design, backdrop customization",
+        photoResIds = listOf(
+            R.drawable.deco_10,
+            R.drawable.deco_11,
+            R.drawable.deco_12,
+        )
     ),
     Vendor(
-        name = "The Petaling Jaya Convention Centre",
+        name = "Sunway Resort Hotel",
         category = "Venue",
-        rating = 4.6,
-        reviewCount = 182,
-        priceFrom = "RM60,400",
-        imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
-        locationArea = "Petaling Jaya",
+        rating = 4.5,
+        reviewCount = 203,
+        priceFrom = "RM38,500",
+        imageUrl = null,
+        imageResId = R.drawable.sunwayresorthotel,
+        locationArea = "Seri Kembangan",
         locationState = "Selangor",
-        capacity = "100 - 300 pax"
+        capacity = "200 - 500 pax",
+        highlights = "Lakeside ballroom views, wellness resort setting, spa packages for the couple",
+        photoResIds = listOf(
+            R.drawable.sunwayresortview,
+            R.drawable.sunwayresortballroom,
+            R.drawable.sunwayresortpool,
+            R.drawable.sunwayresortroom,
+            R.drawable.sunwayresortbuffet,
+        )
     )
 )

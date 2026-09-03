@@ -1,7 +1,5 @@
 package com.example.dcsg1_githubtwogetherapp
 
-// Auto-generated placeholder vendor data for Kuala Lumpur.
-// Swap these out for real vendor listings when available.
 val kualaLumpurVendors: List<Vendor> = listOf(
     Vendor(
         name = "The Majestic Hotel Kuala Lumpur, Autograph Collection",
@@ -15,6 +13,13 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         locationState = "Kuala Lumpur",
         capacity = "150 - 500 pax",
         highlights = "Colonial heritage ballroom, Tiffin Room afternoon tea, iconic 1930s architecture",
+        photoResIds = listOf(
+            R.drawable.majestichotel,
+            R.drawable.majesticlobby,
+            R.drawable.majesticbuffet,
+            R.drawable.majesticballroom,
+            R.drawable.majestichotelswimming
+        )
     ),
     Vendor(
         name = "Moments by KLCC",
@@ -22,11 +27,19 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 146,
         priceFrom = "RM5,900",
-        imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.momentbyklcc,
         locationArea = "KLCC",
         locationState = "Kuala Lumpur",
         capacity = "Full day coverage",
-        highlights = "Candid shots, drone footage, same-day sneak peek"
+        highlights = "Candid shots, drone footage, same-day sneak peek",
+        photoResIds = listOf(
+            R.drawable.klphoto1,
+            R.drawable.klphoto2,
+            R.drawable.klphoto3,
+            R.drawable.klphoto4,
+            R.drawable.klphoto5,
+        )
     ),
     Vendor(
         name = "Bangsar Beauty Bar",
@@ -34,11 +47,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 38,
         priceFrom = "RM3,000",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.bangsarbeautybar,
         locationArea = "Bangsar",
         locationState = "Kuala Lumpur",
         capacity = "Bridal + family",
-        highlights = "Natural glam look, long-lasting makeup, on-site service"
+        highlights = "Natural glam look, long-lasting makeup, on-site service",
+        photoResIds = listOf(
+            R.drawable.klmakeup1,
+            R.drawable.klmakeup2,
+            R.drawable.klmakeup3,
+            R.drawable.klmakeup4,
+        )
     ),
     Vendor(
         name = "Mont Kiara Sound Ensemble",
@@ -46,11 +66,17 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 5.0,
         reviewCount = 182,
         priceFrom = "RM4,500",
-        imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.montkiarasoundessemble,
         locationArea = "Mont Kiara",
         locationState = "Kuala Lumpur",
         capacity = "Full band",
-        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire"
+        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire",
+        photoResIds = listOf(
+            R.drawable.klliveband1,
+            R.drawable.klliveband2,
+            R.drawable.klliveband3,
+        )
     ),
     Vendor(
         name = "Cheras Emcee Services",
@@ -58,11 +84,17 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.9,
         reviewCount = 31,
         priceFrom = "RM900",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.mccherasservices,
         locationArea = "Cheras",
         locationState = "Kuala Lumpur",
         capacity = "Bilingual hosting",
-        highlights = "Bilingual hosting, warm tone, flexible timing"
+        highlights = "Bilingual hosting, warm tone, flexible timing",
+        photoResIds = listOf(
+            R.drawable.klemcee1,
+            R.drawable.klemcee2,
+            R.drawable.klemcee3,
+        )
     ),
     Vendor(
         name = "Setapak Wedding Attire",
@@ -70,11 +102,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 214,
         priceFrom = "RM2,900",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.setapakweddingattire,
         locationArea = "Setapak",
         locationState = "Kuala Lumpur",
         capacity = "2 outfit rentals",
-        highlights = "Modern & traditional styles, rental & purchase options, accessories included"
+        highlights = "Modern & traditional styles, rental & purchase options, accessories included",
+        photoResIds = listOf(
+            R.drawable.attire_17,
+            R.drawable.attire_18,
+            R.drawable.attire_19,
+            R.drawable.attire_20
+        )
     ),
     Vendor(
         name = "Ampang Event Styling",
@@ -82,11 +121,17 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.6,
         reviewCount = 178,
         priceFrom = "RM5,400",
-        imageUrl = "https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.ampangeventstyling,
         locationArea = "Ampang",
         locationState = "Kuala Lumpur",
         capacity = "Up to 100 pax venue",
-        highlights = "Full venue transformation, premium florals, custom theme design"
+        highlights = "Full venue transformation, premium florals, custom theme design",
+        photoResIds = listOf(
+            R.drawable.deco_4,
+            R.drawable.deco_5,
+            R.drawable.deco_6
+        )
     ),
     Vendor(
         name = "Mandarin Oriental, Kuala Lumpur",
@@ -106,11 +151,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 73,
         priceFrom = "RM6,200",
-        imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.klccweddingphotography,
         locationArea = "KLCC",
         locationState = "Kuala Lumpur",
         capacity = "Full day coverage",
-        highlights = "Candid shots, drone footage, same-day sneak peek"
+        highlights = "Candid shots, drone footage, same-day sneak peek",
+        photoResIds = listOf(
+            R.drawable.klphoto6,
+            R.drawable.klphoto7,
+            R.drawable.klphoto8,
+            R.drawable.klphoto9,
+        )
     ),
     Vendor(
         name = "Bangsar Bridal Makeup",
@@ -118,11 +170,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 42,
         priceFrom = "RM2,400",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.bangsarbridalmakeup,
         locationArea = "Bangsar",
         locationState = "Kuala Lumpur",
         capacity = "Bridal + entourage",
-        highlights = "HD makeup, traditional & modern styles, touch-up kit included"
+        highlights = "HD makeup, traditional & modern styles, touch-up kit included",
+        photoResIds = listOf(
+            R.drawable.klmakeup5,
+            R.drawable.klmakeup6,
+            R.drawable.klmakeup7,
+            R.drawable.klmakeup8,
+        )
     ),
     Vendor(
         name = "Harmony Collective",
@@ -130,11 +189,17 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 19,
         priceFrom = "RM5,000",
-        imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.harmonycollective,
         locationArea = "Mont Kiara",
         locationState = "Kuala Lumpur",
         capacity = "Duo acoustic",
-        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire"
+        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire",
+        photoResIds = listOf(
+            R.drawable.klliveband4,
+            R.drawable.klliveband5,
+            R.drawable.klliveband6,
+        )
     ),
     Vendor(
         name = "MC Cheras",
@@ -146,7 +211,12 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         locationArea = "Cheras",
         locationState = "Kuala Lumpur",
         capacity = "Full event hosting",
-        highlights = "Bilingual hosting, warm tone, flexible timing"
+        highlights = "Bilingual hosting, warm tone, flexible timing",
+        photoResIds = listOf(
+            R.drawable.klemcee4,
+            R.drawable.klemcee5,
+            R.drawable.klemcee6,
+        )
     ),
     Vendor(
         name = "Setapak Couture House",
@@ -154,11 +224,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 159,
         priceFrom = "RM3,600",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.setapakcouturehouse,
         locationArea = "Setapak",
         locationState = "Kuala Lumpur",
         capacity = "Full bridal set",
-        highlights = "Modern & traditional styles, rental & purchase options, accessories included"
+        highlights = "Modern & traditional styles, rental & purchase options, accessories included",
+        photoResIds = listOf(
+            R.drawable.attire_2,
+            R.drawable.attire_3,
+            R.drawable.attire_4,
+            R.drawable.attire_5,
+        )
     ),
     Vendor(
         name = "Bloom Deco Ampang",
@@ -166,11 +243,17 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 94,
         priceFrom = "RM5,700",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.bloomdecoampang,
         locationArea = "Ampang",
         locationState = "Kuala Lumpur",
         capacity = "Up to 300 pax venue",
-        highlights = "Full venue transformation, premium florals, custom theme design"
+        highlights = "Full venue transformation, premium florals, custom theme design",
+        photoResIds = listOf(
+            R.drawable.deco_1,
+            R.drawable.deco_2,
+            R.drawable.deco_3
+        )
     ),
     Vendor(
         name = "The St. Regis Kuala Lumpur",
@@ -178,11 +261,19 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.8,
         reviewCount = 142,
         priceFrom = "RM68,000",
-        imageUrl = "https://images.pexels.com/photos/265947/pexels-photo-265947.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.st_regis,
         locationArea = "KL Sentral",
         locationState = "Kuala Lumpur",
         capacity = "150 - 400 pax",
-        highlights = "Butler service, grand ballroom, five-star fine dining catering"
+        highlights = "Butler service, grand ballroom, five-star fine dining catering",
+        photoResIds = listOf(
+            R.drawable.stregislobby,
+            R.drawable.stregisroom,
+            R.drawable.stregissuite,
+            R.drawable.stregisballroom,
+            R.drawable.stregisswimming,
+        )
     ),
     Vendor(
         name = "Four Seasons Hotel Kuala Lumpur",
@@ -190,11 +281,18 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.9,
         reviewCount = 267,
         priceFrom = "RM75,500",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.fourseason,
         locationArea = "KLCC",
         locationState = "Kuala Lumpur",
         capacity = "200 - 600 pax",
-        highlights = "Twin Towers views, luxury ballroom, award-winning catering"
+        highlights = "Twin Towers views, luxury ballroom, award-winning catering",
+        photoResIds = listOf(
+            R.drawable.fourseasonspa,
+            R.drawable.fourseasonballroom,
+            R.drawable.fourseasonrestaurant,
+            R.drawable.fourseasonroom1,
+        )
     ),
     Vendor(
         name = "Shangri-La Kuala Lumpur",
@@ -202,11 +300,19 @@ val kualaLumpurVendors: List<Vendor> = listOf(
         rating = 4.6,
         reviewCount = 318,
         priceFrom = "RM42,000",
-        imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.shangrila,
         locationArea = "Bukit Bintang",
         locationState = "Kuala Lumpur",
         capacity = "250 - 700 pax",
-        highlights = "Grand ballroom, halal certified catering, experienced event team"
+        highlights = "Grand ballroom, halal certified catering, experienced event team",
+        photoResIds = listOf(
+            R.drawable.shangrilalobby,
+            R.drawable.shangrilaballroom,
+            R.drawable.shangrilaroom,
+            R.drawable.shangrilaroom1,
+            R.drawable.shangrilaspa,
+        )
     )
 
 )
