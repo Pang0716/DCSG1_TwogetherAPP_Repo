@@ -13,7 +13,8 @@ data class Vendor(
     val capacity: String = "",
     val highlights: String = "",
     val photoResIds: List<Int> = emptyList(),
-    val photoUrls: List<String> = emptyList()
+    val photoUrls: List<String> = emptyList(),
+    val sampleReviews: List<Review> = emptyList()
 )
 
 val sampleVendors = PG +
