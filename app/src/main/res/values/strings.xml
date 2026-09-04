@@ -532,4 +532,6 @@
 
     <string name="design_saved_title">Design Saved!</string>
     <string name="design_saved_message">Your wedding invitation has been saved. You can now share it with your loved ones.</string>
+
+    <string name="welcome_named_greeting">Welcome, %1$s! 👋</string>
 </resources>

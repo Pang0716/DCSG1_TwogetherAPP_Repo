@@ -528,4 +528,6 @@
 
     <string name="design_saved_title">设计已保存！</string>
     <string name="design_saved_message">您的婚礼请柬已保存。现在可以与亲友分享了。</string>
+
+    <string name="welcome_named_greeting">欢迎，%1$s！👋</string>
 </resources>

@@ -528,4 +528,6 @@
 
     <string name="design_saved_title">Reka Bentuk Disimpan!</string>
     <string name="design_saved_message">Jemputan perkahwinan anda telah disimpan. Anda kini boleh berkongsi dengan orang tersayang.</string>
+
+    <string name="welcome_named_greeting">Selamat Datang, %1$s! 👋</string>
 </resources>

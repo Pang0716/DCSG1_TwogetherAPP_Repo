@@ -127,14 +127,17 @@ private fun attirePackages(basePrice: Int, variant: Int, ctx: Context): List<Pac
     else listOf(R.string.pkg_name_attire_1_0, R.string.pkg_name_attire_1_1, R.string.pkg_name_attire_1_2)
     return listOf(
         PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_attire_0),
-            imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.attire1,
             tags = listOf(ctx.getString(R.string.pkg_tag_attire_0_0), ctx.getString(R.string.pkg_tag_attire_0_1), ctx.getString(R.string.pkg_tag_attire_0_2))),
         PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.3).toInt()), ctx.getString(R.string.pkg_cap_attire_1),
-            imageUrl = "https://images.pexels.com/photos/1444441/pexels-photo-1444441.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.attire5,
             tags = listOf(ctx.getString(R.string.pkg_tag_attire_1_0), ctx.getString(R.string.pkg_tag_attire_1_1), ctx.getString(R.string.pkg_tag_attire_1_2)),
             isPopular = true),
         PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.7).toInt()), ctx.getString(R.string.pkg_cap_attire_2),
-            imageUrl = "https://images.pexels.com/photos/265920/pexels-photo-265920.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.attire6,
             tags = listOf(ctx.getString(R.string.pkg_tag_attire_2_0), ctx.getString(R.string.pkg_tag_attire_2_1), ctx.getString(R.string.pkg_tag_attire_2_2)))
     )
 }

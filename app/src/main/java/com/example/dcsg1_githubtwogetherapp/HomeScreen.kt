@@ -152,7 +152,7 @@ fun HomeTopBar(
 
             Text(
                 text = if (isLoggedIn) {
-                    "Welcome, $userName! 👋"
+                    stringResource(R.string.welcome_named_greeting, userName)
                 } else {
                     stringResource(R.string.welcome_greeting)
                 },

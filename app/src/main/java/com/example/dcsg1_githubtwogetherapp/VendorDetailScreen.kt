@@ -170,7 +170,7 @@ fun VendorDetailTopBar(
             .fillMaxWidth()
             .background(Color(0xFFFDF8F3))
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .padding(top = 30.dp)
+            .padding(top = 20.dp)
     ) {
         Text(
             stringResource(R.string.vendor_details_title),
@@ -561,9 +561,10 @@ fun VendorDetailScreen(
                             Spacer(Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row {
+                                Row(modifier = Modifier.weight(1f)) {
                                     Icon(
                                         Icons.Filled.LocationOn,
                                         contentDescription = null,
@@ -575,15 +576,20 @@ fun VendorDetailScreen(
                                         Text(
                                             vendor.name,
                                             fontSize = 14.sp,
-                                            fontWeight = FontWeight.SemiBold
+                                            fontWeight = FontWeight.SemiBold,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
                                         Text(
                                             "${vendor.locationArea}, ${vendor.locationState}",
                                             fontSize = 13.sp,
-                                            color = Color.Gray
+                                            color = Color.Gray,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
                                     }
                                 }
+                                Spacer(Modifier.width(8.dp))
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.clickable {
