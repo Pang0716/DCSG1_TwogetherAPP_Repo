@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +41,15 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.layout.statusBarsPadding
+
+@Composable
+private fun localizedFontLabel(font: String): String = when (font) {
+    "Elegant" -> stringResource(R.string.font_elegant)
+    "Modern" -> stringResource(R.string.font_modern)
+    "Classic" -> stringResource(R.string.font_classic)
+    else -> font
+}
 
 @Composable
 fun DesignEditorScreen(
@@ -53,7 +63,6 @@ fun DesignEditorScreen(
         AppDatabase.getInstance(context).cardDesignDao()
     }
 
-    // Used to capture the wedding card as an image
     val graphicsLayer = rememberGraphicsLayer()
 
     var selectedStyle by remember {
@@ -78,6 +87,10 @@ fun DesignEditorScreen(
 
     var savedDesignId by remember {
         mutableStateOf<String?>(null)
+    }
+
+    var showSaveSuccess by remember {
+        mutableStateOf(false)
     }
 
     var eventDateMillis by remember {
@@ -107,23 +120,27 @@ fun DesignEditorScreen(
         ).format(Date(it))
     } ?: ""
 
-    fun validateNames(value: String): String? = when {
-        value.isBlank() -> "Required"
+    val requiredMsg = stringResource(R.string.required_field)
+    val lettersOnlyNamesMsg = stringResource(R.string.letters_only_names_error)
+    val lettersNumbersOnlyMsg = stringResource(R.string.letters_numbers_only_error)
+    val pleaseSelectDateMsg = stringResource(R.string.please_select_date)
+    val defaultCoupleNames = stringResource(R.string.default_couple_names)
+    val defaultEventDate = stringResource(R.string.default_event_date)
+    val defaultVenue = stringResource(R.string.default_venue)
 
+    fun validateNames(value: String): String? = when {
+        value.isBlank() -> requiredMsg
         !value.matches(
             Regex("^[a-zA-Z& ]+$")
-        ) -> "Letters only (e.g. Alex & Jamie)"
-
+        ) -> lettersOnlyNamesMsg
         else -> null
     }
 
     fun validateVenue(value: String): String? = when {
-        value.isBlank() -> "Required"
-
+        value.isBlank() -> requiredMsg
         !value.matches(
             Regex("^[a-zA-Z0-9,.\\- ]+$")
-        ) -> "Letters and numbers only"
-
+        ) -> lettersNumbersOnlyMsg
         else -> null
     }
 
@@ -166,13 +183,10 @@ fun DesignEditorScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFAEEDA))
+            .statusBarsPadding()
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-
-        // =========================
-        // TOP BAR
-        // =========================
 
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -194,7 +208,7 @@ fun DesignEditorScreen(
             }
 
             Text(
-                "Design",
+                stringResource(R.string.design_title),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
@@ -202,12 +216,8 @@ fun DesignEditorScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // =========================
-        // CHOOSE STYLE
-        // =========================
-
         Text(
-            "Choose a style",
+            stringResource(R.string.choose_a_style),
             fontWeight = FontWeight.Medium
         )
 
@@ -258,10 +268,6 @@ fun DesignEditorScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-
-        // =========================
-        // WEDDING CARD PREVIEW
-        // =========================
 
         Column(
             modifier = Modifier
@@ -325,7 +331,7 @@ fun DesignEditorScreen(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                "WE ARE GETTING MARRIED",
+                stringResource(R.string.we_are_getting_married),
                 fontSize = 11.sp,
                 letterSpacing = 1.5.sp,
                 color = currentStyleColor,
@@ -336,7 +342,7 @@ fun DesignEditorScreen(
 
             Text(
                 coupleNames.ifBlank {
-                    "Alex & Jamie"
+                    defaultCoupleNames
                 },
                 fontSize = 22.sp,
                 color = Color(0xFF412402),
@@ -346,8 +352,8 @@ fun DesignEditorScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                "${eventDate.ifBlank { "Dec 12, 2026" }} · ${
-                    venue.ifBlank { "The Garden Hall" }
+                "${eventDate.ifBlank { defaultEventDate }} · ${
+                    venue.ifBlank { defaultVenue }
                 }",
                 fontSize = 12.sp,
                 color = Color(0xFF854F0B),
@@ -356,10 +362,6 @@ fun DesignEditorScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-
-        // =========================
-        // ADD PHOTO
-        // =========================
 
         OutlinedButton(
             onClick = {
@@ -380,17 +382,13 @@ fun DesignEditorScreen(
 
             Spacer(Modifier.width(6.dp))
 
-            Text("Add photo")
+            Text(stringResource(R.string.add_photo))
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // =========================
-        // FONT STYLE
-        // =========================
-
         Text(
-            "Font style",
+            stringResource(R.string.font_style_label),
             fontWeight = FontWeight.Medium
         )
 
@@ -425,19 +423,15 @@ fun DesignEditorScreen(
                                 Color(0xFF412402)
                     )
                 ) {
-                    Text(font)
+                    Text(localizedFontLabel(font))
                 }
             }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // =========================
-        // DETAILS
-        // =========================
-
         Text(
-            "Details",
+            stringResource(R.string.details_label),
             fontWeight = FontWeight.Medium
         )
 
@@ -450,7 +444,7 @@ fun DesignEditorScreen(
                 namesError = null
             },
             placeholder = {
-                Text("e.g. Alex & Jamie")
+                Text(stringResource(R.string.couple_names_placeholder))
             },
             isError = namesError != null,
             supportingText = {
@@ -474,7 +468,7 @@ fun DesignEditorScreen(
                 readOnly = true,
                 enabled = false,
                 placeholder = {
-                    Text("Tap to select a date")
+                    Text(stringResource(R.string.tap_to_select_date))
                 },
                 isError = dateError != null,
                 supportingText = {
@@ -522,7 +516,7 @@ fun DesignEditorScreen(
                 venueError = null
             },
             placeholder = {
-                Text("e.g. The Garden Hall")
+                Text(stringResource(R.string.venue_placeholder))
             },
             isError = venueError != null,
             supportingText = {
@@ -538,10 +532,6 @@ fun DesignEditorScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // =========================
-        // SAVE DESIGN
-        // =========================
-
         Button(
             onClick = {
 
@@ -550,7 +540,7 @@ fun DesignEditorScreen(
 
                 dateError =
                     if (eventDateMillis == null)
-                        "Please select a date"
+                        pleaseSelectDateMsg
                     else
                         null
 
@@ -580,6 +570,7 @@ fun DesignEditorScreen(
                         )
 
                         savedDesignId = design.id
+                        showSaveSuccess = true
 
                         onSaveClick(design)
                     }
@@ -592,16 +583,12 @@ fun DesignEditorScreen(
         ) {
 
             Text(
-                "Save design",
+                stringResource(R.string.save_design),
                 color = Color.White
             )
         }
 
         Spacer(Modifier.height(8.dp))
-
-        // =========================
-        // SHARE
-        // =========================
 
         Button(
             onClick = {
@@ -634,13 +621,13 @@ fun DesignEditorScreen(
 
             Spacer(Modifier.width(6.dp))
 
-            Text("Share")
+            Text(stringResource(R.string.share_label))
         }
 
         if (savedDesignId == null) {
 
             Text(
-                "Save your design first to unlock sharing",
+                stringResource(R.string.save_first_to_share),
                 fontSize = 11.sp,
                 color = Color(0xFF9C8A66),
                 modifier = Modifier.fillMaxWidth(),
@@ -648,10 +635,6 @@ fun DesignEditorScreen(
             )
         }
     }
-
-    // =========================
-    // DATE PICKER
-    // =========================
 
     if (showDatePicker) {
 
@@ -692,7 +675,7 @@ fun DesignEditorScreen(
                         showDatePicker = false
                     }
                 ) {
-                    Text("Confirm")
+                    Text(stringResource(R.string.confirm))
                 }
             },
 
@@ -703,7 +686,7 @@ fun DesignEditorScreen(
                         showDatePicker = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -712,5 +695,18 @@ fun DesignEditorScreen(
                 state = datePickerState
             )
         }
+    }
+
+    if (showSaveSuccess) {
+        AlertDialog(
+            onDismissRequest = { showSaveSuccess = false },
+            title = { Text(stringResource(R.string.design_saved_title)) },
+            text = { Text(stringResource(R.string.design_saved_message)) },
+            confirmButton = {
+                TextButton(onClick = { showSaveSuccess = false }) {
+                    Text(stringResource(R.string.ok))
+                }
+            }
+        )
     }
 }

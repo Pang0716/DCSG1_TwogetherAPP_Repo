@@ -491,4 +491,45 @@
     <string name="pkg_tag_deco_2_0">Full venue transformation</string>
     <string name="pkg_tag_deco_2_1">Premium florals</string>
     <string name="pkg_tag_deco_2_2">LED lighting design</string>
+
+    <string name="design_title">Design</string>
+    <string name="design_headline">Create your digital\nwedding invitation</string>
+    <string name="design_subtitle">Design beautiful invitations to share\nwith your loved ones</string>
+    <string name="create_now">Create Now</string>
+    <string name="choose_design_title">Choose Design</string>
+    <string name="pick_style_hint">Pick a style to start customizing</string>
+    <string name="popular_badge">Popular</string>
+    <string name="tap_style_hint">Tap a style to open the customizer</string>
+    <string name="style_gold">Gold Elegance</string>
+    <string name="style_green">Sage Garden</string>
+    <string name="style_pink">Rose Blush</string>
+    <string name="style_blue">Ocean Mist</string>
+    <string name="wedding_invite_share_text">You\'re invited to our wedding! 💍</string>
+    <string name="share_wedding_invitation">Share wedding invitation</string>
+    <string name="share_failed">Share failed: %1$s</string>
+
+    <string name="choose_a_style">Choose a style</string>
+    <string name="add_photo">Add photo</string>
+    <string name="font_style_label">Font style</string>
+    <string name="font_elegant">Elegant</string>
+    <string name="font_modern">Modern</string>
+    <string name="font_classic">Classic</string>
+    <string name="details_label">Details</string>
+    <string name="required_field">Required</string>
+    <string name="letters_only_names_error">Letters only (e.g. Alex &amp; Jamie)</string>
+    <string name="letters_numbers_only_error">Letters and numbers only</string>
+    <string name="couple_names_placeholder">e.g. Alex &amp; Jamie</string>
+    <string name="tap_to_select_date">Tap to select a date</string>
+    <string name="please_select_date">Please select a date</string>
+    <string name="venue_placeholder">e.g. The Garden Hall</string>
+    <string name="we_are_getting_married">WE ARE GETTING MARRIED</string>
+    <string name="default_couple_names">Alex &amp; Jamie</string>
+    <string name="default_event_date">Dec 12, 2026</string>
+    <string name="default_venue">The Garden Hall</string>
+    <string name="save_design">Save design</string>
+    <string name="share_label">Share</string>
+    <string name="save_first_to_share">Save your design first to unlock sharing</string>
+
+    <string name="design_saved_title">Design Saved!</string>
+    <string name="design_saved_message">Your wedding invitation has been saved. You can now share it with your loved ones.</string>
 </resources>

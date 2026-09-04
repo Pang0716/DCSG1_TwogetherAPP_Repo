@@ -18,10 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.statusBarsPadding
 
 data class DesignStyle(
     val id: String,
@@ -30,6 +32,15 @@ data class DesignStyle(
     val emoji: String,
     val popular: Boolean = false
 )
+
+@Composable
+private fun localizedStyleLabel(id: String): String = when (id) {
+    "Gold" -> stringResource(R.string.style_gold)
+    "Green" -> stringResource(R.string.style_green)
+    "Pink" -> stringResource(R.string.style_pink)
+    "Blue" -> stringResource(R.string.style_blue)
+    else -> id
+}
 
 @Composable
 fun ChooseDesignScreen(
@@ -47,6 +58,7 @@ fun ChooseDesignScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFAEEDA))
+            .statusBarsPadding()
             .padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -54,7 +66,7 @@ fun ChooseDesignScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(
-                "Choose Design",
+                stringResource(R.string.choose_design_title),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 17.sp,
                 modifier = Modifier.weight(1f),
@@ -64,7 +76,7 @@ fun ChooseDesignScreen(
 
         Spacer(Modifier.height(6.dp))
         Text(
-            "Pick a style to start customizing",
+            stringResource(R.string.pick_style_hint),
             fontSize = 12.sp,
             color = Color(0xFF9C8A66),
             modifier = Modifier.fillMaxWidth(),
@@ -100,13 +112,13 @@ fun ChooseDesignScreen(
                                     .background(Color(0xFFBA7517))
                                     .padding(horizontal = 7.dp, vertical = 2.dp)
                             ) {
-                                Text("Popular", fontSize = 9.sp, color = Color.White)
+                                Text(stringResource(R.string.popular_badge), fontSize = 9.sp, color = Color.White)
                             }
                         }
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        style.label,
+                        localizedStyleLabel(style.id),
                         fontSize = 12.5.sp,
                         fontWeight = if (style.popular) FontWeight.SemiBold else FontWeight.Normal,
                         color = Color(0xFF412402)
@@ -117,7 +129,7 @@ fun ChooseDesignScreen(
 
         Spacer(Modifier.height(26.dp))
         Text(
-            "Tap a style to open the customizer",
+            stringResource(R.string.tap_style_hint),
             fontSize = 11.sp,
             color = Color(0xFF9C8A66),
             modifier = Modifier.fillMaxWidth(),
@@ -125,4 +137,3 @@ fun ChooseDesignScreen(
         )
     }
 }
-

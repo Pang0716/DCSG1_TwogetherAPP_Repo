@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,7 @@ fun DesignScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 14.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
@@ -53,12 +54,11 @@ fun DesignScreen(
                 tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .padding(start = 20.dp)
                     .clickable { onBackClick() }
             )
             Text(
-                text = "Design",
-                fontSize = 17.sp,
+                text = stringResource(R.string.design_title),
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 modifier = Modifier.align(Alignment.Center)
@@ -88,7 +88,7 @@ fun DesignScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Create your digital\nwedding invitation",
+                text = stringResource(R.string.design_headline),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.Black,
@@ -100,7 +100,7 @@ fun DesignScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Design beautiful invitations to share\nwith your loved ones",
+                text = stringResource(R.string.design_subtitle),
                 fontSize = 13.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
@@ -120,7 +120,7 @@ fun DesignScreen(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text("Create Now", fontSize = 15.sp)
+                Text(stringResource(R.string.create_now), fontSize = 15.sp)
             }
         }
     }

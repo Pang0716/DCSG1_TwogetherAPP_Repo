@@ -34,6 +34,9 @@ fun shareWeddingCard(
             file
         )
 
+        val shareText = context.getString(R.string.wedding_invite_share_text)
+        val shareTitle = context.getString(R.string.share_wedding_invitation)
+
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
 
@@ -44,7 +47,7 @@ fun shareWeddingCard(
 
             putExtra(
                 Intent.EXTRA_TEXT,
-                "You're invited to our wedding! 💍"
+                shareText
             )
 
             addFlags(
@@ -52,7 +55,7 @@ fun shareWeddingCard(
             )
 
             clipData = ClipData.newRawUri(
-                "Wedding Invitation",
+                shareTitle,
                 imageUri
             )
         }
@@ -60,7 +63,7 @@ fun shareWeddingCard(
         context.startActivity(
             Intent.createChooser(
                 shareIntent,
-                "Share wedding invitation"
+                shareTitle
             )
         )
 
@@ -68,7 +71,7 @@ fun shareWeddingCard(
 
         Toast.makeText(
             context,
-            "Share failed: ${e.message}",
+            context.getString(R.string.share_failed, e.message ?: ""),
             Toast.LENGTH_LONG
         ).show()
 

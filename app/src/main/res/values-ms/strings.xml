@@ -487,4 +487,45 @@
     <string name="pkg_tag_deco_2_0">Transformasi tempat penuh</string>
     <string name="pkg_tag_deco_2_1">Bunga premium</string>
     <string name="pkg_tag_deco_2_2">Reka bentuk pencahayaan LED</string>
+
+    <string name="design_title">Reka Bentuk</string>
+    <string name="design_headline">Cipta jemputan\nperkahwinan digital anda</string>
+    <string name="design_subtitle">Reka jemputan yang cantik untuk dikongsi\nbersama orang tersayang</string>
+    <string name="create_now">Cipta Sekarang</string>
+    <string name="choose_design_title">Pilih Reka Bentuk</string>
+    <string name="pick_style_hint">Pilih gaya untuk mula menyesuaikan</string>
+    <string name="popular_badge">Popular</string>
+    <string name="tap_style_hint">Ketik gaya untuk membuka penyesuai</string>
+    <string name="style_gold">Keanggunan Emas</string>
+    <string name="style_green">Taman Sage</string>
+    <string name="style_pink">Mawar Merah Jambu</string>
+    <string name="style_blue">Kabus Lautan</string>
+    <string name="wedding_invite_share_text">Anda dijemput ke majlis perkahwinan kami! 💍</string>
+    <string name="share_wedding_invitation">Kongsi jemputan perkahwinan</string>
+    <string name="share_failed">Perkongsian gagal: %1$s</string>
+
+    <string name="choose_a_style">Pilih gaya</string>
+    <string name="add_photo">Tambah foto</string>
+    <string name="font_style_label">Gaya fon</string>
+    <string name="font_elegant">Elegan</string>
+    <string name="font_modern">Moden</string>
+    <string name="font_classic">Klasik</string>
+    <string name="details_label">Butiran</string>
+    <string name="required_field">Diperlukan</string>
+    <string name="letters_only_names_error">Huruf sahaja (cth. Alex &amp; Jamie)</string>
+    <string name="letters_numbers_only_error">Huruf dan nombor sahaja</string>
+    <string name="couple_names_placeholder">cth. Alex &amp; Jamie</string>
+    <string name="tap_to_select_date">Ketik untuk pilih tarikh</string>
+    <string name="please_select_date">Sila pilih tarikh</string>
+    <string name="venue_placeholder">cth. The Garden Hall</string>
+    <string name="we_are_getting_married">KAMI AKAN BERKAHWIN</string>
+    <string name="default_couple_names">Alex &amp; Jamie</string>
+    <string name="default_event_date">12 Dis 2026</string>
+    <string name="default_venue">The Garden Hall</string>
+    <string name="save_design">Simpan reka bentuk</string>
+    <string name="share_label">Kongsi</string>
+    <string name="save_first_to_share">Simpan reka bentuk anda dahulu untuk membuka perkongsian</string>
+
+    <string name="design_saved_title">Reka Bentuk Disimpan!</string>
+    <string name="design_saved_message">Jemputan perkahwinan anda telah disimpan. Anda kini boleh berkongsi dengan orang tersayang.</string>
 </resources>

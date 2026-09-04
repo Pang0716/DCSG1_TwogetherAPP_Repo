@@ -487,4 +487,45 @@
     <string name="pkg_tag_deco_2_0">全场地改造</string>
     <string name="pkg_tag_deco_2_1">高级花艺</string>
     <string name="pkg_tag_deco_2_2">LED 灯光设计</string>
+
+    <string name="design_title">设计</string>
+    <string name="design_headline">制作您的数字\n婚礼请柬</string>
+    <string name="design_subtitle">设计精美请柬，与您的\n亲友分享</string>
+    <string name="create_now">立即创建</string>
+    <string name="choose_design_title">选择设计</string>
+    <string name="pick_style_hint">选择样式开始自定义</string>
+    <string name="popular_badge">热门</string>
+    <string name="tap_style_hint">点击样式打开自定义工具</string>
+    <string name="style_gold">金色优雅</string>
+    <string name="style_green">鼠尾草花园</string>
+    <string name="style_pink">玫瑰粉红</string>
+    <string name="style_blue">海洋薄雾</string>
+    <string name="wedding_invite_share_text">诚邀您参加我们的婚礼！💍</string>
+    <string name="share_wedding_invitation">分享婚礼请柬</string>
+    <string name="share_failed">分享失败：%1$s</string>
+
+    <string name="choose_a_style">选择样式</string>
+    <string name="add_photo">添加照片</string>
+    <string name="font_style_label">字体样式</string>
+    <string name="font_elegant">优雅</string>
+    <string name="font_modern">现代</string>
+    <string name="font_classic">经典</string>
+    <string name="details_label">详情</string>
+    <string name="required_field">必填</string>
+    <string name="letters_only_names_error">仅限字母（例如 Alex &amp; Jamie）</string>
+    <string name="letters_numbers_only_error">仅限字母和数字</string>
+    <string name="couple_names_placeholder">例如 Alex &amp; Jamie</string>
+    <string name="tap_to_select_date">点击选择日期</string>
+    <string name="please_select_date">请选择日期</string>
+    <string name="venue_placeholder">例如 The Garden Hall</string>
+    <string name="we_are_getting_married">我们即将结婚</string>
+    <string name="default_couple_names">Alex &amp; Jamie</string>
+    <string name="default_event_date">2026年12月12日</string>
+    <string name="default_venue">The Garden Hall</string>
+    <string name="save_design">保存设计</string>
+    <string name="share_label">分享</string>
+    <string name="save_first_to_share">请先保存设计以解锁分享功能</string>
+
+    <string name="design_saved_title">设计已保存！</string>
+    <string name="design_saved_message">您的婚礼请柬已保存。现在可以与亲友分享了。</string>
 </resources>

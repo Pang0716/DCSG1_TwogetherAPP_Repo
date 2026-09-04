@@ -174,7 +174,7 @@ fun VendorDetailTopBar(
     ) {
         Text(
             stringResource(R.string.vendor_details_title),
-            fontSize = 18.sp,
+            fontSize = 19.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
         )
