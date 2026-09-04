@@ -47,8 +47,8 @@ object CartRepository {
 
         return rows.mapNotNull { row ->
             sampleVendors.find { it.name == row.vendorName }?.let { vendor ->
-                val pkg = generatePackages(vendor).find { it.name == row.packageName }
-                    ?: generatePackages(vendor).first()
+                val pkg = generatePackages(vendor, context).find { it.name == row.packageName }
+                    ?: generatePackages(vendor, context).first()
                 CartItem(vendor, pkg, androidx.compose.runtime.mutableStateOf(row.isChecked))
             }
         }

@@ -27,6 +27,64 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
+
+class CardNumberVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = if (text.text.length > 16) text.text.substring(0, 16) else text.text
+        val out = StringBuilder()
+        for (i in trimmed.indices) {
+            out.append(trimmed[i])
+            if ((i + 1) % 4 == 0 && i != trimmed.lastIndex) out.append(" ")
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 4) return offset
+                if (offset <= 8) return offset + 1
+                if (offset <= 12) return offset + 2
+                if (offset <= 16) return offset + 3
+                return offset + 3
+            }
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 4) return offset
+                if (offset <= 9) return offset - 1
+                if (offset <= 14) return offset - 2
+                if (offset <= 19) return offset - 3
+                return offset - 3
+            }
+        }
+
+        return TransformedText(AnnotatedString(out.toString()), offsetMapping)
+    }
+}
+
+class ExpiryDateVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = if (text.text.length > 4) text.text.substring(0, 4) else text.text
+        val out = StringBuilder()
+        for (i in trimmed.indices) {
+            out.append(trimmed[i])
+            if (i == 1 && i != trimmed.lastIndex) out.append("/")
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 2) return offset
+                return offset + 1
+            }
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 2) return offset
+                return offset - 1
+            }
+        }
+
+        return TransformedText(AnnotatedString(out.toString()), offsetMapping)
+    }
+}
 
 data class PaymentMethod(
     val id: String,
@@ -75,8 +133,8 @@ fun PaymentScreen(
     var selectedBank by remember { mutableStateOf<String?>(null) }
     var bankMenuExpanded by remember { mutableStateOf(false) }
 
-    val cardValid = cardNumber.replace(" ", "").length == 16 &&
-            Regex("^(0[1-9]|1[0-2])/\\d{2}$").matches(cardExpiry) &&
+    val cardValid = cardNumber.length == 16 &&
+            Regex("^(0[1-9]|1[0-2])\\d{2}$").matches(cardExpiry) &&
             cardCvv.length == 3 &&
             cardName.isNotBlank()
 
@@ -125,10 +183,7 @@ fun PaymentScreen(
                             cardNumber = cardNumber,
                             onCardNumberChange = { cardNumber = it.filter { c -> c.isDigit() }.take(16) },
                             cardExpiry = cardExpiry,
-                            onCardExpiryChange = { input ->
-                                val digits = input.filter { it.isDigit() }.take(4)
-                                cardExpiry = if (digits.length >= 3) "${digits.take(2)}/${digits.drop(2)}" else digits
-                            },
+                            onCardExpiryChange = { cardExpiry = it.filter { c -> c.isDigit() }.take(4) },
                             cardCvv = cardCvv,
                             onCardCvvChange = { cardCvv = it.filter { c -> c.isDigit() }.take(3) },
                             cardName = cardName,
@@ -213,6 +268,7 @@ fun CardDetailsForm(
             placeholder = { Text("1234 5678 9012 3456") }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth(),
+            visualTransformation = CardNumberVisualTransformation(),
             isError = cardNumber.isNotEmpty() && cardNumber.length != 16
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -225,7 +281,8 @@ fun CardDetailsForm(
                     placeholder = { Text("MM/YY") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth(),
-                    isError = cardExpiry.isNotEmpty() && !Regex("^(0[1-9]|1[0-2])/\\d{2}$").matches(cardExpiry)
+                    visualTransformation = ExpiryDateVisualTransformation(),
+                    isError = cardExpiry.length == 4 && !Regex("^(0[1-9]|1[0-2])\\d{2}$").matches(cardExpiry)
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
