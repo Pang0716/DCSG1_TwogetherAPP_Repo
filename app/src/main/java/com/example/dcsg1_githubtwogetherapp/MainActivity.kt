@@ -151,7 +151,18 @@ class MainActivity : ComponentActivity() {
                         }
 
                         // MainActivity.kt additions inside NavHost
-                        composable("edit_profile") { EditProfileScreen(onBackClick = { navController.popBackStack() }) }
+                        composable("edit_profile") {
+                            EditProfileScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onForgotPasswordClick = {
+                                    scope.launch { logoutUser() }
+                                    isLoggedIn = false
+                                    navController.navigate("forgot_password") {
+                                        popUpTo("home") { inclusive = false }
+                                    }
+                                }
+                            )
+                        }
                         composable("help_support") { HelpSupportScreen(onBackClick = { navController.popBackStack() }) }
                         composable("language") { LanguageScreen(onBackClick = { navController.popBackStack() }) }
 

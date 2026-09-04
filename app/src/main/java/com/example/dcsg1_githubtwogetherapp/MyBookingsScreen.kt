@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -79,7 +80,7 @@ fun MyBookingsScreen(onBackClick: () -> Unit, onBookingClick: (BookingEntity) ->
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(bookings, key = { it.localId }) { booking ->
+                    itemsIndexed(bookings) { index, booking ->
                         BookingRow(booking, onClick = { onBookingClick(booking) })
                     }
                 }
@@ -122,8 +123,11 @@ fun BookingRow(booking: BookingEntity, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(booking.vendorName, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Text(booking.category, fontSize = 12.sp, color = Color.Gray)
+            val currentLocale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
             Text(
-                "Booked on ${SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(booking.bookedAt))}",
+                remember(booking.bookedAt, currentLocale) {
+                    "Booked on ${SimpleDateFormat("dd MMM yyyy", currentLocale).format(Date(booking.bookedAt))}"
+                },
                 fontSize = 11.sp, color = Color.Gray
             )
         }

@@ -240,7 +240,7 @@ fun WeddingDateCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(if (hasArrived) 230.dp else 200.dp)
+            .heightIn(min = if (hasArrived) 230.dp else 200.dp)
             .padding(16.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(

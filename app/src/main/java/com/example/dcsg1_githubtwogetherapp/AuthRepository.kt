@@ -211,3 +211,16 @@ suspend fun reauthenticate(email: String, currentPassword: String): Result<Unit>
         Result.failure(Exception("Current password is incorrect."))
     }
 }
+
+suspend fun updateAvatarUrl(url: String): Result<Unit> {
+    return try {
+        supabase.auth.updateUser {
+            data = kotlinx.serialization.json.buildJsonObject {
+                put("avatar_url", kotlinx.serialization.json.JsonPrimitive(url))
+            }
+        }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(Exception("Failed to update profile photo. Please try again."))
+    }
+}
