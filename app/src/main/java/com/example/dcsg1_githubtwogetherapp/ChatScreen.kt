@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -114,7 +115,7 @@ fun ChatScreen(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("Type a message...") },
+                    placeholder = { Text(stringResource(R.string.type_a_message)) },
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.weight(1f),
                     singleLine = true
@@ -142,7 +143,7 @@ fun ChatScreen(
     ) { innerPadding ->
         if (messages.isEmpty()) {
             Box(modifier = Modifier.padding(innerPadding).fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Say hello to $otherPartyName!", fontSize = 13.sp, color = Color.Gray)
+                Text(stringResource(R.string.say_hello_to, otherPartyName), fontSize = 13.sp, color = Color.Gray)
             }
         } else {
             LazyColumn(

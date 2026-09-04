@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,7 +69,7 @@ fun CartScreen(
                     .clickable { onBackClick() }
             )
             Text(
-                "Booking Summary",
+                stringResource(R.string.booking_summary),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -91,7 +92,7 @@ fun CartScreen(
                     modifier = Modifier.size(56.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("Your cart is empty", fontSize = 15.sp, color = Color.Gray)
+                Text(stringResource(R.string.cart_empty), fontSize = 15.sp, color = Color.Gray)
             }
         } else {
             Column(
@@ -134,7 +135,7 @@ fun CartScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Total (${CartSession.selectedCount} items)",
+                        stringResource(R.string.total_items, CartSession.selectedCount),
                         fontSize = 14.sp,
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold
@@ -157,7 +158,7 @@ fun CartScreen(
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text("Proceed to Payment", fontSize = 15.sp)
+                    Text(stringResource(R.string.proceed_to_payment), fontSize = 15.sp)
                 }
             }
         }

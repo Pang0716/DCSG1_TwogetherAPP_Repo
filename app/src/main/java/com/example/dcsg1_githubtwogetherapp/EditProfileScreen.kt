@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -53,6 +54,8 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
     var isUploadingPhoto by remember { mutableStateOf(false) }
     var photoError by remember { mutableStateOf<String?>(null) }
 
+    val photoErrorMessage = stringResource(R.string.photo_update_error)
+
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             val userId = user?.id
@@ -65,7 +68,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                         loadCurrentUserProfile()
                         photoError = null
                     } catch (e: Exception) {
-                        photoError = "Couldn't update photo. Please try again."
+                        photoError = photoErrorMessage
                     }
                     isUploadingPhoto = false
                 }
@@ -85,7 +88,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                         loadCurrentUserProfile()
                         photoError = null
                     } catch (e: Exception) {
-                        photoError = "Couldn't update photo. Please try again."
+                        photoError = photoErrorMessage
                     }
                     isUploadingPhoto = false
                 }
@@ -106,28 +109,37 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
     var infoError by remember { mutableStateOf<String?>(null) }
     var infoSuccess by remember { mutableStateOf(false) }
     var genderMenuExpanded by remember { mutableStateOf(false) }
-    val nameError = if (fullName.isBlank()) "Full name is required."
-    else if (!Regex("^[A-Za-z\\s]+$").matches(fullName.trim())) "Only letters and spaces allowed."
+
+    val fullNameRequiredMsg = stringResource(R.string.full_name_required)
+    val fullNameLettersOnlyMsg = stringResource(R.string.full_name_letters_only)
+    val phoneInvalidMsg = stringResource(R.string.phone_invalid)
+    val dobFormatErrorMsg = stringResource(R.string.dob_format_error)
+    val dobInvalidMonthMsg = stringResource(R.string.dob_invalid_month)
+    val dobInvalidYearMsg = stringResource(R.string.dob_invalid_year)
+    val dobInvalidDayMsg = stringResource(R.string.dob_invalid_day)
+
+    val nameError = if (fullName.isBlank()) fullNameRequiredMsg
+    else if (!Regex("^[A-Za-z\\s]+$").matches(fullName.trim())) fullNameLettersOnlyMsg
     else null
 
     val phoneError = if (phoneNumber.isNotBlank()) {
         val cleaned = phoneNumber.replace(" ", "").replace("-", "")
-        if (!Regex("^01(1\\d{8}|[02-9]\\d{7})$").matches(cleaned)) "Enter a valid Malaysian number." else null
+        if (!Regex("^01(1\\d{8}|[02-9]\\d{7})$").matches(cleaned)) phoneInvalidMsg else null
     } else null
 
     val dobError = if (dateOfBirth.isNotBlank()) {
         val parts = dateOfBirth.split("/")
         if (parts.size != 3) {
-            "Use DD/MM/YYYY format."
+            dobFormatErrorMsg
         } else {
             val day = parts[0].toIntOrNull()
             val month = parts[1].toIntOrNull()
             val year = parts[2].toIntOrNull()
             when {
-                day == null || month == null || year == null -> "Use DD/MM/YYYY format."
-                month !in 1..12 -> "Invalid month."
-                year < 1900 || year > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) -> "Invalid year."
-                day !in 1..daysInMonth(month, year) -> "Invalid day for that month."
+                day == null || month == null || year == null -> dobFormatErrorMsg
+                month !in 1..12 -> dobInvalidMonthMsg
+                year < 1900 || year > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) -> dobInvalidYearMsg
+                day !in 1..daysInMonth(month, year) -> dobInvalidDayMsg
                 else -> null
             }
         }
@@ -141,6 +153,12 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
     var isSavingPassword by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var passwordSuccess by remember { mutableStateOf(false) }
+
+    val fixErrorsMsg = stringResource(R.string.fix_errors_before_saving)
+    val currentPasswordRequiredMsg = stringResource(R.string.current_password_required)
+    val newPasswordMinLengthMsg = stringResource(R.string.new_password_min_length)
+    val passwordsDoNotMatchMsg = stringResource(R.string.passwords_do_not_match)
+    val couldNotVerifyEmailMsg = stringResource(R.string.could_not_verify_email)
 
     Column(
         modifier = Modifier
@@ -156,7 +174,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
             modifier = Modifier.size(24.dp).clickable { onBackClick() }
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Edit Profile", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(stringResource(R.string.edit_profile_title), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -217,10 +235,10 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 .background(Color.White)
                 .padding(18.dp)
         ) {
-            Text("Personal Info", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(stringResource(R.string.personal_info), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Full Name", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.full_name_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = fullName,
@@ -237,19 +255,19 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Email", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.email_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(4.dp))
             Text(user?.email ?: "", fontSize = 14.sp, color = Color.DarkGray)
-            Text("Email cannot be changed here.", fontSize = 11.sp, color = Color.Gray)
+            Text(stringResource(R.string.email_cannot_change), fontSize = 11.sp, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Phone Number", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.phone_number_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                placeholder = { Text("e.g. 012-345 6789") },
+                placeholder = { Text(stringResource(R.string.phone_number_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 shape = RoundedCornerShape(10.dp),
                 singleLine = true,
@@ -268,14 +286,19 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Gender", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.gender_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
+            val genderOptions = listOf(
+                stringResource(R.string.gender_male),
+                stringResource(R.string.gender_female),
+                stringResource(R.string.gender_prefer_not)
+            )
             ExposedDropdownMenuBox(
                 expanded = genderMenuExpanded,
                 onExpandedChange = { genderMenuExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = gender.ifBlank { "Select gender" },
+                    value = gender.ifBlank { stringResource(R.string.select_gender) },
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderMenuExpanded) },
@@ -286,7 +309,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                     expanded = genderMenuExpanded,
                     onDismissRequest = { genderMenuExpanded = false }
                 ) {
-                    listOf("Male", "Female", "Prefer not to say").forEach { option ->
+                    genderOptions.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(option) },
                             onClick = { gender = option; genderMenuExpanded = false }
@@ -297,12 +320,12 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Date of Birth", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.date_of_birth_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = dateOfBirth,
                 onValueChange = { dateOfBirth = it },
-                placeholder = { Text("DD/MM/YYYY") },
+                placeholder = { Text(stringResource(R.string.dob_format)) },
                 isError = dobError != null,
                 shape = RoundedCornerShape(10.dp),
                 singleLine = true,
@@ -320,14 +343,14 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 Spacer(modifier = Modifier.height(8.dp))
             }
             if (infoSuccess) {
-                Text("Profile updated!", color = Color(0xFF2E7D32), fontSize = 12.sp)
+                Text(stringResource(R.string.profile_updated), color = Color(0xFF2E7D32), fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
             Button(
                 onClick = {
                     if (nameError != null || phoneError != null || dobError != null) {
-                        infoError = "Please fix the errors above before saving."
+                        infoError = fixErrorsMsg
                         return@Button
                     }
                     infoError = null
@@ -350,7 +373,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 modifier = Modifier.fillMaxWidth().height(46.dp)
             ) {
                 if (isSavingInfo) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp))
-                else Text("Save Changes")
+                else Text(stringResource(R.string.save_changes))
             }
         }
 
@@ -367,7 +390,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Change Password", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.change_password), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             }
             Spacer(modifier = Modifier.height(14.dp))
 
@@ -375,9 +398,9 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Current Password", fontSize = 12.sp, color = Color.Gray)
+                Text(stringResource(R.string.current_password_label), fontSize = 12.sp, color = Color.Gray)
                 Text(
-                    "Forgot password?",
+                    stringResource(R.string.forgot_password),
                     fontSize = 12.sp,
                     color = Color(0xFFB5722C),
                     fontWeight = FontWeight.Bold,
@@ -397,7 +420,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("New Password", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.new_password_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = newPassword,
@@ -419,7 +442,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("Confirm New Password", fontSize = 12.sp, color = Color.Gray)
+            Text(stringResource(R.string.confirm_new_password_label), fontSize = 12.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = confirmPassword,
@@ -438,16 +461,16 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 Spacer(modifier = Modifier.height(8.dp))
             }
             if (passwordSuccess) {
-                Text("Password changed successfully!", color = Color(0xFF2E7D32), fontSize = 12.sp)
+                Text(stringResource(R.string.password_changed_success), color = Color(0xFF2E7D32), fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
             Button(
                 onClick = {
                     when {
-                        currentPassword.isBlank() -> passwordError = "Enter your current password."
-                        newPassword.length < 6 -> passwordError = "New password must be at least 6 characters."
-                        newPassword != confirmPassword -> passwordError = "Passwords do not match."
+                        currentPassword.isBlank() -> passwordError = currentPasswordRequiredMsg
+                        newPassword.length < 6 -> passwordError = newPasswordMinLengthMsg
+                        newPassword != confirmPassword -> passwordError = passwordsDoNotMatchMsg
                         else -> {
                             passwordError = null
                             passwordSuccess = false
@@ -456,7 +479,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                                 val email = user?.email
                                 if (email == null) {
                                     isSavingPassword = false
-                                    passwordError = "Could not verify account email."
+                                    passwordError = couldNotVerifyEmailMsg
                                     return@launch
                                 }
                                 val reauth = reauthenticate(email, currentPassword)
@@ -485,7 +508,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                 modifier = Modifier.fillMaxWidth().height(46.dp)
             ) {
                 if (isSavingPassword) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp))
-                else Text("Update Password")
+                else Text(stringResource(R.string.update_password))
             }
         }
 
@@ -495,7 +518,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
     if (showPhotoOptions) {
         AlertDialog(
             onDismissRequest = { showPhotoOptions = false },
-            title = { Text("Update Profile Photo") },
+            title = { Text(stringResource(R.string.update_profile_photo)) },
             text = {
                 Column {
                     Row(
@@ -510,7 +533,7 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                     ) {
                         Icon(Icons.Filled.CameraAlt, contentDescription = null, tint = Color(0xFFB5722C))
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Take Photo")
+                        Text(stringResource(R.string.take_photo))
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -524,12 +547,12 @@ fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit
                     ) {
                         Icon(Icons.Filled.PhotoLibrary, contentDescription = null, tint = Color(0xFFB5722C))
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Choose from Gallery")
+                        Text(stringResource(R.string.choose_from_gallery))
                     }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showPhotoOptions = false }) { Text("Cancel") }
+                TextButton(onClick = { showPhotoOptions = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

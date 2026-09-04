@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -29,11 +30,15 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
 
     val scope = rememberCoroutineScope()
 
+    val passwordMinCharsMsg = stringResource(R.string.password_min_chars)
+    val passwordLettersNumbersMsg = stringResource(R.string.password_letters_numbers)
+    val passwordsMismatchMsg = stringResource(R.string.passwords_do_not_match)
+
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("Password Updated") },
-            text = { Text("Your password has been changed successfully. Please log in again.") },
+            title = { Text(stringResource(R.string.password_updated_title)) },
+            text = { Text(stringResource(R.string.password_updated_message)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -44,7 +49,7 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                ) { Text("Go to Login") }
+                ) { Text(stringResource(R.string.go_to_login)) }
             }
         )
     }
@@ -57,27 +62,27 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(60.dp))
 
-        Text("Set New Password", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(stringResource(R.string.set_new_password_title), fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Text(
-            text = "Please enter your new password below.",
+            text = stringResource(R.string.set_new_password_subtitle),
             fontSize = 13.sp, color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        Text(text = "New Password", fontSize = 13.sp, color = Color.Black)
+        Text(text = stringResource(R.string.new_password_label), fontSize = 13.sp, color = Color.Black)
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = newPassword,
             onValueChange = { newPassword = it },
-            placeholder = { Text("Enter new password") },
+            placeholder = { Text(stringResource(R.string.new_password_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = "Toggle password visibility"
+                        contentDescription = stringResource(R.string.toggle_password_visibility)
                     )
                 }
             },
@@ -88,12 +93,12 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        Text(text = "Confirm New Password", fontSize = 13.sp, color = Color.Black)
+        Text(text = stringResource(R.string.confirm_new_password_label), fontSize = 13.sp, color = Color.Black)
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            placeholder = { Text("Confirm new password") },
+            placeholder = { Text(stringResource(R.string.confirm_new_password_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -111,15 +116,15 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
         Button(
             onClick = {
                 if (newPassword.length < 8) {
-                    errorMessage = "Password must be at least 8 characters."
+                    errorMessage = passwordMinCharsMsg
                     return@Button
                 }
                 if (!newPassword.any { it.isLetter() } || !newPassword.any { it.isDigit() }) {
-                    errorMessage = "Password must contain letters and numbers."
+                    errorMessage = passwordLettersNumbersMsg
                     return@Button
                 }
                 if (newPassword != confirmPassword) {
-                    errorMessage = "Passwords do not match."
+                    errorMessage = passwordsMismatchMsg
                     return@Button
                 }
                 errorMessage = null
@@ -140,7 +145,7 @@ fun ResetPasswordScreen(onDone: () -> Unit) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
             } else {
-                Text("Update Password", fontSize = 16.sp)
+                Text(stringResource(R.string.update_password), fontSize = 16.sp)
             }
         }
     }

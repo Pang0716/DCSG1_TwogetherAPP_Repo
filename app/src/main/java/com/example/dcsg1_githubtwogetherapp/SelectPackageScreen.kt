@@ -41,17 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-/**
- * Content shown inside the ModalBottomSheet triggered by "Save to Cart" on VendorDetailScreen.
- * No Scaffold/topBar here on purpose - the bottom sheet itself already provides the drag
- * handle and the swipe-down-to-dismiss / tap-outside-to-dismiss gestures, so a back button
- * and its own app bar would be redundant.
- */
 @Composable
 fun SelectPackageSheetContent(
     vendor: Vendor,
@@ -59,7 +54,6 @@ fun SelectPackageSheetContent(
     onContinueClick: (PackageOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Default to whichever package is marked isPopular, otherwise just the first one
     var selectedIndex by remember {
         mutableStateOf(packages.indexOfFirst { it.isPopular }.let { if (it >= 0) it else 0 })
     }
@@ -93,7 +87,7 @@ fun SelectPackageSheetContent(
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            "${vendor.rating} (${vendor.reviewCount} reviews)",
+                            stringResource(R.string.rating_reviews, vendor.rating.toString(), vendor.reviewCount),
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
@@ -116,10 +110,10 @@ fun SelectPackageSheetContent(
             }
 
             Spacer(Modifier.height(18.dp))
-            Text("Choose a Wedding Package", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.choose_wedding_package), fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp))
             Text(
-                "Find the perfect package for your special day.",
+                stringResource(R.string.find_perfect_package),
                 fontSize = 13.sp,
                 color = Color.Gray
             )
@@ -145,7 +139,7 @@ fun SelectPackageSheetContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("From", fontSize = 12.sp, color = Color.Gray)
+                    Text(stringResource(R.string.from_label), fontSize = 12.sp, color = Color.Gray)
                     Text(
                         selectedPackage.price,
                         fontSize = 20.sp,
@@ -160,7 +154,7 @@ fun SelectPackageSheetContent(
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.height(50.dp)
                 ) {
-                    Text("Continue")
+                    Text(stringResource(R.string.continue_label))
                     Spacer(Modifier.width(2.dp))
                     Icon(Icons.Filled.ChevronRight, contentDescription = null)
                 }
@@ -169,11 +163,6 @@ fun SelectPackageSheetContent(
     }
 }
 
-/**
- * Same visual layout as the display-only PackageCard in PackageCard.kt, but clickable and
- * with a RadioButton - this is the one place in the app where picking a package actually
- * matters, so the selection UI belongs here rather than on the read-only Packages Tab.
- */
 @Composable
 private fun SelectablePackageCard(
     pkg: PackageOption,
@@ -223,7 +212,7 @@ private fun SelectablePackageCard(
                                     .background(TagChipBg)
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
-                                Text("Most Popular", fontSize = 10.sp, color = TagChipText, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.most_popular), fontSize = 10.sp, color = TagChipText, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -267,7 +256,6 @@ private fun SelectablePackageCard(
     }
 }
 
-/** Small vendor thumbnail, same imageResId -> imageUrl -> placeholder fallback used elsewhere. */
 @Composable
 private fun VendorThumbnail(vendor: Vendor, modifier: Modifier = Modifier) {
     when {

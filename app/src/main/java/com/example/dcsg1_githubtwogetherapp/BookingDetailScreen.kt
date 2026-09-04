@@ -12,12 +12,15 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,7 +38,7 @@ fun BookingDetailScreen(booking: BookingEntity, onBackClick: () -> Unit) {
         containerColor = Color(0xFFFDF8F3),
         topBar = {
             TopAppBar(
-                title = { Text("Booking Details", fontWeight = FontWeight.Bold, color = Color.Black) },
+                title = { Text(stringResource(R.string.booking_details_title), fontWeight = FontWeight.Bold, color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -76,7 +79,7 @@ fun BookingDetailScreen(booking: BookingEntity, onBackClick: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = Color(0xFF3F7D4F), modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Booking Confirmed", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF3F7D4F))
+                Text(stringResource(R.string.booking_confirmed_label), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF3F7D4F))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,18 +91,20 @@ fun BookingDetailScreen(booking: BookingEntity, onBackClick: () -> Unit) {
                     .background(Color.White)
                     .padding(18.dp)
             ) {
-                Text("Receipt", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.receipt_label), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(14.dp))
 
-                ReceiptRow("Vendor", booking.vendorName)
-                ReceiptRow("Category", booking.category)
-                ReceiptRow("Amount Paid", booking.price, valueColor = Color(0xFFB5722C), bold = true)
-                ReceiptRow("Payment Method", booking.paymentMethod)
-                ReceiptRow(
-                    "Booked On",
-                    SimpleDateFormat("dd MMM yyyy, h:mm a", Locale.getDefault()).format(Date(booking.bookedAt))
-                )
-                ReceiptRow("Receipt No.", "TWG-${booking.localId.toString().padStart(6, '0')}")
+                val currentLocale = LocalConfiguration.current.locales[0]
+                val bookedOnFormatted = remember(booking.bookedAt, currentLocale) {
+                    SimpleDateFormat("dd MMM yyyy, h:mm a", currentLocale).format(Date(booking.bookedAt))
+                }
+
+                ReceiptRow(stringResource(R.string.receipt_vendor), booking.vendorName)
+                ReceiptRow(stringResource(R.string.receipt_category), booking.category)
+                ReceiptRow(stringResource(R.string.receipt_amount_paid), booking.price, valueColor = Color(0xFFB5722C), bold = true)
+                ReceiptRow(stringResource(R.string.receipt_payment_method), booking.paymentMethod)
+                ReceiptRow(stringResource(R.string.receipt_booked_on), bookedOnFormatted)
+                ReceiptRow(stringResource(R.string.receipt_number), "TWG-${booking.localId.toString().padStart(6, '0')}")
             }
         }
     }

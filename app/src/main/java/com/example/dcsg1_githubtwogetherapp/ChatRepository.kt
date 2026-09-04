@@ -177,4 +177,12 @@ object ChatRepository {
     suspend fun hasUnreadMessages(context: Context, myId: String): Boolean {
         return loadConversations(context, myId).any { it.isUnread }
     }
+
+    suspend fun subscribeToAllIncoming(myId: String) =
+        supabase.realtime.channel("chat_incoming_$myId").also { it.subscribe() }
+            .postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+                table = "chat_messages"
+            }
+            .map { it.decodeRecord<ChatMessageRow>() }
+            .filter { it.receiverId == myId }
 }

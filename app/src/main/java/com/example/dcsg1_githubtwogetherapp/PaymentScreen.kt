@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,9 @@ data class PaymentMethod(
     val logoResId: Int
 )
 
+// label stays English — this is the value saved into the bookings table for a consistent record.
+// Display text is localized separately via localizedPaymentMethodLabel(), same pattern as
+// quickActions/bottomNavItems in HomeScreen.kt.
 val paymentMethods = listOf(
     PaymentMethod("card", "Credit / Debit Card", R.drawable.ic_payment_card, R.drawable.ic_logo_card),
     PaymentMethod("fpx", "FPX Online Banking", R.drawable.ic_payment_fpx, R.drawable.ic_logo_fpx),
@@ -43,6 +47,16 @@ val paymentMethods = listOf(
 )
 
 val fpxBanks = listOf("Maybank2u", "CIMB Clicks", "Public Bank", "RHB Now", "Hong Leong Connect", "Bank Islam")
+
+@Composable
+private fun localizedPaymentMethodLabel(id: String): String = when (id) {
+    "card" -> stringResource(R.string.pm_card)
+    "fpx" -> stringResource(R.string.pm_fpx)
+    "tng" -> stringResource(R.string.pm_tng)
+    "grabpay" -> stringResource(R.string.pm_grabpay)
+    "atome" -> stringResource(R.string.pm_atome)
+    else -> id
+}
 
 @Composable
 fun PaymentScreen(
@@ -85,7 +99,7 @@ fun PaymentScreen(
                 tint = Color.Black,
                 modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp).clickable { onBackClick() }
             )
-            Text("Payment", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.align(Alignment.Center))
+            Text(stringResource(R.string.payment_title), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.align(Alignment.Center))
         }
 
         Column(
@@ -94,7 +108,7 @@ fun PaymentScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-            Text("Select Payment Method", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+            Text(stringResource(R.string.select_payment_method), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
             Spacer(modifier = Modifier.height(12.dp))
 
             paymentMethods.forEach { method ->
@@ -127,7 +141,7 @@ fun PaymentScreen(
                             onBankSelected = { selectedBank = it; bankMenuExpanded = false }
                         )
                         else -> Text(
-                            "You'll be redirected to ${method.label} to complete payment.",
+                            stringResource(R.string.redirect_to_pay, localizedPaymentMethodLabel(method.id)),
                             fontSize = 12.sp,
                             color = Color.Gray,
                             modifier = Modifier.padding(vertical = 8.dp)
@@ -142,7 +156,7 @@ fun PaymentScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.Lock, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Secure and encrypted payment", fontSize = 12.sp, color = Color.Gray)
+                Text(stringResource(R.string.secure_encrypted_payment), fontSize = 12.sp, color = Color.Gray)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -164,7 +178,7 @@ fun PaymentScreen(
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
-                Text("Pay Now", fontSize = 15.sp)
+                Text(stringResource(R.string.pay_now), fontSize = 15.sp)
             }
         }
     }
@@ -184,15 +198,15 @@ fun CardDetailsForm(
             .background(Color.White)
             .padding(14.dp)
     ) {
-        Text("Cardholder Name", fontSize = 12.sp, color = Color.Gray)
+        Text(stringResource(R.string.cardholder_name), fontSize = 12.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = cardName, onValueChange = onCardNameChange,
-            placeholder = { Text("Name on card") }, singleLine = true,
+            placeholder = { Text(stringResource(R.string.name_on_card)) }, singleLine = true,
             shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Text("Card Number", fontSize = 12.sp, color = Color.Gray)
+        Text(stringResource(R.string.card_number), fontSize = 12.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = cardNumber, onValueChange = onCardNumberChange,
@@ -204,7 +218,7 @@ fun CardDetailsForm(
         Spacer(modifier = Modifier.height(10.dp))
         Row {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Expiry (MM/YY)", fontSize = 12.sp, color = Color.Gray)
+                Text(stringResource(R.string.expiry_mmyy), fontSize = 12.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = cardExpiry, onValueChange = onCardExpiryChange,
@@ -216,7 +230,7 @@ fun CardDetailsForm(
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text("CVV", fontSize = 12.sp, color = Color.Gray)
+                Text(stringResource(R.string.cvv_label), fontSize = 12.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = cardCvv, onValueChange = onCardCvvChange,
@@ -245,11 +259,11 @@ fun FpxBankPicker(
             .background(Color.White)
             .padding(14.dp)
     ) {
-        Text("Select Your Bank", fontSize = 12.sp, color = Color.Gray)
+        Text(stringResource(R.string.select_your_bank), fontSize = 12.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(6.dp))
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandedChange) {
             OutlinedTextField(
-                value = selectedBank ?: "Choose a bank",
+                value = selectedBank ?: stringResource(R.string.choose_a_bank),
                 onValueChange = {}, readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 shape = RoundedCornerShape(10.dp),
@@ -282,7 +296,7 @@ fun PaymentMethodRow(method: PaymentMethod, isSelected: Boolean, onSelect: () ->
             contentScale = ContentScale.Fit, modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
         )
         Spacer(modifier = Modifier.width(12.dp))
-        Text(method.label, fontSize = 14.sp, color = Color.Black, modifier = Modifier.weight(1f))
+        Text(localizedPaymentMethodLabel(method.id), fontSize = 14.sp, color = Color.Black, modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.width(8.dp))
         Image(painter = painterResource(id = method.logoResId), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.widthIn(max = 64.dp).height(22.dp))
     }

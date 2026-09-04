@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,8 +76,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// ===== Reviews =====
-// Reviews removed for now, will add back later
+@Composable
+private fun localizedTabLabel(tab: String): String = when (tab) {
+    "About" -> stringResource(R.string.tab_about)
+    "Packages" -> stringResource(R.string.tab_packages)
+    "Photos" -> stringResource(R.string.tab_photos)
+    "Reviews" -> stringResource(R.string.tab_reviews)
+    else -> tab
+}
 
 @Composable
 fun VendorInfoCard(
@@ -95,19 +102,19 @@ fun VendorInfoCard(
     ) {
         InfoColumn(
             icon = Icons.Outlined.Person,
-            label = "Capacity",
+            label = stringResource(R.string.capacity_label),
             value = capacity,
             modifier = Modifier.weight(1f)
         )
         InfoColumn(
             icon = Icons.Outlined.Sell,
-            label = "Price Range",
+            label = stringResource(R.string.price_range_label),
             value = priceRange,
             modifier = Modifier.weight(1f)
         )
         InfoColumn(
             icon = Icons.Outlined.WorkspacePremium,
-            label = "Highlights",
+            label = stringResource(R.string.highlights_label),
             value = highlights,
             modifier = Modifier.weight(1f)
         )
@@ -166,7 +173,7 @@ fun VendorDetailTopBar(
             .padding(top = 30.dp)
     ) {
         Text(
-            "Vendor Details",
+            stringResource(R.string.vendor_details_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
@@ -198,7 +205,7 @@ fun VendorDetailTopBar(
                     onDismissRequest = { showShareMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Share via...") },
+                        text = { Text(stringResource(R.string.share_via)) },
                         onClick = {
                             showShareMenu = false
                             onShareClick()
@@ -206,7 +213,7 @@ fun VendorDetailTopBar(
                         leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null) }
                     )
                     DropdownMenuItem(
-                        text = { Text("Copy link") },
+                        text = { Text(stringResource(R.string.copy_link)) },
                         onClick = {
                             showShareMenu = false
                             onCopyLinkClick()
@@ -221,7 +228,7 @@ fun VendorDetailTopBar(
             ) {
                 Icon(
                     if (isFavorited) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = if (isFavorited) "Remove from favorites" else "Add to favorites",
+                    contentDescription = if (isFavorited) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
                     tint = if (isFavorited) Color(0xFFE24B4A) else Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
@@ -237,11 +244,6 @@ fun VendorDetailScreen(
     onBackClick: () -> Unit,
     isLoggedIn: Boolean,
     onNavigateToLogin: () -> Unit,
-    // TODO: vendorUserId is a placeholder for now (there's no real field on Vendor
-    // tying it to an actual registered user account for in-app chat). Check with
-    // whoever built ChatScreen/ChatListScreen what this should actually be - probably
-    // needs a real vendorUserId field added to the Vendor data class once vendors are
-    // linked to real accounts, not just static demo data.
     onChatClick: (vendorUserId: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -260,7 +262,11 @@ fun VendorDetailScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Loaded along with favorite status: if no logged-in user id (not logged in), skip and favoriteRecord stays null
+    val linkCopiedMsg = stringResource(R.string.link_copied)
+    val reviewSubmitFailedMsg = stringResource(R.string.review_submit_failed)
+    val guestDefaultName = stringResource(R.string.guest_default_name)
+    val addedToCartMsg = stringResource(R.string.added_to_cart)
+
     LaunchedEffect(vendor.name) {
         val userId = UserSession.currentUser.value?.id
         if (userId != null) {
@@ -273,10 +279,6 @@ fun VendorDetailScreen(
         }
     }
 
-    // Same structure as fetchUsers() in Practical 9: fetch reviews from the database when the
-    // screen first appears (or the vendor changes).
-    // try/catch prevents the whole screen from crashing on no network/query failure - falls
-    // back to local sample data on failure.
     LaunchedEffect(vendor.name) {
         try {
             val fetched = withContext(Dispatchers.IO) { fetchReviews(vendor.name) }
@@ -299,10 +301,6 @@ fun VendorDetailScreen(
             VendorDetailTopBar(
                 onBackClick = onBackClick,
                 onShareClick = {
-                    // Points to the deployed vendor.html preview page for this specific
-                    // vendor. Doesn't auto-open the app even if it's installed (that needs
-                    // Android App Links domain verification, out of scope for now) -
-                    // anyone who clicks it just sees the web preview of this one vendor.
                     val vendorLink = "https://magenta-cat-6febc8.netlify.app/vendor.html?name=${android.net.Uri.encode(vendor.name)}"
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
@@ -318,7 +316,7 @@ fun VendorDetailScreen(
                     val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                     val clipData = android.content.ClipData.newPlainText("Vendor link", vendorLink)
                     clipboardManager.setPrimaryClip(clipData)
-                    android.widget.Toast.makeText(context, "Link copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(context, linkCopiedMsg, android.widget.Toast.LENGTH_SHORT).show()
                 },
                 isFavorited = favoriteRecord != null,
                 onFavoriteClick = {
@@ -331,17 +329,14 @@ fun VendorDetailScreen(
                             scope.launch {
                                 try {
                                     if (current != null) {
-                                        // Already favorited -> unfavorite
                                         withContext(Dispatchers.IO) { removeFavorite(current.id) }
                                         favoriteRecord = null
                                     } else {
-                                        // Not favorited -> favorite it, then query again to get the database-generated id
                                         withContext(Dispatchers.IO) { addFavorite(userId, vendor.name) }
                                         favoriteRecord = withContext(Dispatchers.IO) { fetchFavorite(userId, vendor.name) }
                                     }
                                 } catch (e: Exception) {
                                     android.util.Log.e("VendorDetailScreen", "favorite toggle failed for ${vendor.name}", e)
-                                    // Network failure - leave the state unchanged, heart icon stays as is
                                 }
                             }
                         }
@@ -362,8 +357,6 @@ fun VendorDetailScreen(
                         if (!isLoggedIn) {
                             onNavigateToLogin()
                         } else {
-                            // Placeholder vendorUserId - see the TODO on the function
-                            // signature above, this isn't a real user account id yet
                             onChatClick(vendor.name)
                         }
                     },
@@ -377,7 +370,7 @@ fun VendorDetailScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text("Chat", fontSize = 16.sp)
+                    Text(stringResource(R.string.chat_label), fontSize = 16.sp)
                 }
                 Button(
                     onClick = {
@@ -398,7 +391,7 @@ fun VendorDetailScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text("Save to Cart", fontSize = 16.sp)
+                    Text(stringResource(R.string.save_to_cart), fontSize = 16.sp)
                 }
             }
         }
@@ -440,9 +433,6 @@ fun VendorDetailScreen(
                         }
                     }
 
-                    // This was originally a Brush.verticalGradient overlay; Brush wasn't covered
-                    // in the course, so it's replaced with a flat semi-transparent overlay -
-                    // less refined-looking but functionally the same (keeps the bottom text readable)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -471,7 +461,7 @@ fun VendorDetailScreen(
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
-                                "${vendor.rating} (${vendor.reviewCount} reviews)",
+                                stringResource(R.string.rating_reviews, vendor.rating.toString(), vendor.reviewCount),
                                 fontSize = 13.sp,
                                 color = Color.White
                             )
@@ -497,7 +487,7 @@ fun VendorDetailScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = tab,
+                                    text = localizedTabLabel(tab),
                                     fontSize = 15.sp,
                                     fontWeight = if (tab == selectedTab) FontWeight.SemiBold else FontWeight.Normal,
                                     color = if (tab == selectedTab) Color(0xFFB5722C) else Color.Gray,
@@ -534,7 +524,7 @@ fun VendorDetailScreen(
                             Spacer(Modifier.height(22.dp))
 
                             Text(
-                                "About ${vendor.name}",
+                                stringResource(R.string.about_vendor, vendor.name),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -547,7 +537,7 @@ fun VendorDetailScreen(
                             )
 
                             Spacer(Modifier.height(22.dp))
-                            Text("Location", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.location_label), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -577,10 +567,6 @@ fun VendorDetailScreen(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.clickable {
-                                        // Only search by area + state (real place names), not the
-                                        // vendor name itself — vendor names in this dataset are
-                                        // placeholder/demo data and searching a made-up business
-                                        // name could return "not found" or an unrelated real place
                                         val query = "${vendor.locationArea}, ${vendor.locationState}"
                                         val mapsIntent = Intent(
                                             Intent.ACTION_VIEW,
@@ -591,7 +577,7 @@ fun VendorDetailScreen(
                                         context.startActivity(mapsIntent)
                                     }
                                 ) {
-                                    Text("View Map", fontSize = 13.sp, color = Color(0xFFB5722C))
+                                    Text(stringResource(R.string.view_map), fontSize = 13.sp, color = Color(0xFFB5722C))
                                     Icon(
                                         Icons.Filled.ChevronRight,
                                         contentDescription = null,
@@ -611,14 +597,14 @@ fun VendorDetailScreen(
                     item {
                         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                             Text(
-                                "Choose the perfect package",
+                                stringResource(R.string.choose_perfect_package),
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.Black
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "All packages include venue rental and standard setup.",
+                                stringResource(R.string.packages_include_hint),
                                 fontSize = 13.sp,
                                 color = Color.Gray
                             )
@@ -636,7 +622,7 @@ fun VendorDetailScreen(
                     if (photos.isEmpty()) {
                         item {
                             Text(
-                                "No photos yet",
+                                stringResource(R.string.no_photos_yet),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(16.dp)
@@ -657,7 +643,7 @@ fun VendorDetailScreen(
                     if (reviewsLoadFailed) {
                         item {
                             Text(
-                                "Couldn't load the latest reviews — showing sample data. Check your connection and reopen this page.",
+                                stringResource(R.string.reviews_load_failed),
                                 fontSize = 12.sp,
                                 color = Color(0xFFB5722C),
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -667,20 +653,16 @@ fun VendorDetailScreen(
                     item {
                         Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                             AddReviewForm(
-                                // Fallback name if not logged in, to avoid showing null
-                                reviewerName = UserSession.currentUser.value?.fullName ?: "Guest",
+                                reviewerName = UserSession.currentUser.value?.fullName ?: guestDefaultName,
                                 submitError = reviewSubmitError,
                                 onSubmit = { rating, comment ->
                                     if (!isLoggedIn) {
                                         showLoginDialog = true
                                     } else {
-                                        val reviewerName = UserSession.currentUser.value?.fullName ?: "Guest"
+                                        val reviewerName = UserSession.currentUser.value?.fullName ?: guestDefaultName
                                         reviewSubmitError = null
                                         scope.launch {
                                             try {
-                                                // Same as addUser() in Practical 9:
-                                                // after inserting, the database sends back the row with its real id,
-                                                // use that directly as the new review to show, no need to compute nextId ourselves
                                                 val inserted = withContext(Dispatchers.IO) {
                                                     insertReview(
                                                         vendorName = vendor.name,
@@ -691,8 +673,7 @@ fun VendorDetailScreen(
                                                 }
                                                 reviews.add(inserted)
                                             } catch (e: Exception) {
-                                                // Submit failed (e.g. no network) - show it instead of failing silently
-                                                reviewSubmitError = "Couldn't submit your review. Please check your connection and try again."
+                                                reviewSubmitError = reviewSubmitFailedMsg
                                             }
                                         }
                                     }
@@ -703,7 +684,7 @@ fun VendorDetailScreen(
                     if (reviews.isEmpty()) {
                         item {
                             Text(
-                                "No reviews yet",
+                                stringResource(R.string.no_reviews_yet),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(16.dp)
@@ -721,7 +702,7 @@ fun VendorDetailScreen(
                 else -> {
                     item {
                         Text(
-                            "$selectedTab content coming soon",
+                            stringResource(R.string.tab_content_coming_soon, localizedTabLabel(selectedTab)),
                             fontSize = 14.sp,
                             color = Color.Gray,
                             modifier = Modifier.padding(16.dp)
@@ -760,11 +741,6 @@ fun VendorDetailScreen(
                         showPackageSelection = false
                     } else {
                         CartSession.addVendor(vendor, selectedPackage)
-                        // This part (CartSession.addVendor) only updates the in-memory list -
-                        // it doesn't survive a reload from CartRepository (e.g. HomeScreen's
-                        // LaunchedEffect(isLoggedIn) calling CartRepository.loadCart). Need to
-                        // actually persist it too, same saveCartItem() the rest of the cart
-                        // flow uses (Supabase + local Room, handled inside that function).
                         val userId = UserSession.currentUser.value?.id
                         if (userId != null) {
                             scope.launch {
@@ -777,14 +753,13 @@ fun VendorDetailScreen(
                                         isChecked = true
                                     )
                                 }
+                                CartSession.addVendor(vendor, selectedPackage)
+                                BudgetAlertChecker.check(context, userId)
                             }
                         }
-                        // Toast isn't from the Practicals but it's about as standard as Android
-                        // gets for a quick one-off confirmation, same idea as the
-                        // Intent.ACTION_SEND share sheet added earlier
                         android.widget.Toast.makeText(
                             context,
-                            "${selectedPackage.name} added to cart",
+                            addedToCartMsg.format(selectedPackage.name),
                             android.widget.Toast.LENGTH_SHORT
                         ).show()
                         showPackageSelection = false
@@ -806,7 +781,7 @@ fun AmenitiesSection(amenities: List<Amenity>, modifier: Modifier = Modifier) {
                 modifier = Modifier.size(18.dp)
             )
             Spacer(Modifier.width(6.dp))
-            Text("Amenities", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.amenities_label), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
         Spacer(Modifier.height(12.dp))
 

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +47,7 @@ fun ChatListScreen(onBackClick: () -> Unit, onConversationClick: (ChatConversati
         containerColor = Color(0xFFFDF8F3),
         topBar = {
             TopAppBar(
-                title = { Text("Chats", fontWeight = FontWeight.Bold, color = Color.Black) },
+                title = { Text(stringResource(R.string.chats_title), fontWeight = FontWeight.Bold, color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -70,8 +71,8 @@ fun ChatListScreen(onBackClick: () -> Unit, onConversationClick: (ChatConversati
                 ) {
                     Icon(Icons.Filled.ChatBubbleOutline, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("No conversations yet", fontSize = 15.sp, color = Color.Gray)
-                    Text("Chat with a vendor from their page to start.", fontSize = 12.sp, color = Color.Gray)
+                    Text(stringResource(R.string.no_conversations_yet), fontSize = 15.sp, color = Color.Gray)
+                    Text(stringResource(R.string.chat_with_vendor_hint), fontSize = 12.sp, color = Color.Gray)
                 }
             }
             else -> {

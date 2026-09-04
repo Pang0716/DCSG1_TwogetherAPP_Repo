@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,10 +38,10 @@ fun BookingConfirmationScreen(
             Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(34.dp))
         }
         Spacer(modifier = Modifier.height(20.dp))
-        Text("Booking Confirmed!", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+        Text(stringResource(R.string.booking_confirmed_title), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Your booking has been successfully confirmed.",
+            stringResource(R.string.booking_confirmed_message),
             fontSize = 13.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center
@@ -52,11 +53,11 @@ fun BookingConfirmationScreen(
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.fillMaxWidth().height(48.dp)
         ) {
-            Text("View My Bookings")
+            Text(stringResource(R.string.view_my_bookings))
         }
         Spacer(modifier = Modifier.height(12.dp))
         TextButton(onClick = onBackToHome) {
-            Text("Back to Home", color = Color(0xFFB5722C))
+            Text(stringResource(R.string.back_to_home), color = Color(0xFFB5722C))
         }
     }
 }
