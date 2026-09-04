@@ -163,7 +163,7 @@ fun VendorDetailTopBar(
             .fillMaxWidth()
             .background(Color(0xFFFDF8F3))
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .padding(top = 25.dp)
+            .padding(top = 30.dp)
     ) {
         Text(
             "Vendor Details",
@@ -237,6 +237,12 @@ fun VendorDetailScreen(
     onBackClick: () -> Unit,
     isLoggedIn: Boolean,
     onNavigateToLogin: () -> Unit,
+    // TODO: vendorUserId is a placeholder for now (there's no real field on Vendor
+    // tying it to an actual registered user account for in-app chat). Check with
+    // whoever built ChatScreen/ChatListScreen what this should actually be - probably
+    // needs a real vendorUserId field added to the Vendor data class once vendors are
+    // linked to real accounts, not just static demo data.
+    onChatClick: (vendorUserId: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableStateOf("About") }
@@ -352,7 +358,15 @@ fun VendorDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedButton(
-                    onClick = {},
+                    onClick = {
+                        if (!isLoggedIn) {
+                            onNavigateToLogin()
+                        } else {
+                            // Placeholder vendorUserId - see the TODO on the function
+                            // signature above, this isn't a real user account id yet
+                            onChatClick(vendor.name)
+                        }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)

@@ -178,9 +178,6 @@ val PG = listOf(
         R.drawable.melody_liveband_png, "George Town", "Penang",
         capacity = "4 - 6 members",
         highlights = "Customisable song list, live sound system included, 2-hour set",
-        photoResIds = listOf(
-            R.drawable.
-        )
     ),
     Vendor(
         "Harmony Strings Quartet", "Live Band", 4.7, 40, "RM1,800", null,
