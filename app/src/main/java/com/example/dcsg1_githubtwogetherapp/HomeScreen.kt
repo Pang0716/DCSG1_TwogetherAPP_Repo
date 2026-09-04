@@ -133,7 +133,14 @@ private fun localizedNavLabel(label: String): String = when (label) {
 }
 
 @Composable
-fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationClick: () -> Unit, hasUnreadNotifications: Boolean) {
+fun HomeTopBar(
+    isLoggedIn: Boolean,
+    userName: String,
+    onChatClick: () -> Unit,
+    hasUnreadChats: Boolean,
+    onNotificationClick: () -> Unit,
+    hasUnreadNotifications: Boolean
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,12 +149,18 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
+
             Text(
-                text = stringResource(R.string.welcome_greeting),
+                text = if (isLoggedIn) {
+                    "Welcome, $userName! 👋"
+                } else {
+                    stringResource(R.string.welcome_greeting)
+                },
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
+
             Text(
                 text = stringResource(R.string.welcome_tagline),
                 fontSize = 12.sp,
@@ -156,9 +169,15 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
         }
 
         Row {
+
+            // Chat
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(end = 16.dp).clickable { onChatClick() }
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .clickable {
+                        onChatClick()
+                    }
             ) {
                 Box {
                     Icon(
@@ -167,6 +186,7 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                         tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
+
                     if (hasUnreadChats) {
                         Box(
                             modifier = Modifier
@@ -179,9 +199,12 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                 }
             }
 
+            // Notification
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { onNotificationClick() }
+                modifier = Modifier.clickable {
+                    onNotificationClick()
+                }
             ) {
                 Box {
                     Icon(
@@ -190,6 +213,7 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                         tint = Color.Black,
                         modifier = Modifier.size(25.dp)
                     )
+
                     if (hasUnreadNotifications) {
                         Box(
                             modifier = Modifier
@@ -202,64 +226,6 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                 }
             }
         }
-    }
-}
-
-@Composable
-fun LocationSelector(
-    selectedState: String,
-    onStateChosen: (String) -> Unit
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-            .clickable { showDialog = true }
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Filled.LocationOn,
-                contentDescription = stringResource(R.string.location_label),
-                tint = Color.Gray,
-                modifier = Modifier.size(18.dp).padding(end = 6.dp)
-            )
-            Text(text = selectedState, fontSize = 14.sp, color = Color.Black)
-        }
-        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.expand_description), tint = Color.Gray)
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(stringResource(R.string.select_a_state)) },
-            text = {
-                LazyColumn {
-                    items(malaysiaWeddingLocations) { state ->
-                        Text(
-                            text = state.stateName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onStateChosen(state.stateName)
-                                    showDialog = false
-                                }
-                                .padding(vertical = 12.dp)
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
     }
 }
 
@@ -759,13 +725,28 @@ fun HomeScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 HomeTopBar(
+                    isLoggedIn = isLoggedIn,
+                    userName = UserSession.currentUser.value?.fullName
+                        ?: stringResource(R.string.default_user_name),
+
                     onChatClick = {
-                        if (isLoggedIn) onOpenChatList() else showLoginDialog = true
+                        if (isLoggedIn) {
+                            onOpenChatList()
+                        } else {
+                            showLoginDialog = true
+                        }
                     },
+
                     hasUnreadChats = hasUnreadChats,
+
                     onNotificationClick = {
-                        if (isLoggedIn) onOpenNotifications() else showLoginDialog = true
+                        if (isLoggedIn) {
+                            onOpenNotifications()
+                        } else {
+                            showLoginDialog = true
+                        }
                     },
+
                     hasUnreadNotifications = hasUnreadNotifications
                 )
                 Spacer(Modifier.height(8.dp))
@@ -815,6 +796,102 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun LocationSelector(
+    selectedState: String,
+    onStateChosen: (String) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .border(
+                1.dp,
+                Color.LightGray,
+                RoundedCornerShape(8.dp)
+            )
+            .clickable {
+                showDialog = true
+            }
+            .padding(
+                horizontal = 12.dp,
+                vertical = 10.dp
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.LocationOn,
+                contentDescription = stringResource(R.string.location_label),
+                tint = Color.Gray,
+                modifier = Modifier
+                    .size(18.dp)
+                    .padding(end = 6.dp)
+            )
+
+            Text(
+                text = selectedState,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+
+        Icon(
+            imageVector = Icons.Filled.KeyboardArrowDown,
+            contentDescription = stringResource(R.string.expand_description),
+            tint = Color.Gray
+        )
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+
+            title = {
+                Text(
+                    stringResource(R.string.select_a_state)
+                )
+            },
+
+            text = {
+                LazyColumn {
+                    items(malaysiaWeddingLocations) { state ->
+
+                        Text(
+                            text = state.stateName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onStateChosen(state.stateName)
+                                    showDialog = false
+                                }
+                                .padding(vertical = 12.dp)
+                        )
+                    }
+                }
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text(
+                        stringResource(R.string.cancel)
+                    )
+                }
+            }
+        )
+    }
+}
 @Composable
 fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
     Row(
