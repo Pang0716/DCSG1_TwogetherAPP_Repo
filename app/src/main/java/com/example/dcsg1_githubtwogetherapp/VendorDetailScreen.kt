@@ -284,12 +284,29 @@ fun VendorDetailScreen(
 
     LaunchedEffect(vendor.name) {
         try {
-            val fetched = withContext(Dispatchers.IO) { fetchReviews(vendor.name) }
+            val fetched = withContext(Dispatchers.IO) {
+                fetchReviews(vendor.name)
+            }
+
             reviews.clear()
-            reviews.addAll(fetched)
+
+            if (fetched.isNotEmpty()) {
+                // Use reviews from Supabase if available
+                reviews.addAll(fetched)
+            } else {
+                // No reviews in database, use generated reviews
+                reviews.addAll(generateReviews(vendor))
+            }
+
             reviewsLoadFailed = false
+
         } catch (e: Exception) {
-            android.util.Log.e("VendorDetailScreen", "fetchReviews failed for ${vendor.name}", e)
+            android.util.Log.e(
+                "VendorDetailScreen",
+                "fetchReviews failed for ${vendor.name}",
+                e
+            )
+
             reviews.clear()
             reviews.addAll(generateReviews(vendor))
             reviewsLoadFailed = true
