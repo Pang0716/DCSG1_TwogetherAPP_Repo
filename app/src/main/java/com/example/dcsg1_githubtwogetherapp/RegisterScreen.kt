@@ -207,7 +207,7 @@ fun RegisterScreen(
 
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_description),   // <-- CHANGED
                 modifier = Modifier.size(24.dp).clickable { onBackClick() }
             )
 

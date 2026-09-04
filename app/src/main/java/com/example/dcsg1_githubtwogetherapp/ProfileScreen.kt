@@ -73,7 +73,7 @@ fun ProfileScreen(
             if (isLoggedIn && user?.avatarUrl != null) {
                 AsyncImage(
                     model = user.avatarUrl,
-                    contentDescription = "Profile photo",
+                    contentDescription = stringResource(R.string.profile_photo_description),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(90.dp).clip(CircleShape)
                 )

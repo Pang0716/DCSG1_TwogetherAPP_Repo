@@ -61,7 +61,7 @@ fun CartScreen(
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_description),
                 tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
@@ -249,7 +249,7 @@ fun CartItemRow(item: CartItem, onDelete: () -> Unit, onCheckedChange: (Boolean)
             Row {
                 Icon(
                     imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
+                    contentDescription = stringResource(R.string.edit_description),
                     tint = Color(0xFFB5722C),
                     modifier = Modifier
                         .size(16.dp)
@@ -258,7 +258,7 @@ fun CartItemRow(item: CartItem, onDelete: () -> Unit, onCheckedChange: (Boolean)
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
                     imageVector = Icons.Filled.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete_description),
                     tint = Color.Gray,
                     modifier = Modifier
                         .size(16.dp)

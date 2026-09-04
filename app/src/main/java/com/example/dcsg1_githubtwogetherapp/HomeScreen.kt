@@ -163,7 +163,7 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                 Box {
                     Icon(
                         imageVector = Icons.Outlined.ChatBubbleOutline,
-                        contentDescription = "Chat",
+                        contentDescription = stringResource(R.string.chat_label),
                         tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
@@ -186,7 +186,7 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationC
                 Box {
                     Icon(
                         imageVector = Icons.Outlined.NotificationsNone,
-                        contentDescription = "Notifications",
+                        contentDescription = stringResource(R.string.notifications_title),
                         tint = Color.Black,
                         modifier = Modifier.size(25.dp)
                     )
@@ -225,13 +225,13 @@ fun LocationSelector(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.LocationOn,
-                contentDescription = "Location",
+                contentDescription = stringResource(R.string.location_label),
                 tint = Color.Gray,
                 modifier = Modifier.size(18.dp).padding(end = 6.dp)
             )
             Text(text = selectedState, fontSize = 14.sp, color = Color.Black)
         }
-        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Expand", tint = Color.Gray)
+        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.expand_description), tint = Color.Gray)
     }
 
     if (showDialog) {
@@ -289,7 +289,7 @@ fun WeddingDateCard(
         if (!hasArrived) {
             Image(
                 painter = painterResource(id = R.drawable.wedding_flowers),
-                contentDescription = "Wedding flowers",
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -400,7 +400,7 @@ fun WeddingDateCard(
         ) {
             Icon(
                 imageVector = Icons.Filled.Group,
-                contentDescription = "Guestlist",
+                contentDescription = stringResource(R.string.guestlist),
                 tint = Color(0xFFB5722C),
                 modifier = Modifier.size(16.dp)
             )
@@ -463,7 +463,7 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = action.iconResId),
-            contentDescription = action.label,
+            contentDescription = localizedQuickActionLabel(action.label),
             modifier = Modifier.size(34.dp)
         )
         Spacer(modifier = Modifier.height(6.dp))
@@ -688,7 +688,7 @@ fun HomeScreen(
 
     if (LoginEventState.showWelcomeMessage.value) {
         WelcomeBackDialog(
-            userName = UserSession.currentUser.value?.fullName ?: "there",
+            userName = UserSession.currentUser.value?.fullName ?: stringResource(R.string.default_user_name),
             onDismiss = { LoginEventState.showWelcomeMessage.value = false }
         )
     }
@@ -835,7 +835,7 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
             ) {
                 Icon(
                     imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                    contentDescription = item.label,
+                    contentDescription = localizedNavLabel(item.label),
                     tint = if (isSelected) Color(0xFFB5722C) else Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
@@ -1013,7 +1013,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
             if (BudgetSession.totalBudget.value > 0) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit Budget",
+                    contentDescription = stringResource(R.string.edit_budget_description),
                     tint = Color(0xFFB5722C),
                     modifier = Modifier
                         .size(20.dp)
@@ -1318,7 +1318,7 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                                 Text(guest, fontSize = 14.sp, color = Color.Black, modifier = Modifier.weight(1f))
                                 Icon(
                                     Icons.Filled.Close,
-                                    contentDescription = "Remove",
+                                    contentDescription = stringResource(R.string.remove_description),
                                     tint = Color.Gray,
                                     modifier = Modifier
                                         .size(18.dp)
@@ -1351,7 +1351,7 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                             .clickable { addGuest() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color.White)
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_description), tint = Color.White)
                     }
                 }
             }
