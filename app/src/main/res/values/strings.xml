@@ -282,4 +282,19 @@
     <string name="find_perfect_package">Find the perfect package for your special day.</string>
     <string name="from_label">From</string>
     <string name="continue_label">Continue</string>
+
+    <string name="google_signin_no_token">Google sign-in failed: no token received.</string>
+    <string name="no_internet_connection">No internet connection. Please check your network and try again.</string>
+    <string name="facebook_login_no_internet">Facebook login failed. Please check your internet connection and try again.</string>
+
+    <string name="back_description">Back</string>
+
+    <string name="edit_description">Edit</string>
+    <string name="delete_description">Delete</string>
+
+    <string name="expand_description">Expand</string>
+    <string name="edit_budget_description">Edit Budget</string>
+    <string name="remove_description">Remove</string>
+    <string name="add_description">Add</string>
+    <string name="profile_photo_description">Profile photo</string>
 </resources>

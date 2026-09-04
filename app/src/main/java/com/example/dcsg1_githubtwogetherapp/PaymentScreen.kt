@@ -95,7 +95,7 @@ fun PaymentScreen(
         Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_description),
                 tint = Color.Black,
                 modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp).clickable { onBackClick() }
             )
