@@ -249,7 +249,8 @@ fun VendorDetailScreen(
 ) {
     var selectedTab by remember { mutableStateOf("About") }
     val tabs = listOf("About", "Packages", "Photos", "Reviews")
-    val packages = remember { generatePackages(vendor) }
+    val context = LocalContext.current
+    val packages = remember { generatePackages(vendor, context) }
     val photos = remember { generatePhotos(vendor) }
     val reviews = remember { mutableStateListOf<Review>() }
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
@@ -260,7 +261,6 @@ fun VendorDetailScreen(
     var showLoginDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     val linkCopiedMsg = stringResource(R.string.link_copied)
     val reviewSubmitFailedMsg = stringResource(R.string.review_submit_failed)
@@ -530,7 +530,7 @@ fun VendorDetailScreen(
                             )
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                generateAboutDescription(vendor),
+                                generateAboutDescription(vendor, context),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 lineHeight = 22.sp
@@ -588,7 +588,7 @@ fun VendorDetailScreen(
                             }
                             Spacer(Modifier.height(18.dp))
 
-                            AmenitiesSection(amenities = generateAmenities(vendor))
+                            AmenitiesSection(amenities = generateAmenities(vendor, context))
                         }
                     }
                 }

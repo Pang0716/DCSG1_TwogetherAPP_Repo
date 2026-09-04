@@ -1,5 +1,6 @@
 package com.example.dcsg1_githubtwogetherapp
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checkroom
 import androidx.compose.material.icons.outlined.ContentCut
@@ -23,59 +24,55 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Amenity(val label: String, val icon: ImageVector)
 
-/** Kept as the Venue list and as a fallback for any category not covered below. */
-val defaultAmenities = listOf(
-    Amenity("Ballroom", Icons.Outlined.EventSeat),
-    Amenity("Halal Catering", Icons.Outlined.Restaurant),
-    Amenity("Bridal Room", Icons.Outlined.Checkroom),
-    Amenity("Parking", Icons.Outlined.LocalParking),
-    Amenity("AV System", Icons.Outlined.Tv),
-    Amenity("Wi-Fi", Icons.Outlined.Wifi)
-)
+fun generateAmenities(vendor: Vendor, context: Context): List<Amenity> {
+    fun s(resId: Int) = context.getString(resId)
 
-/**
- * Same idea as generatePackages()/generatePhotos()/generateReviews() - branch by
- * vendor.category instead of showing venue-only amenities (ballroom, bridal room, etc.)
- * for every vendor regardless of type.
- */
-fun generateAmenities(vendor: Vendor): List<Amenity> {
+    val defaultAmenities = listOf(
+        Amenity(s(R.string.am_ballroom), Icons.Outlined.EventSeat),
+        Amenity(s(R.string.am_halal_catering), Icons.Outlined.Restaurant),
+        Amenity(s(R.string.am_bridal_room), Icons.Outlined.Checkroom),
+        Amenity(s(R.string.am_parking), Icons.Outlined.LocalParking),
+        Amenity(s(R.string.am_av_system), Icons.Outlined.Tv),
+        Amenity(s(R.string.am_wifi), Icons.Outlined.Wifi)
+    )
+
     return when (vendor.category) {
         "Venue" -> defaultAmenities
         "Photographer" -> listOf(
-            Amenity("Digital Gallery", Icons.Outlined.PhotoLibrary),
-            Amenity("Photo Album", Icons.Outlined.EventSeat),
-            Amenity("Studio Access", Icons.Outlined.Face),
-            Amenity("Same-day Preview", Icons.Outlined.EventAvailable)
+            Amenity(s(R.string.am_digital_gallery), Icons.Outlined.PhotoLibrary),
+            Amenity(s(R.string.am_photo_album), Icons.Outlined.EventSeat),
+            Amenity(s(R.string.am_studio_access), Icons.Outlined.Face),
+            Amenity(s(R.string.am_same_day_preview), Icons.Outlined.EventAvailable)
         )
         "Makeup" -> listOf(
-            Amenity("Airbrush Makeup", Icons.Outlined.Face),
-            Amenity("Hair Styling", Icons.Outlined.ContentCut),
-            Amenity("Trial Session", Icons.Outlined.EventAvailable),
-            Amenity("Touch-up Kit", Icons.Outlined.Checkroom)
+            Amenity(s(R.string.am_airbrush_makeup), Icons.Outlined.Face),
+            Amenity(s(R.string.am_hair_styling), Icons.Outlined.ContentCut),
+            Amenity(s(R.string.am_trial_session), Icons.Outlined.EventAvailable),
+            Amenity(s(R.string.am_touchup_kit), Icons.Outlined.Checkroom)
         )
         "Live Band" -> listOf(
-            Amenity("Sound System", Icons.Outlined.QueueMusic),
-            Amenity("Custom Setlist", Icons.Outlined.QueueMusic),
-            Amenity("Stage Lighting", Icons.Outlined.Lightbulb),
-            Amenity("MC Coordination", Icons.Outlined.Mic)
+            Amenity(s(R.string.am_sound_system), Icons.Outlined.QueueMusic),
+            Amenity(s(R.string.am_custom_setlist), Icons.Outlined.QueueMusic),
+            Amenity(s(R.string.am_stage_lighting), Icons.Outlined.Lightbulb),
+            Amenity(s(R.string.am_mc_coordination), Icons.Outlined.Mic)
         )
         "Emcee" -> listOf(
-            Amenity("Bilingual Hosting", Icons.Outlined.Translate),
-            Amenity("Script Writing", Icons.Outlined.EventAvailable),
-            Amenity("Rehearsal Included", Icons.Outlined.EventAvailable),
-            Amenity("Games & Activities", Icons.Outlined.SportsEsports)
+            Amenity(s(R.string.am_bilingual_hosting), Icons.Outlined.Translate),
+            Amenity(s(R.string.am_script_writing), Icons.Outlined.EventAvailable),
+            Amenity(s(R.string.am_rehearsal_included), Icons.Outlined.EventAvailable),
+            Amenity(s(R.string.am_games_activities), Icons.Outlined.SportsEsports)
         )
         "Attire" -> listOf(
-            Amenity("Fitting Sessions", Icons.Outlined.Checkroom),
-            Amenity("Alterations", Icons.Outlined.ContentCut),
-            Amenity("Dry Cleaning", Icons.Outlined.LocalLaundryService),
-            Amenity("Accessories", Icons.Outlined.Palette)
+            Amenity(s(R.string.am_fitting_sessions), Icons.Outlined.Checkroom),
+            Amenity(s(R.string.am_alterations), Icons.Outlined.ContentCut),
+            Amenity(s(R.string.am_dry_cleaning), Icons.Outlined.LocalLaundryService),
+            Amenity(s(R.string.am_accessories), Icons.Outlined.Palette)
         )
         "Deco" -> listOf(
-            Amenity("Floral Arrangement", Icons.Outlined.LocalFlorist),
-            Amenity("Lighting Design", Icons.Outlined.Lightbulb),
-            Amenity("Backdrop Setup", Icons.Outlined.PhotoLibrary),
-            Amenity("Theme Design", Icons.Outlined.Palette)
+            Amenity(s(R.string.am_floral_arrangement), Icons.Outlined.LocalFlorist),
+            Amenity(s(R.string.am_lighting_design), Icons.Outlined.Lightbulb),
+            Amenity(s(R.string.am_backdrop_setup), Icons.Outlined.PhotoLibrary),
+            Amenity(s(R.string.am_theme_design), Icons.Outlined.Palette)
         )
         else -> defaultAmenities
     }

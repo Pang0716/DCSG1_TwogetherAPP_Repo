@@ -1,5 +1,6 @@
 package com.example.dcsg1_githubtwogetherapp
 
+import android.content.Context
 import java.util.Locale
 import kotlin.math.abs
 
@@ -17,260 +18,137 @@ private fun formatPrice(amount: Int): String {
     return "RM" + String.format(Locale.US, "%,d", amount)
 }
 
-/**
- * Routes to the matching package template based on vendor.category.
- * category must exactly match the strings in BrowseVendorsScreen's categories list
- * (Venue / Photographer / Makeup / Live Band / Emcee / Attire / Deco).
- * A typo or case mismatch will just fall through to the else branch.
- *
- * Each category also has 2 different package-naming styles ("name variants").
- * Which one a given vendor gets is picked from a hash of vendor.name, so the same
- * vendor always shows the same names on every open (deterministic), but different
- * vendors in the same category won't all show identical package names.
- */
-fun generatePackages(vendor: Vendor): List<PackageOption> {
+fun generatePackages(vendor: Vendor, context: Context): List<PackageOption> {
     val basePrice = vendor.priceFrom.filter { it.isDigit() }.toIntOrNull() ?: 1000
     val variant = abs(vendor.name.hashCode()) % 2
 
     return when (vendor.category) {
-        "Venue" -> venuePackages(basePrice, variant)
-        "Photographer" -> photographerPackages(basePrice, variant)
-        "Makeup" -> makeupPackages(basePrice, variant)
-        "Live Band" -> liveBandPackages(basePrice, variant)
-        "Emcee" -> emceePackages(basePrice, variant)
-        "Attire" -> attirePackages(basePrice, variant)
-        "Deco" -> decoPackages(basePrice, variant)
-        else -> venuePackages(basePrice, variant)
+        "Venue" -> venuePackages(basePrice, variant, context)
+        "Photographer" -> photographerPackages(basePrice, variant, context)
+        "Makeup" -> makeupPackages(basePrice, variant, context)
+        "Live Band" -> liveBandPackages(basePrice, variant, context)
+        "Emcee" -> emceePackages(basePrice, variant, context)
+        "Attire" -> attirePackages(basePrice, variant, context)
+        "Deco" -> decoPackages(basePrice, variant, context)
+        else -> venuePackages(basePrice, variant, context)
     }
 }
 
-private val venueNames = listOf(
-    listOf("Elegance Package", "Signature Package", "Grand Celebration Package"),
-    listOf("Classic Package", "Premium Package", "Royal Package")
-)
-
-private fun venuePackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = venueNames[variant]
+private fun venuePackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_venue_0_0, R.string.pkg_name_venue_0_1, R.string.pkg_name_venue_0_2)
+    else listOf(R.string.pkg_name_venue_1_0, R.string.pkg_name_venue_1_1, R.string.pkg_name_venue_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "100 - 300 pax",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_venue_0),
             imageUrl = "https://images.pexels.com/photos/265947/pexels-photo-265947.jpeg",
-            tags = listOf("Halal catering", "Elegant ballroom", "Custom packages"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.3).toInt()),
-            capacity = "300 - 500 pax",
+            tags = listOf(ctx.getString(R.string.pkg_tag_venue_0_0), ctx.getString(R.string.pkg_tag_venue_0_1), ctx.getString(R.string.pkg_tag_venue_0_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.3).toInt()), ctx.getString(R.string.pkg_cap_venue_1),
             imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
-            tags = listOf("Halal catering", "Premium décor", "Custom packages")
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.7).toInt()),
-            capacity = "500 - 800 pax",
+            tags = listOf(ctx.getString(R.string.pkg_tag_venue_1_0), ctx.getString(R.string.pkg_tag_venue_1_1), ctx.getString(R.string.pkg_tag_venue_1_2))),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.7).toInt()), ctx.getString(R.string.pkg_cap_venue_2),
             imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
-            tags = listOf("Halal catering", "Luxury ballroom", "Custom packages")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_venue_2_0), ctx.getString(R.string.pkg_tag_venue_2_1), ctx.getString(R.string.pkg_tag_venue_2_2)))
     )
 }
 
-private val photographerNames = listOf(
-    listOf("Basic Shoot Package", "Premium Shoot Package", "Deluxe Full-Day Package"),
-    listOf("Essential Package", "Signature Shoot Package", "All-Day Coverage Package")
-)
-
-private fun photographerPackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = photographerNames[variant]
+private fun photographerPackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_photographer_0_0, R.string.pkg_name_photographer_0_1, R.string.pkg_name_photographer_0_2)
+    else listOf(R.string.pkg_name_photographer_1_0, R.string.pkg_name_photographer_1_1, R.string.pkg_name_photographer_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "4 hours coverage",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_photographer_0),
             imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
-            tags = listOf("1 photographer", "200+ edited photos", "Online gallery")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.4).toInt()),
-            capacity = "8 hours coverage",
+            tags = listOf(ctx.getString(R.string.pkg_tag_photographer_0_0), ctx.getString(R.string.pkg_tag_photographer_0_1), ctx.getString(R.string.pkg_tag_photographer_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.4).toInt()), ctx.getString(R.string.pkg_cap_photographer_1),
             imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
-            tags = listOf("2 photographers", "500+ edited photos", "Photo album"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.9).toInt()),
-            capacity = "Full-day coverage",
+            tags = listOf(ctx.getString(R.string.pkg_tag_photographer_1_0), ctx.getString(R.string.pkg_tag_photographer_1_1), ctx.getString(R.string.pkg_tag_photographer_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.9).toInt()), ctx.getString(R.string.pkg_cap_photographer_2),
             imageUrl = "https://images.pexels.com/photos/169198/pexels-photo-169198.jpeg",
-            tags = listOf("2 photographers + assistant", "Same-day highlights", "Premium album")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_photographer_2_0), ctx.getString(R.string.pkg_tag_photographer_2_1), ctx.getString(R.string.pkg_tag_photographer_2_2)))
     )
 }
 
-private val makeupNames = listOf(
-    listOf("Bridal Look Package", "Full Glam Package", "VIP Bridal Package"),
-    listOf("Natural Glow Package", "Signature Bridal Package", "Ultimate Beauty Package")
-)
-
-private fun makeupPackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = makeupNames[variant]
+private fun makeupPackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_makeup_0_0, R.string.pkg_name_makeup_0_1, R.string.pkg_name_makeup_0_2)
+    else listOf(R.string.pkg_name_makeup_1_0, R.string.pkg_name_makeup_1_1, R.string.pkg_name_makeup_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "1 trial + wedding day",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_makeup_0),
             imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
-            tags = listOf("Airbrush makeup", "Hairstyling", "False lashes")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.35).toInt()),
-            capacity = "2 trials + wedding day",
+            tags = listOf(ctx.getString(R.string.pkg_tag_makeup_0_0), ctx.getString(R.string.pkg_tag_makeup_0_1), ctx.getString(R.string.pkg_tag_makeup_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.35).toInt()), ctx.getString(R.string.pkg_cap_makeup_1),
             imageUrl = "https://images.pexels.com/photos/3065171/pexels-photo-3065171.jpeg",
-            tags = listOf("Airbrush makeup", "Touch-up kit", "Hair accessories"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.8).toInt()),
-            capacity = "Unlimited trials",
+            tags = listOf(ctx.getString(R.string.pkg_tag_makeup_1_0), ctx.getString(R.string.pkg_tag_makeup_1_1), ctx.getString(R.string.pkg_tag_makeup_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.8).toInt()), ctx.getString(R.string.pkg_cap_makeup_2),
             imageUrl = "https://images.pexels.com/photos/3985338/pexels-photo-3985338.jpeg",
-            tags = listOf("On-site touch-up", "Family makeup included", "Premium products")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_makeup_2_0), ctx.getString(R.string.pkg_tag_makeup_2_1), ctx.getString(R.string.pkg_tag_makeup_2_2)))
     )
 }
 
-private val liveBandNames = listOf(
-    listOf("Duo Acoustic Package", "Trio Band Package", "Full Band Package"),
-    listOf("Intimate Set Package", "Classic Band Package", "Grand Performance Package")
-)
-
-private fun liveBandPackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = liveBandNames[variant]
+private fun liveBandPackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_liveband_0_0, R.string.pkg_name_liveband_0_1, R.string.pkg_name_liveband_0_2)
+    else listOf(R.string.pkg_name_liveband_1_0, R.string.pkg_name_liveband_1_1, R.string.pkg_name_liveband_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "2 sets, 45 min each",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_liveband_0),
             imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
-            tags = listOf("Vocalist + guitarist", "Sound system included", "Custom song list")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.4).toInt()),
-            capacity = "3 sets, 45 min each",
+            tags = listOf(ctx.getString(R.string.pkg_tag_liveband_0_0), ctx.getString(R.string.pkg_tag_liveband_0_1), ctx.getString(R.string.pkg_tag_liveband_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.4).toInt()), ctx.getString(R.string.pkg_cap_liveband_1),
             imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
-            tags = listOf("3-piece band", "Full sound system", "MC coordination"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 2.0).toInt()),
-            capacity = "Full night, 4 sets",
+            tags = listOf(ctx.getString(R.string.pkg_tag_liveband_1_0), ctx.getString(R.string.pkg_tag_liveband_1_1), ctx.getString(R.string.pkg_tag_liveband_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 2.0).toInt()), ctx.getString(R.string.pkg_cap_liveband_2),
             imageUrl = "https://images.pexels.com/photos/1699161/pexels-photo-1699161.jpeg",
-            tags = listOf("5-piece band", "Stage lighting", "Custom repertoire")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_liveband_2_0), ctx.getString(R.string.pkg_tag_liveband_2_1), ctx.getString(R.string.pkg_tag_liveband_2_2)))
     )
 }
 
-private val emceeNames = listOf(
-    listOf("Solo Emcee Package", "Bilingual Emcee Package", "Premium Hosting Package"),
-    listOf("Standard Hosting Package", "Dual Language Package", "Full Programme Package")
-)
-
-private fun emceePackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = emceeNames[variant]
+private fun emceePackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_emcee_0_0, R.string.pkg_name_emcee_0_1, R.string.pkg_name_emcee_0_2)
+    else listOf(R.string.pkg_name_emcee_1_0, R.string.pkg_name_emcee_1_1, R.string.pkg_name_emcee_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "3 hours hosting",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_emcee_0),
             imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
-            tags = listOf("Single language", "Script preparation", "On-site coordination")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.3).toInt()),
-            capacity = "5 hours hosting",
+            tags = listOf(ctx.getString(R.string.pkg_tag_emcee_0_0), ctx.getString(R.string.pkg_tag_emcee_0_1), ctx.getString(R.string.pkg_tag_emcee_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.3).toInt()), ctx.getString(R.string.pkg_cap_emcee_1),
             imageUrl = "https://images.pexels.com/photos/2608519/pexels-photo-2608519.jpeg",
-            tags = listOf("Bilingual hosting", "Games and activities", "Script preparation"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.6).toInt()),
-            capacity = "Full event coverage",
+            tags = listOf(ctx.getString(R.string.pkg_tag_emcee_1_0), ctx.getString(R.string.pkg_tag_emcee_1_1), ctx.getString(R.string.pkg_tag_emcee_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.6).toInt()), ctx.getString(R.string.pkg_cap_emcee_2),
             imageUrl = "https://images.pexels.com/photos/2608520/pexels-photo-2608520.jpeg",
-            tags = listOf("Trilingual hosting", "Rehearsal included", "Custom program design")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_emcee_2_0), ctx.getString(R.string.pkg_tag_emcee_2_1), ctx.getString(R.string.pkg_tag_emcee_2_2)))
     )
 }
 
-private val attireNames = listOf(
-    listOf("Rental Basic Package", "Rental Premium Package", "Full Bridal Set Package"),
-    listOf("Starter Package", "Boutique Package", "Complete Ensemble Package")
-)
-
-private fun attirePackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = attireNames[variant]
+private fun attirePackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_attire_0_0, R.string.pkg_name_attire_0_1, R.string.pkg_name_attire_0_2)
+    else listOf(R.string.pkg_name_attire_1_0, R.string.pkg_name_attire_1_1, R.string.pkg_name_attire_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "1 outfit rental",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_attire_0),
             imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
-            tags = listOf("1 fitting session", "Basic alterations", "3-day rental")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.3).toInt()),
-            capacity = "2 outfit rentals",
+            tags = listOf(ctx.getString(R.string.pkg_tag_attire_0_0), ctx.getString(R.string.pkg_tag_attire_0_1), ctx.getString(R.string.pkg_tag_attire_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.3).toInt()), ctx.getString(R.string.pkg_cap_attire_1),
             imageUrl = "https://images.pexels.com/photos/1444441/pexels-photo-1444441.jpeg",
-            tags = listOf("2 fitting sessions", "Custom alterations", "Accessories included"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.7).toInt()),
-            capacity = "3+ outfit rentals",
+            tags = listOf(ctx.getString(R.string.pkg_tag_attire_1_0), ctx.getString(R.string.pkg_tag_attire_1_1), ctx.getString(R.string.pkg_tag_attire_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.7).toInt()), ctx.getString(R.string.pkg_cap_attire_2),
             imageUrl = "https://images.pexels.com/photos/265920/pexels-photo-265920.jpeg",
-            tags = listOf("Unlimited fittings", "Custom tailoring", "Full accessories set")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_attire_2_0), ctx.getString(R.string.pkg_tag_attire_2_1), ctx.getString(R.string.pkg_tag_attire_2_2)))
     )
 }
 
-private val decoNames = listOf(
-    listOf("Simple Deco Package", "Themed Deco Package", "Luxury Deco Package"),
-    listOf("Essential Styling Package", "Signature Deco Package", "Grand Transformation Package")
-)
-
-private fun decoPackages(basePrice: Int, variant: Int): List<PackageOption> {
-    val n = decoNames[variant]
+private fun decoPackages(basePrice: Int, variant: Int, ctx: Context): List<PackageOption> {
+    val n = if (variant == 0) listOf(R.string.pkg_name_deco_0_0, R.string.pkg_name_deco_0_1, R.string.pkg_name_deco_0_2)
+    else listOf(R.string.pkg_name_deco_1_0, R.string.pkg_name_deco_1_1, R.string.pkg_name_deco_1_2)
     return listOf(
-        PackageOption(
-            name = n[0],
-            price = formatPrice(basePrice),
-            capacity = "Up to 100 pax venue",
+        PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_deco_0),
             imageResId = R.drawable.elegancepackage,
-            tags = listOf("Backdrop setup", "Basic floral", "Table centerpieces")
-        ),
-        PackageOption(
-            name = n[1],
-            price = formatPrice((basePrice * 1.4).toInt()),
-            capacity = "Up to 300 pax venue",
+            tags = listOf(ctx.getString(R.string.pkg_tag_deco_0_0), ctx.getString(R.string.pkg_tag_deco_0_1), ctx.getString(R.string.pkg_tag_deco_0_2))),
+        PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.4).toInt()), ctx.getString(R.string.pkg_cap_deco_1),
             imageResId = R.drawable.signaturepackage,
-            tags = listOf("Custom theme design", "Floral arch", "Ambient lighting"),
-            isPopular = true
-        ),
-        PackageOption(
-            name = n[2],
-            price = formatPrice((basePrice * 1.9).toInt()),
-            capacity = "Up to 800 pax venue",
+            tags = listOf(ctx.getString(R.string.pkg_tag_deco_1_0), ctx.getString(R.string.pkg_tag_deco_1_1), ctx.getString(R.string.pkg_tag_deco_1_2)),
+            isPopular = true),
+        PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.9).toInt()), ctx.getString(R.string.pkg_cap_deco_2),
             imageResId = R.drawable.grandcelebrationpackage,
-            tags = listOf("Full venue transformation", "Premium florals", "LED lighting design")
-        )
+            tags = listOf(ctx.getString(R.string.pkg_tag_deco_2_0), ctx.getString(R.string.pkg_tag_deco_2_1), ctx.getString(R.string.pkg_tag_deco_2_2)))
     )
 }

@@ -180,7 +180,7 @@ fun CartScreen(
         ) {
             SelectPackageSheetContent(
                 vendor = item.vendor,
-                packages = generatePackages(item.vendor),
+                packages = generatePackages(item.vendor, context),
                 onContinueClick = { newPackage ->
                     CartSession.updatePackage(item.vendor, newPackage)
                     val userId = UserSession.currentUser.value?.id
