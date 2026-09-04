@@ -9,7 +9,8 @@ data class UserProfile(
     val avatarUrl: String?,
     val phoneNumber: String? = null,
     val gender: String? = null,
-    val dateOfBirth: String? = null
+    val dateOfBirth: String? = null,
+    val role: String = "customer"
 )
 
 object UserSession {

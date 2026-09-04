@@ -13,9 +13,11 @@ import androidx.room.RoomDatabase
         CartEntity::class,
         UserEntity::class,
         FavoriteEntity::class,
-        CardDesignEntity::class
+        CardDesignEntity::class,
+        ChatEntity::class,
+        ChatReadEntity::class
     ],
-    version = 9
+    version = 13
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
@@ -25,6 +27,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun favoriteDao(): FavoriteDao
     abstract fun cardDesignDao(): CardDesignDao
+    abstract fun chatDao(): ChatDao
+    abstract fun chatReadDao(): ChatReadDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

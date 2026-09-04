@@ -43,6 +43,27 @@ object BookingRepository {
     }
 
     suspend fun loadBookings(context: Context, userId: String): List<BookingEntity> {
-        return AppDatabase.getInstance(context).bookingDao().getBookings(userId)
+        return try {
+            val remote = supabase.postgrest["bookings"]
+                .select { filter { eq("user_id", userId) } }
+                .decodeList<BookingRow>()
+
+            val dao = AppDatabase.getInstance(context).bookingDao()
+            val entities = remote.map {
+                BookingEntity(
+                    userId = userId,
+                    vendorName = it.vendorName,
+                    category = it.category,
+                    price = it.price,
+                    paymentMethod = it.paymentMethod,
+                    bookedAt = System.currentTimeMillis()
+                )
+            }
+            // Refresh local cache to match remote (source of truth)
+            entities.forEach { dao.insertBooking(it) }
+            entities.sortedByDescending { it.bookedAt }
+        } catch (e: Exception) {
+            AppDatabase.getInstance(context).bookingDao().getBookings(userId)
+        }
     }
 }

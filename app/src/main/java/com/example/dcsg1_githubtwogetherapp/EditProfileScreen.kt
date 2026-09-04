@@ -26,6 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.ui.platform.LocalContext
 
 private fun daysInMonth(month: Int, year: Int): Int {
     return when (month) {
@@ -37,9 +44,58 @@ private fun daysInMonth(month: Int, year: Int): Int {
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(onBackClick: () -> Unit) {
+fun EditProfileScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit) {
     val user = UserSession.currentUser.value
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var showPhotoOptions by remember { mutableStateOf(false) }
+    var isUploadingPhoto by remember { mutableStateOf(false) }
+    var photoError by remember { mutableStateOf<String?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            val userId = user?.id
+            if (userId != null) {
+                isUploadingPhoto = true
+                scope.launch {
+                    try {
+                        val url = AvatarRepository.uploadFromUri(context, userId, uri)
+                        updateAvatarUrl(url)
+                        loadCurrentUserProfile()
+                        photoError = null
+                    } catch (e: Exception) {
+                        photoError = "Couldn't update photo. Please try again."
+                    }
+                    isUploadingPhoto = false
+                }
+            }
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            val userId = user?.id
+            if (userId != null) {
+                isUploadingPhoto = true
+                scope.launch {
+                    try {
+                        val url = AvatarRepository.uploadFromBitmap(userId, bitmap)
+                        updateAvatarUrl(url)
+                        loadCurrentUserProfile()
+                        photoError = null
+                    } catch (e: Exception) {
+                        photoError = "Couldn't update photo. Please try again."
+                    }
+                    isUploadingPhoto = false
+                }
+            }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) cameraLauncher.launch(null)
+    }
 
     // ---- Personal info state ----
     var fullName by remember { mutableStateOf(user?.fullName ?: "") }
@@ -106,21 +162,49 @@ fun EditProfileScreen(onBackClick: () -> Unit) {
 
         // ---- Avatar ----
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            if (user?.avatarUrl != null) {
-                AsyncImage(
-                    model = user.avatarUrl,
-                    contentDescription = "Profile photo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(90.dp).clip(CircleShape)
-                )
-            } else {
+            Box {
+                if (user?.avatarUrl != null) {
+                    AsyncImage(
+                        model = user.avatarUrl,
+                        contentDescription = "Profile photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(90.dp).clip(CircleShape)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.size(90.dp).clip(CircleShape).background(Color(0xFFFDECD8)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(40.dp))
+                    }
+                }
+
+                if (isUploadingPhoto) {
+                    Box(
+                        modifier = Modifier.size(90.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.4f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(28.dp))
+                    }
+                }
+
                 Box(
-                    modifier = Modifier.size(90.dp).clip(CircleShape).background(Color(0xFFFDECD8)),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFB5722C))
+                        .clickable { showPhotoOptions = true },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(40.dp))
+                    Icon(Icons.Filled.Edit, contentDescription = "Change photo", tint = Color.White, modifier = Modifier.size(14.dp))
                 }
             }
+        }
+
+        photoError?.let {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(it, color = Color.Red, fontSize = 11.sp)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -287,7 +371,19 @@ fun EditProfileScreen(onBackClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text("Current Password", fontSize = 12.sp, color = Color.Gray)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Current Password", fontSize = 12.sp, color = Color.Gray)
+                Text(
+                    "Forgot password?",
+                    fontSize = 12.sp,
+                    color = Color(0xFFB5722C),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onForgotPasswordClick() }
+                )
+            }
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = currentPassword,
@@ -394,5 +490,47 @@ fun EditProfileScreen(onBackClick: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+
+    if (showPhotoOptions) {
+        AlertDialog(
+            onDismissRequest = { showPhotoOptions = false },
+            title = { Text("Update Profile Photo") },
+            text = {
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPhotoOptions = false
+                                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                            }
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Icon(Icons.Filled.CameraAlt, contentDescription = null, tint = Color(0xFFB5722C))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("Take Photo")
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPhotoOptions = false
+                                galleryLauncher.launch("image/*")
+                            }
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Icon(Icons.Filled.PhotoLibrary, contentDescription = null, tint = Color(0xFFB5722C))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("Choose from Gallery")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPhotoOptions = false }) { Text("Cancel") }
+            }
+        )
     }
 }

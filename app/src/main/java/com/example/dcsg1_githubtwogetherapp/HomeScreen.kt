@@ -111,11 +111,11 @@ val bottomNavItems = listOf(
 
 
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -136,14 +136,25 @@ fun HomeTopBar() {
         Row {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(end = 18.dp)
+                modifier = Modifier.padding(end = 16.dp).clickable { onChatClick() }
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.ChatBubbleOutline,
-                    contentDescription = "Chat",
-                    tint = Color.Black,
-                    modifier = Modifier.size(25.dp)
-                )
+                Box {
+                    Icon(
+                        imageVector = Icons.Outlined.ChatBubbleOutline,
+                        contentDescription = "Chat",
+                        tint = Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    if (hasUnreadChats) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .align(Alignment.TopEnd)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE24B4A))
+                        )
+                    }
+                }
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -229,7 +240,7 @@ fun WeddingDateCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(if (hasArrived) 230.dp else 200.dp)
+            .heightIn(min = if (hasArrived) 230.dp else 200.dp)
             .padding(16.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(
@@ -541,7 +552,9 @@ fun HomeScreen(
     onViewBudgetDetails: () -> Unit,
     onViewSavedVendors: () -> Unit,
     onBrowseVendors: (String) -> Unit,
-    onCreateDesignClick: () -> Unit
+    onCreateDesignClick: () -> Unit,
+    onOpenChatList: () -> Unit,
+    onViewMyBookings: () -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -549,6 +562,7 @@ fun HomeScreen(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showGuestListDialog by remember { mutableStateOf(false) }
     var pendingCategory by remember { mutableStateOf("All") }
+    var hasUnreadChats by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -561,6 +575,14 @@ fun HomeScreen(
             WeddingSession.weddingDateMillis.value = date
             WeddingSession.guestList.value = guests
             CartSession.items.value = CartRepository.loadCart(context, userId)
+            hasUnreadChats = ChatRepository.hasUnreadMessages(context, userId)
+        }
+    }
+
+    LaunchedEffect(selectedTab) {
+        val userId = UserSession.currentUser.value?.id
+        if (selectedTab == 0 && isLoggedIn && userId != null) {
+            hasUnreadChats = ChatRepository.hasUnreadMessages(context, userId)
         }
     }
 
@@ -661,7 +683,7 @@ fun HomeScreen(
                     onEditProfile = onEditProfile,
                     onHelpSupport = onHelpSupport,
                     onLanguage = onLanguage,
-                    onViewBookings = { onTabSelected(3) },
+                    onViewBookings = onViewMyBookings,
                     onViewSavedVendors = onViewSavedVendors
                 )
             }
@@ -673,7 +695,12 @@ fun HomeScreen(
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
             ) {
-                HomeTopBar()
+                HomeTopBar(
+                    onChatClick = {
+                        if (isLoggedIn) onOpenChatList() else showLoginDialog = true
+                    },
+                    hasUnreadChats = hasUnreadChats
+                )
                 Spacer(Modifier.height(8.dp))
                 LocationSelector(
                     selectedState = selectedState,
@@ -1287,7 +1314,9 @@ fun HomeScreenPreview() {
         onViewBudgetDetails = { },
         onViewSavedVendors = { },
         onBrowseVendors = {},
-        onCreateDesignClick = {}
+        onCreateDesignClick = {},
+        onOpenChatList = {},
+        onViewMyBookings = { }
     )
 }
 
@@ -1308,6 +1337,8 @@ fun HomeScreenLoggedInPreview() {
         onViewBudgetDetails = { },
         onViewSavedVendors = { },
         onBrowseVendors = {},
-        onCreateDesignClick = {}
+        onCreateDesignClick = {},
+        onOpenChatList = {},
+        onViewMyBookings = { }
     )
 }

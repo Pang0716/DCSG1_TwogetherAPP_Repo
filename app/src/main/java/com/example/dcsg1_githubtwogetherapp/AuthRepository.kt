@@ -116,7 +116,8 @@ fun loadCurrentUserProfile() {
             avatarUrl = user.userMetadata?.get("avatar_url")?.toString()?.trim('"'),
             phoneNumber = user.userMetadata?.get("phone_number")?.toString()?.trim('"'),
             gender = user.userMetadata?.get("gender")?.toString()?.trim('"'),
-            dateOfBirth = user.userMetadata?.get("date_of_birth")?.toString()?.trim('"')
+            dateOfBirth = user.userMetadata?.get("date_of_birth")?.toString()?.trim('"'),
+            role = user.userMetadata?.get("role")?.toString()?.trim('"') ?: "customer"
         )
         UserSession.currentUser.value = profile
 
@@ -208,5 +209,18 @@ suspend fun reauthenticate(email: String, currentPassword: String): Result<Unit>
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(Exception("Current password is incorrect."))
+    }
+}
+
+suspend fun updateAvatarUrl(url: String): Result<Unit> {
+    return try {
+        supabase.auth.updateUser {
+            data = kotlinx.serialization.json.buildJsonObject {
+                put("avatar_url", kotlinx.serialization.json.JsonPrimitive(url))
+            }
+        }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(Exception("Failed to update profile photo. Please try again."))
     }
 }
