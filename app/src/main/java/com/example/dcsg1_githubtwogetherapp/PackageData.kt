@@ -39,14 +39,17 @@ private fun venuePackages(basePrice: Int, variant: Int, ctx: Context): List<Pack
     else listOf(R.string.pkg_name_venue_1_0, R.string.pkg_name_venue_1_1, R.string.pkg_name_venue_1_2)
     return listOf(
         PackageOption(ctx.getString(n[0]), formatPrice(basePrice), ctx.getString(R.string.pkg_cap_venue_0),
-            imageUrl = "https://images.pexels.com/photos/265947/pexels-photo-265947.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.elegancepackage,
             tags = listOf(ctx.getString(R.string.pkg_tag_venue_0_0), ctx.getString(R.string.pkg_tag_venue_0_1), ctx.getString(R.string.pkg_tag_venue_0_2)),
             isPopular = true),
         PackageOption(ctx.getString(n[1]), formatPrice((basePrice * 1.3).toInt()), ctx.getString(R.string.pkg_cap_venue_1),
-            imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.signaturepackage,
             tags = listOf(ctx.getString(R.string.pkg_tag_venue_1_0), ctx.getString(R.string.pkg_tag_venue_1_1), ctx.getString(R.string.pkg_tag_venue_1_2))),
         PackageOption(ctx.getString(n[2]), formatPrice((basePrice * 1.7).toInt()), ctx.getString(R.string.pkg_cap_venue_2),
-            imageUrl = "https://images.pexels.com/photos/169194/pexels-photo-169194.jpeg",
+            imageUrl = null,
+            imageResId = R.drawable.grandcelebrationpackage,
             tags = listOf(ctx.getString(R.string.pkg_tag_venue_2_0), ctx.getString(R.string.pkg_tag_venue_2_1), ctx.getString(R.string.pkg_tag_venue_2_2)))
     )
 }

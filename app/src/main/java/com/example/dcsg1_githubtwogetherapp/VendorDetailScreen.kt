@@ -252,7 +252,10 @@ fun VendorDetailScreen(
     val context = LocalContext.current
     val packages = remember { generatePackages(vendor, context) }
     val photos = remember { generatePhotos(vendor) }
-    val reviews = remember { mutableStateListOf<Review>() }
+    val reviews = remember { mutableStateListOf<Review>().apply {
+            addAll(generateReviews(vendor))
+        }
+    }
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
     var reviewsLoadFailed by remember { mutableStateOf(false) }
     var reviewSubmitError by remember { mutableStateOf<String?>(null) }
@@ -281,12 +284,29 @@ fun VendorDetailScreen(
 
     LaunchedEffect(vendor.name) {
         try {
-            val fetched = withContext(Dispatchers.IO) { fetchReviews(vendor.name) }
+            val fetched = withContext(Dispatchers.IO) {
+                fetchReviews(vendor.name)
+            }
+
             reviews.clear()
-            reviews.addAll(fetched)
+
+            if (fetched.isNotEmpty()) {
+                // Use reviews from Supabase if available
+                reviews.addAll(fetched)
+            } else {
+                // No reviews in database, use generated reviews
+                reviews.addAll(generateReviews(vendor))
+            }
+
             reviewsLoadFailed = false
+
         } catch (e: Exception) {
-            android.util.Log.e("VendorDetailScreen", "fetchReviews failed for ${vendor.name}", e)
+            android.util.Log.e(
+                "VendorDetailScreen",
+                "fetchReviews failed for ${vendor.name}",
+                e
+            )
+
             reviews.clear()
             reviews.addAll(generateReviews(vendor))
             reviewsLoadFailed = true
