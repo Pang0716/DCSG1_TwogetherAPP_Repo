@@ -252,7 +252,10 @@ fun VendorDetailScreen(
     val context = LocalContext.current
     val packages = remember { generatePackages(vendor, context) }
     val photos = remember { generatePhotos(vendor) }
-    val reviews = remember { mutableStateListOf<Review>() }
+    val reviews = remember { mutableStateListOf<Review>().apply {
+            addAll(generateReviews(vendor))
+        }
+    }
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
     var reviewsLoadFailed by remember { mutableStateOf(false) }
     var reviewSubmitError by remember { mutableStateOf<String?>(null) }
