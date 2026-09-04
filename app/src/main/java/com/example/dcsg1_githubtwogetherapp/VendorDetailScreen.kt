@@ -163,7 +163,7 @@ fun VendorDetailTopBar(
             .fillMaxWidth()
             .background(Color(0xFFFDF8F3))
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .padding(top = 25.dp)
+            .padding(top = 28.dp)
     ) {
         Text(
             "Vendor Details",
