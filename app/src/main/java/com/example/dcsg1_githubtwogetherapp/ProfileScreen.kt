@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,16 +42,16 @@ fun ProfileScreen(
     if (showLogoutConfirm) {
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
-            title = { Text("Log Out") },
-            text = { Text("Are you sure you want to log out?") },
+            title = { Text(stringResource(R.string.log_out)) },
+            text = { Text(stringResource(R.string.log_out_confirm)) },
             confirmButton = {
                 Button(
                     onClick = { showLogoutConfirm = false; onLogout() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                ) { Text("Log Out") }
+                ) { Text(stringResource(R.string.log_out)) }
             },
             dismissButton = {
-                TextButton(onClick = { showLogoutConfirm = false }) { Text("Cancel") }
+                TextButton(onClick = { showLogoutConfirm = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -61,7 +62,7 @@ fun ProfileScreen(
             .background(Color.White)
             .padding(20.dp)
     ) {
-        Text("Profile", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(stringResource(R.string.profile_title), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -72,7 +73,7 @@ fun ProfileScreen(
             if (isLoggedIn && user?.avatarUrl != null) {
                 AsyncImage(
                     model = user.avatarUrl,
-                    contentDescription = "Profile photo",
+                    contentDescription = stringResource(R.string.profile_photo_description),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(90.dp).clip(CircleShape)
                 )
@@ -88,7 +89,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             if (isLoggedIn) {
-                Text(user?.fullName ?: "User", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(user?.fullName ?: stringResource(R.string.default_user_name), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(user?.email ?: "", fontSize = 13.sp, color = Color.Gray)
                 if (!user?.phoneNumber.isNullOrBlank()) {
                     Text(user?.phoneNumber ?: "", fontSize = 13.sp, color = Color.Gray)
@@ -110,11 +111,11 @@ fun ProfileScreen(
                 ) {
                     Icon(Icons.Filled.Edit, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Edit", fontSize = 12.sp, color = Color(0xFFB5722C))
+                    Text(stringResource(R.string.edit_label), fontSize = 12.sp, color = Color(0xFFB5722C))
                 }
             } else {
-                Text("Guest", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text("Not logged in", fontSize = 13.sp, color = Color.Gray)
+                Text(stringResource(R.string.guest_label), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.not_logged_in), fontSize = 13.sp, color = Color.Gray)
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -123,7 +124,7 @@ fun ProfileScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Login / Register", fontSize = 13.sp)
+                    Text(stringResource(R.string.login_register), fontSize = 13.sp)
                 }
             }
         }
@@ -131,13 +132,13 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isLoggedIn) {
-            ProfileMenuItem(icon = Icons.Filled.Work, label = "My Bookings") { onViewBookings() }
-            ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = "Saved Vendors") { onViewSavedVendors() }
+            ProfileMenuItem(icon = Icons.Filled.Work, label = stringResource(R.string.my_bookings)) { onViewBookings() }
+            ProfileMenuItem(icon = Icons.Filled.FavoriteBorder, label = stringResource(R.string.saved_vendors)) { onViewSavedVendors() }
         }
-        ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = "Help & Support") { onHelpSupport() }
-        ProfileMenuItem(icon = Icons.Filled.Language, label = "Language") { onLanguage() }
+        ProfileMenuItem(icon = Icons.Filled.HelpOutline, label = stringResource(R.string.help_support)) { onHelpSupport() }
+        ProfileMenuItem(icon = Icons.Filled.Language, label = stringResource(R.string.language_label)) { onLanguage() }
         if (isLoggedIn) {
-            ProfileMenuItem(icon = Icons.Filled.Logout, label = "Logout") { showLogoutConfirm = true }
+            ProfileMenuItem(icon = Icons.Filled.Logout, label = stringResource(R.string.logout_label)) { showLogoutConfirm = true }
         }
     }
 }

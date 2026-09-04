@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,19 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+
+@Composable
+private fun localizedCategoryLabel(category: String): String = when (category) {
+    "All" -> stringResource(R.string.category_all)
+    "Venue" -> stringResource(R.string.nav_venue)
+    "Photographer" -> stringResource(R.string.nav_photographer)
+    "Makeup" -> stringResource(R.string.nav_makeup)
+    "Live Band" -> stringResource(R.string.nav_liveband)
+    "Emcee" -> stringResource(R.string.nav_emcee)
+    "Deco" -> stringResource(R.string.nav_deco)
+    "Attire" -> stringResource(R.string.nav_attire)
+    else -> category
+}
 
 @Composable
 fun VendorCard(
@@ -111,7 +125,7 @@ fun VendorCard(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = vendor.category,
+                text = localizedCategoryLabel(vendor.category),
                 fontSize = 12.sp,
                 color = Color(0xFFB5722C)
             )
@@ -125,14 +139,14 @@ fun VendorCard(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "${vendor.rating} (${vendor.reviewCount} reviews)",
+                    text = stringResource(R.string.rating_reviews, vendor.rating.toString(), vendor.reviewCount),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
             }
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "From ${vendor.priceFrom}",
+                text = stringResource(R.string.from_price, vendor.priceFrom),
                 fontSize = 13.sp,
                 color = Color.Black
             )
@@ -203,7 +217,7 @@ fun FeaturedVendorCard(
             ) {
                 Icon(
                     imageVector = if (isFavorited) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = if (isFavorited) "Remove from favorites" else "Add to favorites",
+                    contentDescription = if (isFavorited) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
                     tint = if (isFavorited) Color(0xFFE24B4A) else Color.Black,
                     modifier = Modifier.size(15.dp)
                 )
@@ -222,10 +236,10 @@ fun FeaturedVendorCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.Star, contentDescription = null, tint = Color(0xFFF5A623), modifier = Modifier.size(12.dp))
                 Spacer(Modifier.width(3.dp))
-                Text("${vendor.rating} (${vendor.reviewCount} reviews)", fontSize = 11.sp, color = Color.Gray)
+                Text(stringResource(R.string.rating_reviews, vendor.rating.toString(), vendor.reviewCount), fontSize = 11.sp, color = Color.Gray)
             }
             Spacer(Modifier.height(3.dp))
-            Text("From ${vendor.priceFrom}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(stringResource(R.string.from_price, vendor.priceFrom), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         }
     }
 }
@@ -241,11 +255,6 @@ fun BrowseVendorsScreen(
     var query by remember { mutableStateOf("") }
     val categories = listOf("All", "Venue", "Photographer", "Makeup", "Live Band", "Emcee", "Attire","Deco")
     var selectedCategory by remember { mutableStateOf(initialCategory) }
-    // Was: var selectedState by remember { mutableStateOf("Penang") } - that reset to
-    // "Penang" every time this screen got recreated (e.g. navigating into
-    // VendorDetailScreen and back). Now reads/writes VendorFilterSession instead, same
-    // "hold it in a global object" pattern as CartSession/BudgetSession/UserSession, so
-    // the selected state survives navigating away and back.
     var selectedState by VendorFilterSession.selectedState
     val filteredVendors = vendors.filter { vendor ->
         val matchesState = vendor.locationState == selectedState
@@ -298,7 +307,7 @@ fun BrowseVendorsTopBar(onBackClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(
-            text = "Browse Vendors",
+            text = stringResource(R.string.browse_vendors_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
@@ -335,7 +344,7 @@ fun VendorSearchBar(
         ) {
             if (query.isEmpty()) {
                 Text(
-                    text = "Search vendors, services...",
+                    text = stringResource(R.string.search_vendors_placeholder),
                     fontSize = 13.sp,
                     color = Color.Gray,
                     lineHeight = 16.sp
@@ -372,7 +381,7 @@ fun CategoryChip(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = label,
+            text = localizedCategoryLabel(label),
             fontSize = 13.sp,
             color = if (isSelected) Color.White else Color.Black
         )

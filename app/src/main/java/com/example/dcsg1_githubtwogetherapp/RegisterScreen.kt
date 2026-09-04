@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,42 +40,43 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 
-// ---- Validation logic, separated out so it's reusable and easy to read ----
+// ---- Validation logic — messages are now passed in already-localized, since these
+// aren't @Composable functions and can't call stringResource() themselves ----
 
 private val namePattern = Regex("^[A-Za-z\\s]+$")
 private val emailPattern = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 private val malaysiaPhonePattern = Regex("^01(1\\d{8}|[02-9]\\d{7})$")
 
-private fun validateName(value: String): String? {
-    if (value.isBlank()) return "Full name is required."
-    if (value.trim().length < 2) return "Full name is too short."
-    if (!namePattern.matches(value.trim())) return "Only letters and spaces allowed."
+private fun validateName(value: String, requiredMsg: String, shortMsg: String, lettersMsg: String): String? {
+    if (value.isBlank()) return requiredMsg
+    if (value.trim().length < 2) return shortMsg
+    if (!namePattern.matches(value.trim())) return lettersMsg
     return null
 }
 
-private fun validateEmail(value: String): String? {
-    if (value.isBlank()) return "Email is required."
-    if (!emailPattern.matches(value.trim())) return "Enter a valid email address."
+private fun validateEmail(value: String, requiredMsg: String, invalidMsg: String): String? {
+    if (value.isBlank()) return requiredMsg
+    if (!emailPattern.matches(value.trim())) return invalidMsg
     return null
 }
 
-private fun validatePhone(value: String): String? {
-    if (value.isBlank()) return "Phone number is required."
+private fun validatePhone(value: String, requiredMsg: String, invalidMsg: String): String? {
+    if (value.isBlank()) return requiredMsg
     val cleaned = value.replace(" ", "").replace("-", "")
-    if (!malaysiaPhonePattern.matches(cleaned)) return "Enter a valid Malaysian number (e.g. 012-3456789)."
+    if (!malaysiaPhonePattern.matches(cleaned)) return invalidMsg
     return null
 }
 
-private fun validatePassword(value: String): String? {
-    if (value.isBlank()) return "Password is required."
-    if (value.length < 8) return "At least 8 characters required."
-    if (!value.any { it.isLetter() } || !value.any { it.isDigit() }) return "Must contain letters and numbers."
+private fun validatePassword(value: String, requiredMsg: String, minCharsMsg: String, lettersNumbersMsg: String): String? {
+    if (value.isBlank()) return requiredMsg
+    if (value.length < 8) return minCharsMsg
+    if (!value.any { it.isLetter() } || !value.any { it.isDigit() }) return lettersNumbersMsg
     return null
 }
 
-private fun validateConfirmPassword(password: String, confirm: String): String? {
-    if (confirm.isBlank()) return "Please confirm your password."
-    if (password != confirm) return "Passwords do not match."
+private fun validateConfirmPassword(password: String, confirm: String, requiredMsg: String, mismatchMsg: String): String? {
+    if (confirm.isBlank()) return requiredMsg
+    if (password != confirm) return mismatchMsg
     return null
 }
 
@@ -96,20 +98,31 @@ fun RegisterScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showSuccessDialog by remember { mutableStateOf(false) }
 
-    // Tracks whether each field has been "touched" — so errors only show after the user
-    // actually interacts with a field, not immediately when the screen first loads
     var nameTouched by remember { mutableStateOf(false) }
     var emailTouched by remember { mutableStateOf(false) }
     var phoneTouched by remember { mutableStateOf(false) }
     var passwordTouched by remember { mutableStateOf(false) }
     var confirmTouched by remember { mutableStateOf(false) }
 
-    // Live-computed error messages — recalculated automatically whenever the related value changes
-    val nameError = validateName(fullName)
-    val emailError = validateEmail(email)
-    val phoneError = validatePhone(phoneNumber)
-    val passwordError = validatePassword(password)
-    val confirmError = validateConfirmPassword(password, confirmPassword)
+    // Localized validation messages, computed once per recomposition
+    val nameRequiredMsg = stringResource(R.string.full_name_required)
+    val nameShortMsg = stringResource(R.string.full_name_short_error)
+    val nameLettersMsg = stringResource(R.string.full_name_letters_only)
+    val emailRequiredMsg = stringResource(R.string.email_required)
+    val emailInvalidMsg = stringResource(R.string.email_invalid)
+    val phoneRequiredMsg = stringResource(R.string.phone_required)
+    val phoneInvalidMsg = stringResource(R.string.phone_invalid_full)
+    val passwordRequiredMsg = stringResource(R.string.password_required)
+    val passwordMinCharsMsg = stringResource(R.string.password_min_chars)
+    val passwordLettersNumbersMsg = stringResource(R.string.password_letters_numbers)
+    val confirmRequiredMsg = stringResource(R.string.confirm_password_required)
+    val confirmMismatchMsg = stringResource(R.string.passwords_do_not_match)
+
+    val nameError = validateName(fullName, nameRequiredMsg, nameShortMsg, nameLettersMsg)
+    val emailError = validateEmail(email, emailRequiredMsg, emailInvalidMsg)
+    val phoneError = validatePhone(phoneNumber, phoneRequiredMsg, phoneInvalidMsg)
+    val passwordError = validatePassword(password, passwordRequiredMsg, passwordMinCharsMsg, passwordLettersNumbersMsg)
+    val confirmError = validateConfirmPassword(password, confirmPassword, confirmRequiredMsg, confirmMismatchMsg)
 
     val isFormValid = nameError == null && emailError == null && phoneError == null &&
             passwordError == null && confirmError == null && agreedToTerms
@@ -119,6 +132,9 @@ fun RegisterScreen(
     val googleSignInClient = remember { getGoogleSignInClient(context) }
     val view = LocalView.current
     val activity = view.context as? android.app.Activity
+
+    val googleSigninFailedMsg = stringResource(R.string.google_signin_failed)
+    val facebookSigninFailedMsg = stringResource(R.string.facebook_signin_failed)
 
     val googleLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -142,7 +158,7 @@ fun RegisterScreen(
             }
         } catch (e: com.google.android.gms.common.api.ApiException) {
             if (e.statusCode != 12501) {
-                errorMessage = "Google sign-in failed. Please try again."
+                errorMessage = googleSigninFailedMsg
             }
         }
     }
@@ -170,13 +186,13 @@ fun RegisterScreen(
         if (showSuccessDialog) {
             AlertDialog(
                 onDismissRequest = { },
-                title = { Text("Check Your Email") },
-                text = { Text("We've sent a confirmation link to $email. Please verify your email, then log in.") },
+                title = { Text(stringResource(R.string.check_your_email)) },
+                text = { Text(stringResource(R.string.confirmation_link_sent, email)) },
                 confirmButton = {
                     Button(
                         onClick = { showSuccessDialog = false; onBackClick() },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                    ) { Text("Go to Login") }
+                    ) { Text(stringResource(R.string.go_to_login)) }
                 }
             )
         }
@@ -191,25 +207,25 @@ fun RegisterScreen(
 
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_description),   // <-- CHANGED
                 modifier = Modifier.size(24.dp).clickable { onBackClick() }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(stringResource(R.string.register_title), fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Text(
-                text = "Let's start planning your\nperfect wedding ✨",
+                text = stringResource(R.string.register_subtitle),
                 fontSize = 13.sp, color = Color.Gray, lineHeight = 18.sp
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             ValidatedField(
-                label = "Full Name *",
+                label = stringResource(R.string.full_name_field),
                 value = fullName,
                 onValueChange = { fullName = it; nameTouched = true },
-                placeholder = "Enter your full name",
+                placeholder = stringResource(R.string.full_name_label),
                 icon = Icons.Filled.Person,
                 error = if (nameTouched) nameError else null
             )
@@ -217,10 +233,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(14.dp))
 
             ValidatedField(
-                label = "Email *",
+                label = stringResource(R.string.email_field),
                 value = email,
                 onValueChange = { email = it; emailTouched = true },
-                placeholder = "Enter your email",
+                placeholder = stringResource(R.string.email_placeholder),
                 icon = Icons.Filled.Email,
                 keyboardType = KeyboardType.Email,
                 error = if (emailTouched) emailError else null
@@ -228,17 +244,17 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Already have an account with Google or Facebook? Just log in using that instead.",
+                text = stringResource(R.string.social_login_hint),
                 fontSize = 11.sp, color = Color.Gray
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
             ValidatedField(
-                label = "Phone Number *",
+                label = stringResource(R.string.phone_field),
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it; phoneTouched = true },
-                placeholder = "e.g. 012-345 6789",
+                placeholder = stringResource(R.string.phone_number_placeholder),
                 icon = Icons.Filled.Phone,
                 keyboardType = KeyboardType.Phone,
                 error = if (phoneTouched) phoneError else null,
@@ -248,10 +264,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(14.dp))
 
             PasswordField(
-                label = "Password *",
+                label = stringResource(R.string.password_field),
                 value = password,
                 onValueChange = { password = it; passwordTouched = true },
-                placeholder = "Enter your password",
+                placeholder = stringResource(R.string.password_placeholder),
                 visible = passwordVisible,
                 onToggleVisibility = { passwordVisible = !passwordVisible },
                 error = if (passwordTouched) passwordError else null
@@ -260,10 +276,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(14.dp))
 
             PasswordField(
-                label = "Confirm Password *",
+                label = stringResource(R.string.confirm_password_field),
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it; confirmTouched = true },
-                placeholder = "Confirm your password",
+                placeholder = stringResource(R.string.confirm_new_password_label),
                 visible = confirmPasswordVisible,
                 onToggleVisibility = { confirmPasswordVisible = !confirmPasswordVisible },
                 error = if (confirmTouched) confirmError else null
@@ -277,17 +293,21 @@ fun RegisterScreen(
                     onCheckedChange = { agreedToTerms = it },
                     colors = CheckboxDefaults.colors(checkedColor = Color(0xFFB5722C))
                 )
+                val part1 = stringResource(R.string.agree_to_terms_1)
+                val termsText = stringResource(R.string.terms_of_service)
+                val part2 = stringResource(R.string.agree_to_terms_2)
+                val privacyText = stringResource(R.string.privacy_policy)
                 val annotatedText = buildAnnotatedString {
-                    append("I agree to the ")
+                    append(part1)
                     pushStringAnnotation(tag = "TERMS", annotation = "terms")
                     withStyle(SpanStyle(color = Color(0xFFB5722C), fontWeight = FontWeight.Bold)) {
-                        append("Terms of Service")
+                        append(termsText)
                     }
                     pop()
-                    append(" and ")
+                    append(part2)
                     pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
                     withStyle(SpanStyle(color = Color(0xFFB5722C), fontWeight = FontWeight.Bold)) {
-                        append("Privacy Policy")
+                        append(privacyText)
                     }
                     pop()
                     append(" *")
@@ -335,7 +355,7 @@ fun RegisterScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
                 } else {
-                    Text("Create Account", fontSize = 16.sp)
+                    Text(stringResource(R.string.create_account), fontSize = 16.sp)
                 }
             }
 
@@ -343,7 +363,7 @@ fun RegisterScreen(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
-                Text("  or continue with  ", fontSize = 12.sp, color = Color.Gray)
+                Text("  ${stringResource(R.string.or_continue_with)}  ", fontSize = 12.sp, color = Color.Gray)
                 HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
             }
 
@@ -379,7 +399,7 @@ fun RegisterScreen(
                                     try {
                                         signInWithFacebookOAuth()
                                     } catch (e: Exception) {
-                                        errorMessage = "Facebook sign-in failed. Please try again."
+                                        errorMessage = facebookSigninFailedMsg
                                     } finally {
                                         isLoading = false
                                     }
@@ -466,7 +486,7 @@ fun PasswordField(
                 IconButton(onClick = onToggleVisibility) {
                     Icon(
                         imageVector = if (visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = "Toggle password visibility"
+                        contentDescription = stringResource(R.string.toggle_password_visibility)
                     )
                 }
             },

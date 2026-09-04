@@ -31,22 +31,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-// Not private anymore - SelectPackageScreen.kt (the "save to cart" package picker) reuses these
 val AccentColor = Color(0xFFB5722C)
 val CardBorderColor = Color(0xFFE8DFD3)
 val TagChipBg = Color(0xFFF5E9D9)
 val TagChipText = Color(0xFF7A4E1D)
 
-/**
- * Horizontal layout package card, display-only, not clickable.
- * imageResId takes priority (local resource) -> imageUrl (remote image) -> placeholder icon.
- * All three cards use the same orange border; "Most Popular" is shown via a badge instead of the border.
- */
 @Composable
 fun PackageCard(
     pkg: PackageOption,
@@ -95,7 +90,7 @@ fun PackageCard(
                                 .background(TagChipBg)
                                 .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
-                            Text("Most Popular", fontSize = 10.sp, color = TagChipText, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.most_popular), fontSize = 10.sp, color = TagChipText, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -153,7 +148,6 @@ fun PackageCard(
     }
 }
 
-/** Picks a fitting icon based on keywords in the tag; falls back to a gift icon otherwise. */
 fun tagIcon(tag: String): ImageVector {
     val lower = tag.lowercase()
     return when {
@@ -175,7 +169,6 @@ fun PackageImage(pkg: PackageOption, modifier: Modifier = Modifier) {
             )
         }
         pkg.imageUrl != null -> {
-            // Basic AsyncImage, no loading/error state handling
             AsyncImage(
                 model = pkg.imageUrl,
                 contentDescription = pkg.name,

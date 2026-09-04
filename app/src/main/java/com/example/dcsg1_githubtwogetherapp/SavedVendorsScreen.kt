@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +70,7 @@ fun SavedVendorsScreen(
                     .clickable { onBackClick() }
             )
             Text(
-                "Saved Vendors",
+                stringResource(R.string.saved_vendors_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -91,7 +92,7 @@ fun SavedVendorsScreen(
                 ) {
                     Icon(Icons.Filled.FavoriteBorder, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(56.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("No saved vendors yet", fontSize = 15.sp, color = Color.Gray)
+                    Text(stringResource(R.string.no_saved_vendors_yet), fontSize = 15.sp, color = Color.Gray)
                 }
             }
             else -> {

@@ -3,6 +3,7 @@ package com.example.dcsg1_githubtwogetherapp
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
@@ -45,6 +46,16 @@ class MainActivity : ComponentActivity() {
                 var selectedHomeTab by remember { mutableStateOf(0) }
                 val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
+
+                val notificationPermissionLauncher = rememberLauncherForActivityResult(
+                    androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+                ) { }
+
+                LaunchedEffect(isLoggedIn) {
+                    if (isLoggedIn && android.os.Build.VERSION.SDK_INT >= 33) {
+                        notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
 
                 LaunchedEffect(Unit) {
                     supabase.auth.sessionStatus.collect { status ->
@@ -101,7 +112,8 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onCreateDesignClick = { navController.navigate("choose_design") },
                                 onOpenChatList = { navController.navigate("chatList") },
-                                onViewMyBookings = { navController.navigate("myBookings") }
+                                onViewMyBookings = { navController.navigate("myBookings") },
+                                onOpenNotifications = { navController.navigate("notifications") }
                             )
                         }
 
@@ -217,6 +229,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     CartRepository.removeCartItem(context, userId, item.vendor.name)
                                                 }
+                                                if (paidItems.isNotEmpty()) {
+                                                    val summary = if (paidItems.size == 1) paidItems[0].vendor.name else "${paidItems.size} vendors"
+                                                    NotificationRepository.add(context, userId, "Booking Confirmed", "Your booking with $summary is confirmed!")
+                                                    WeddingReminderWorker.showNotification(context, "Your booking with $summary is confirmed!")
+                                                }
                                                 CartSession.items.value = CartSession.items.value.filterNot { it.isChecked.value }
                                                 isProcessing = false
                                                 navController.navigate("bookingConfirmation")
@@ -329,6 +346,10 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
+                        }
+
+                        composable("notifications") {
+                            NotificationListScreen(onBackClick = { navController.popBackStack() })
                         }
                     }
                 }

@@ -28,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Group
@@ -108,10 +109,31 @@ val bottomNavItems = listOf(
     NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person)
 )
 
-
+@Composable
+private fun localizedQuickActionLabel(label: String): String = when (label) {
+    "Venue" -> stringResource(R.string.nav_venue)
+    "Photographer" -> stringResource(R.string.nav_photographer)
+    "Makeup" -> stringResource(R.string.nav_makeup)
+    "Live Band" -> stringResource(R.string.nav_liveband)
+    "Emcee" -> stringResource(R.string.nav_emcee)
+    "Deco" -> stringResource(R.string.nav_deco)
+    "Attire" -> stringResource(R.string.nav_attire)
+    "More" -> stringResource(R.string.nav_more)
+    else -> label
+}
 
 @Composable
-fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean) {
+private fun localizedNavLabel(label: String): String = when (label) {
+    "Home" -> stringResource(R.string.bottom_home)
+    "Vendors" -> stringResource(R.string.bottom_vendors)
+    "Design" -> stringResource(R.string.bottom_design)
+    "Cart" -> stringResource(R.string.bottom_cart)
+    "Profile" -> stringResource(R.string.bottom_profile)
+    else -> label
+}
+
+@Composable
+fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean, onNotificationClick: () -> Unit, hasUnreadNotifications: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,13 +143,13 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean) {
     ) {
         Column {
             Text(
-                text = "Welcome! 👋",
+                text = stringResource(R.string.welcome_greeting),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
             Text(
-                text = "Let's plan your perfect wedding",
+                text = stringResource(R.string.welcome_tagline),
                 fontSize = 12.sp,
                 color = Color.Gray
             )
@@ -141,7 +163,7 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean) {
                 Box {
                     Icon(
                         imageVector = Icons.Outlined.ChatBubbleOutline,
-                        contentDescription = "Chat",
+                        contentDescription = stringResource(R.string.chat_label),
                         tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
@@ -157,13 +179,27 @@ fun HomeTopBar(onChatClick: () -> Unit, hasUnreadChats: Boolean) {
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Outlined.NotificationsNone,
-                    contentDescription = "Notifications",
-                    tint = Color.Black,
-                    modifier = Modifier.size(25.dp)
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.clickable { onNotificationClick() }
+            ) {
+                Box {
+                    Icon(
+                        imageVector = Icons.Outlined.NotificationsNone,
+                        contentDescription = stringResource(R.string.notifications_title),
+                        tint = Color.Black,
+                        modifier = Modifier.size(25.dp)
+                    )
+                    if (hasUnreadNotifications) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .align(Alignment.TopEnd)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE24B4A))
+                        )
+                    }
+                }
             }
         }
     }
@@ -189,19 +225,19 @@ fun LocationSelector(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.LocationOn,
-                contentDescription = "Location",
+                contentDescription = stringResource(R.string.location_label),
                 tint = Color.Gray,
                 modifier = Modifier.size(18.dp).padding(end = 6.dp)
             )
             Text(text = selectedState, fontSize = 14.sp, color = Color.Black)
         }
-        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Expand", tint = Color.Gray)
+        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.expand_description), tint = Color.Gray)
     }
 
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Select a State") },
+            title = { Text(stringResource(R.string.select_a_state)) },
             text = {
                 LazyColumn {
                     items(malaysiaWeddingLocations) { state ->
@@ -220,7 +256,7 @@ fun LocationSelector(
             },
             confirmButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -253,7 +289,7 @@ fun WeddingDateCard(
         if (!hasArrived) {
             Image(
                 painter = painterResource(id = R.drawable.wedding_flowers),
-                contentDescription = "Wedding flowers",
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -266,10 +302,10 @@ fun WeddingDateCard(
         when {
             dateMillis == null -> {
                 Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
-                    Text("Set your wedding date", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+                    Text(stringResource(R.string.set_your_wedding_date), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Let's set your wedding date\nto see your countdown!",
+                        text = stringResource(R.string.wedding_date_subtitle),
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
@@ -279,7 +315,7 @@ fun WeddingDateCard(
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        Text("Set Wedding Date", fontSize = 12.sp)
+                        Text(stringResource(R.string.set_wedding_date_btn), fontSize = 12.sp)
                     }
                 }
             }
@@ -292,13 +328,13 @@ fun WeddingDateCard(
                 ) {
                     Text("🎉", fontSize = 26.sp)
                     Text(
-                        text = "Congratulations!",
+                        text = stringResource(R.string.congratulations),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Wishing you a lifetime of happiness together 💍",
+                        text = stringResource(R.string.congrats_message),
                         fontSize = 11.sp,
                         color = Color.White.copy(alpha = 0.9f),
                         textAlign = TextAlign.Center
@@ -310,6 +346,7 @@ fun WeddingDateCard(
                             .background(Color.White)
                             .clickable {
                                 WeddingSession.weddingDateMillis.value = null
+                                WeddingReminderWorker.scheduleReminders(context, null)
                                 val userId = UserSession.currentUser.value?.id
                                 if (userId != null) {
                                     weddingSaveScope.launch {
@@ -319,21 +356,21 @@ fun WeddingDateCard(
                             }
                             .padding(horizontal = 28.dp, vertical = 8.dp)
                     ) {
-                        Text("OK", color = Color(0xFFB5722C), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.ok), color = Color(0xFFB5722C), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
             else -> {
                 val days = daysUntil(dateMillis)
                 Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
-                    Text("Wedding Countdown", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
+                    Text(stringResource(R.string.wedding_countdown), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB5722C))
                     Text(formatWeddingDate(dateMillis), fontSize = 12.sp, color = Color.Gray)
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(text = "$days", fontSize = 44.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (days == 1L) "day to go" else "days to go",
+                            text = if (days == 1L) stringResource(R.string.day_to_go) else stringResource(R.string.days_to_go),
                             fontSize = 13.sp,
                             color = Color.Gray,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -341,7 +378,7 @@ fun WeddingDateCard(
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Change Date",
+                        text = stringResource(R.string.change_date),
                         fontSize = 12.sp,
                         color = Color(0xFFB5722C),
                         fontWeight = FontWeight.Bold,
@@ -363,12 +400,12 @@ fun WeddingDateCard(
         ) {
             Icon(
                 imageVector = Icons.Filled.Group,
-                contentDescription = "Guestlist",
+                contentDescription = stringResource(R.string.guestlist),
                 tint = Color(0xFFB5722C),
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Text(text = "Guestlist", fontSize = 12.sp, color = Color.Black)
+            Text(text = stringResource(R.string.guestlist), fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(6.dp))
             Text(text = "${WeddingSession.guestList.value.size}", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(4.dp))
@@ -426,12 +463,12 @@ fun QuickActionItem(action: QuickAction, modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = action.iconResId),
-            contentDescription = action.label,
+            contentDescription = localizedQuickActionLabel(action.label),
             modifier = Modifier.size(34.dp)
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = action.label,
+            text = localizedQuickActionLabel(action.label),
             fontSize = 11.sp,
             color = Color.Black,
             maxLines = 1
@@ -470,9 +507,9 @@ fun FeaturedVendorsSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Featured Vendors", fontSize = 16.sp, color = Color.Black)
+            Text(stringResource(R.string.featured_vendors), fontSize = 16.sp, color = Color.Black)
             Text(
-                "See All >",
+                stringResource(R.string.see_all),
                 fontSize = 12.sp,
                 color = Color(0xFFB5722C),
                 modifier = Modifier.clickable { onSeeAllClick() }
@@ -483,7 +520,7 @@ fun FeaturedVendorsSection(
 
         if (filteredVendors.isEmpty()) {
             Text(
-                text = "No vendors found near $currentArea yet",
+                text = stringResource(R.string.no_vendors_found, currentArea),
                 fontSize = 12.sp,
                 color = Color.Gray,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -554,7 +591,8 @@ fun HomeScreen(
     onBrowseVendors: (String) -> Unit,
     onCreateDesignClick: () -> Unit,
     onOpenChatList: () -> Unit,
-    onViewMyBookings: () -> Unit
+    onViewMyBookings: () -> Unit,
+    onOpenNotifications: () -> Unit
 ) {
     var selectedState by remember { mutableStateOf("Penang") }
     var showLoginDialog by remember { mutableStateOf(false) }
@@ -563,6 +601,7 @@ fun HomeScreen(
     var showGuestListDialog by remember { mutableStateOf(false) }
     var pendingCategory by remember { mutableStateOf("All") }
     var hasUnreadChats by remember { mutableStateOf(false) }
+    var hasUnreadNotifications by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -573,9 +612,32 @@ fun HomeScreen(
             BudgetSession.totalBudget.value = BudgetRepository.loadBudget(context, userId)
             val (date, guests) = WeddingRepository.loadWedding(context, userId)
             WeddingSession.weddingDateMillis.value = date
+            WeddingReminderWorker.scheduleReminders(context, date)
             WeddingSession.guestList.value = guests
             CartSession.items.value = CartRepository.loadCart(context, userId)
             hasUnreadChats = ChatRepository.hasUnreadMessages(context, userId)
+        }
+    }
+
+    LaunchedEffect(isLoggedIn) {
+        val userId = UserSession.currentUser.value?.id
+        if (isLoggedIn && userId != null) {
+            // Catch up on anything missed while this account wasn't actively subscribed
+            val conversations = ChatRepository.loadConversations(context, userId)
+            conversations.filter { it.isUnread }.forEach { convo ->
+                NotificationRepository.add(context, userId, "New message from ${convo.vendorName}", convo.lastMessage)
+            }
+            if (conversations.any { it.isUnread }) {
+                hasUnreadNotifications = true
+            }
+
+            // Then keep listening live for anything new from here on
+            ChatRepository.subscribeToAllIncoming(userId).collect { row ->
+                NotificationRepository.add(context, userId, "New message from ${row.senderName}", row.content)
+                WeddingReminderWorker.showNotification(context, "${row.senderName}: ${row.content}")
+                hasUnreadChats = true
+                hasUnreadNotifications = true
+            }
         }
     }
 
@@ -592,6 +654,7 @@ fun HomeScreen(
             onConfirm = { millis ->
                 WeddingSession.weddingDateMillis.value = millis
                 showDatePickerDialog = false
+                WeddingReminderWorker.scheduleReminders(context, millis)
                 val userId = UserSession.currentUser.value?.id
                 if (userId != null) {
                     coroutineScope.launch {
@@ -625,7 +688,7 @@ fun HomeScreen(
 
     if (LoginEventState.showWelcomeMessage.value) {
         WelcomeBackDialog(
-            userName = UserSession.currentUser.value?.fullName ?: "there",
+            userName = UserSession.currentUser.value?.fullName ?: stringResource(R.string.default_user_name),
             onDismiss = { LoginEventState.showWelcomeMessage.value = false }
         )
     }
@@ -699,7 +762,11 @@ fun HomeScreen(
                     onChatClick = {
                         if (isLoggedIn) onOpenChatList() else showLoginDialog = true
                     },
-                    hasUnreadChats = hasUnreadChats
+                    hasUnreadChats = hasUnreadChats,
+                    onNotificationClick = {
+                        if (isLoggedIn) onOpenNotifications() else showLoginDialog = true
+                    },
+                    hasUnreadNotifications = hasUnreadNotifications
                 )
                 Spacer(Modifier.height(8.dp))
                 LocationSelector(
@@ -768,13 +835,13 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
             ) {
                 Icon(
                     imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                    contentDescription = item.label,
+                    contentDescription = localizedNavLabel(item.label),
                     tint = if (isSelected) Color(0xFFB5722C) else Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = item.label,
+                    text = localizedNavLabel(item.label),
                     fontSize = 10.sp,
                     color = if (isSelected) Color(0xFFB5722C) else Color.Gray
                 )
@@ -814,7 +881,7 @@ fun LoginRequiredDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Login Required",
+                text = stringResource(R.string.login_required_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
@@ -823,7 +890,7 @@ fun LoginRequiredDialog(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Please login or register to set\nyour wedding date.",
+                text = stringResource(R.string.login_required_wedding_date),
                 fontSize = 13.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
@@ -839,7 +906,7 @@ fun LoginRequiredDialog(
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancel", color = Color.Black)
+                    Text(stringResource(R.string.cancel), color = Color.Black)
                 }
 
                 Button(
@@ -848,7 +915,7 @@ fun LoginRequiredDialog(
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Login")
+                    Text(stringResource(R.string.login_button))
                 }
             }
         }
@@ -883,7 +950,7 @@ fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Login Successful",
+                text = stringResource(R.string.login_successful),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
@@ -892,14 +959,14 @@ fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Welcome, $userName!",
+                text = stringResource(R.string.welcome_user, userName),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFB5722C),
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Your wedding journey starts here.",
+                text = stringResource(R.string.wedding_journey_starts),
                 fontSize = 13.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
@@ -913,7 +980,7 @@ fun WelcomeBackDialog(userName: String, onDismiss: () -> Unit) {
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Done")
+                Text(stringResource(R.string.done))
             }
         }
     }
@@ -936,9 +1003,9 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Budget Planner", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.budget_planner), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(
-                    text = "Track your budget and plan smartly",
+                    text = stringResource(R.string.budget_planner_subtitle),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
@@ -946,7 +1013,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
             if (BudgetSession.totalBudget.value > 0) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit Budget",
+                    contentDescription = stringResource(R.string.edit_budget_description),
                     tint = Color(0xFFB5722C),
                     modifier = Modifier
                         .size(20.dp)
@@ -959,7 +1026,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
 
         if (BudgetSession.totalBudget.value <= 0) {
             Text(
-                text = "You haven't set a budget yet.",
+                text = stringResource(R.string.no_budget_yet),
                 fontSize = 13.sp,
                 color = Color.Gray
             )
@@ -969,7 +1036,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C)),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Set Your Budget", fontSize = 13.sp)
+                Text(stringResource(R.string.set_your_budget), fontSize = 13.sp)
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -999,7 +1066,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
                         )
                     }
                     Text(
-                        text = "${BudgetSession.percentageUsed}%\nUsed",
+                        text = "${BudgetSession.percentageUsed}%\n${stringResource(R.string.used_label)}",
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
                         color = Color.Black
@@ -1010,7 +1077,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
 
                 Column {
                     Text(
-                        text = "Total Budget",
+                        text = stringResource(R.string.total_budget),
                         fontSize = 11.sp,
                         color = Color.Gray
                     )
@@ -1021,8 +1088,8 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
                         color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    LegendDot(color = Color(0xFFB5722C), label = "Used: RM ${"%,.0f".format(BudgetSession.usedBudget)}")
-                    LegendDot(color = Color(0xFFF0E4D8), label = "Remaining: RM ${"%,.0f".format(BudgetSession.remainingBudget)}")
+                    LegendDot(color = Color(0xFFB5722C), label = "${stringResource(R.string.used_label)}: RM ${"%,.0f".format(BudgetSession.usedBudget)}")
+                    LegendDot(color = Color(0xFFF0E4D8), label = "${stringResource(R.string.remaining_label)}: RM ${"%,.0f".format(BudgetSession.remainingBudget)}")
                 }
             }
 
@@ -1033,7 +1100,7 @@ fun BudgetPlannerCard(onSetBudgetClick: () -> Unit, onViewDetailsClick: () -> Un
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("View Details", color = Color(0xFFB5722C))
+                Text(stringResource(R.string.view_details), color = Color(0xFFB5722C))
                 Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = Color(0xFFB5722C))
             }
         }
@@ -1066,23 +1133,23 @@ fun SetBudgetDialog(
     val amount = budgetInput.toDoubleOrNull()
     val errorMessage = when {
         budgetInput.isBlank() -> null
-        amount == null -> "Please enter a valid number."
-        amount <= 0 -> "Budget must be more than RM 0."
+        amount == null -> stringResource(R.string.budget_error_required)
+        amount <= 0 -> stringResource(R.string.budget_error_zero)
         else -> null
     }
     val warningMessage = if (amount != null && amount > 0 && amount < CartSession.totalCart) {
-        "This is less than what you've already added to Cart (RM ${"%,.0f".format(CartSession.totalCart)})."
+        stringResource(R.string.budget_warning_less_than_cart, "%,.0f".format(CartSession.totalCart))
     } else null
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initialAmount > 0) "Edit Your Wedding Budget" else "Set Your Wedding Budget") },
+        title = { Text(if (initialAmount > 0) stringResource(R.string.edit_your_wedding_budget) else stringResource(R.string.set_your_wedding_budget)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = budgetInput,
                     onValueChange = { budgetInput = it },
-                    placeholder = { Text("e.g. 70000") },
+                    placeholder = { Text(stringResource(R.string.budget_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     isError = errorMessage != null
@@ -1105,20 +1172,20 @@ fun SetBudgetDialog(
                 enabled = amount != null && amount > 0,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
             ) {
-                Text("Confirm")
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 
     if (showConfirmWarningDialog && amount != null) {
         AlertDialog(
             onDismissRequest = { showConfirmWarningDialog = false },
-            title = { Text("Are you sure?") },
+            title = { Text(stringResource(R.string.are_you_sure)) },
             text = {
-                Text("Your budget (RM ${"%,.0f".format(amount)}) is less than the RM ${"%,.0f".format(CartSession.totalCart)} already in your Cart. You may go over budget.")
+                Text(stringResource(R.string.budget_confirm_warning, "%,.0f".format(amount), "%,.0f".format(CartSession.totalCart)))
             },
             confirmButton = {
                 Button(
@@ -1127,10 +1194,10 @@ fun SetBudgetDialog(
                         onConfirm(amount)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                ) { Text("Yes, Confirm") }
+                ) { Text(stringResource(R.string.yes_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirmWarningDialog = false }) { Text("Go Back") }
+                TextButton(onClick = { showConfirmWarningDialog = false }) { Text(stringResource(R.string.go_back)) }
             }
         )
     }
@@ -1153,10 +1220,10 @@ fun SetWeddingDateDialog(onDismiss: () -> Unit, onConfirm: (Long) -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 datePickerState.selectedDateMillis?.let { onConfirm(it) }
-            }) { Text("Confirm", color = Color(0xFFB5722C)) }
+            }) { Text(stringResource(R.string.confirm), color = Color(0xFFB5722C)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     ) {
         DatePicker(state = datePickerState)
@@ -1210,14 +1277,14 @@ fun GuestListDialog(onDismiss: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.Group, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Guest List (${WeddingSession.guestList.value.size})")
+                Text(stringResource(R.string.guest_list_title, WeddingSession.guestList.value.size))
             }
         },
         text = {
             Column {
                 if (WeddingSession.guestList.value.isEmpty()) {
                     Text(
-                        text = "No guests added yet.",
+                        text = stringResource(R.string.no_guests_added),
                         fontSize = 13.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 16.dp)
@@ -1251,7 +1318,7 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                                 Text(guest, fontSize = 14.sp, color = Color.Black, modifier = Modifier.weight(1f))
                                 Icon(
                                     Icons.Filled.Close,
-                                    contentDescription = "Remove",
+                                    contentDescription = stringResource(R.string.remove_description),
                                     tint = Color.Gray,
                                     modifier = Modifier
                                         .size(18.dp)
@@ -1268,7 +1335,7 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                     OutlinedTextField(
                         value = newGuestName,
                         onValueChange = { newGuestName = it },
-                        placeholder = { Text("Guest name") },
+                        placeholder = { Text(stringResource(R.string.guest_name_placeholder)) },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp),
@@ -1284,14 +1351,14 @@ fun GuestListDialog(onDismiss: () -> Unit) {
                             .clickable { addGuest() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color.White)
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_description), tint = Color.White)
                     }
                 }
             }
         },
         confirmButton = {
             Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))) {
-                Text("Done")
+                Text(stringResource(R.string.done))
             }
         }
     )
@@ -1316,7 +1383,8 @@ fun HomeScreenPreview() {
         onBrowseVendors = {},
         onCreateDesignClick = {},
         onOpenChatList = {},
-        onViewMyBookings = { }
+        onViewMyBookings = { },
+        onOpenNotifications = { }
     )
 }
 
@@ -1339,6 +1407,7 @@ fun HomeScreenLoggedInPreview() {
         onBrowseVendors = {},
         onCreateDesignClick = {},
         onOpenChatList = {},
-        onViewMyBookings = { }
+        onViewMyBookings = { },
+        onOpenNotifications = { }
     )
 }

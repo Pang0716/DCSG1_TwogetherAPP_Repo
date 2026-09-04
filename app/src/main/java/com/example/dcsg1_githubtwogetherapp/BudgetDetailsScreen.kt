@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,7 @@ fun BudgetDetailsScreen(onBackClick: () -> Unit) {
         containerColor = Color(0xFFFAF7F2),
         topBar = {
             TopAppBar(
-                title = { Text("Budget Details", color = Color.Black, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.budget_details_title), color = Color.Black, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
@@ -58,7 +59,7 @@ fun BudgetDetailsScreen(onBackClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Expenses",
+                text = stringResource(R.string.expenses_label),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -115,7 +116,7 @@ fun BudgetSummaryCard() {
             Spacer(modifier = Modifier.width(20.dp))
 
             Column {
-                Text("Total Budget", fontSize = 12.sp, color = Color.Gray)
+                Text(stringResource(R.string.total_budget), fontSize = 12.sp, color = Color.Gray)
                 Text(
                     text = "RM ${"%,.0f".format(BudgetSession.totalBudget.value)}",
                     fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black
@@ -123,7 +124,7 @@ fun BudgetSummaryCard() {
                 if (BudgetSession.remainingBudget < 0) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Over budget by RM ${"%,.0f".format(-BudgetSession.remainingBudget)}",
+                        text = stringResource(R.string.over_budget_by, "%,.0f".format(-BudgetSession.remainingBudget)),
                         fontSize = 11.sp, color = Color(0xFFC0392B), fontWeight = FontWeight.Bold
                     )
                 }
@@ -137,10 +138,10 @@ fun BudgetSummaryCard() {
                 .background(Color.White).padding(vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            StatColumn("Used", BudgetSession.usedBudget, Color(0xFFB5722C))
+            StatColumn(stringResource(R.string.used_label), BudgetSession.usedBudget, Color(0xFFB5722C))
             VerticalDivider()
             StatColumn(
-                "Remaining", BudgetSession.remainingBudget,
+                stringResource(R.string.remaining_label), BudgetSession.remainingBudget,
                 if (BudgetSession.remainingBudget < 0) Color(0xFFC0392B) else Color(0xFF3F7D4F)
             )
         }
@@ -201,7 +202,7 @@ fun EmptyExpensesState() {
             Icon(imageVector = Icons.Outlined.MoreHoriz, contentDescription = null, tint = Color(0xFFB5722C), modifier = Modifier.size(28.dp))
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Text("No expenses yet", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-        Text("Add a vendor to your Cart and it'll show up here.", fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.no_expenses_yet), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(stringResource(R.string.add_vendor_to_cart_hint), fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center)
     }
 }

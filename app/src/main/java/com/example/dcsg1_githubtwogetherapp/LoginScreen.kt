@@ -66,6 +66,10 @@ fun LoginScreen(
     val callbackManager = remember { FacebookAuthManager.callbackManager }
     val view = LocalView.current
     val activity = view.context as? android.app.Activity
+    val googleSigninNoTokenMsg = stringResource(R.string.google_signin_no_token)
+    val noInternetMsg = stringResource(R.string.no_internet_connection)
+    val googleSigninFailedMsg = stringResource(R.string.google_signin_failed)
+    val facebookLoginFailedMsg = stringResource(R.string.facebook_login_no_internet)
 
     val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -81,19 +85,19 @@ fun LoginScreen(
                     isLoading = false
                     loginResult
                         .onSuccess {
-                            loadCurrentUserProfile()   // ← add this line
+                            loadCurrentUserProfile()
                             onLoginSuccess()
                         }
                         .onFailure { errorMessage = it.message }
                 }
             } else {
-                errorMessage = "Google sign-in failed: no token received"
+                errorMessage = googleSigninNoTokenMsg   // <-- HERE (replaces the hardcoded string)
             }
         } catch (e: ApiException) {
             errorMessage = when (e.statusCode) {
-                12501 -> null // user cancelled — don't show an error at all
-                7 -> "No internet connection. Please check your network and try again."
-                else -> "Google sign-in failed. Please try again."
+                12501 -> null
+                7 -> noInternetMsg
+                else -> googleSigninFailedMsg
             }
         }
     }
@@ -193,7 +197,7 @@ fun LoginScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = "Toggle password visibility"
+                            contentDescription = stringResource(R.string.toggle_password_visibility)   // <-- CHANGED
                         )
                     }
                 },
@@ -298,7 +302,7 @@ fun LoginScreen(
                                 try {
                                     signInWithFacebookOAuth()
                                 } catch (e: Exception) {
-                                    errorMessage = "Facebook login failed. Please check your internet connection and try again."
+                                    errorMessage = facebookLoginFailedMsg   // <-- CHANGED
                                 } finally {
                                     isLoading = false
                                 }

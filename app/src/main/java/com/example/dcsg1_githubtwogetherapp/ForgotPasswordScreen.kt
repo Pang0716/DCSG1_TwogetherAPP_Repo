@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,6 +51,15 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
 
     val scope = rememberCoroutineScope()
     val emailPattern = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
+    val emailInvalidMsg = stringResource(R.string.email_invalid)
+    val codeRequiredMsg = stringResource(R.string.code_required)
+    val codeMustBe8DigitsMsg = stringResource(R.string.code_must_be_8_digits)
+    val passwordRequiredMsg = stringResource(R.string.password_required)
+    val passwordMinCharsMsg = stringResource(R.string.password_min_chars)
+    val passwordLettersNumbersMsg = stringResource(R.string.password_letters_numbers)
+    val confirmRequiredMsg = stringResource(R.string.confirm_password_required)
+    val confirmMismatchMsg = stringResource(R.string.passwords_do_not_match)
 
     LaunchedEffect(resendCooldown) {
         if (resendCooldown > 0) {
@@ -79,8 +89,8 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
         if (showSuccessDialog) {
             AlertDialog(
                 onDismissRequest = { },
-                title = { Text("Password Updated") },
-                text = { Text("Your password has been changed successfully. Please log in again.") },
+                title = { Text(stringResource(R.string.password_updated_title)) },
+                text = { Text(stringResource(R.string.password_updated_message)) },
                 confirmButton = {
                     Button(
                         onClick = {
@@ -91,7 +101,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5722C))
-                    ) { Text("Go to Login") }
+                    ) { Text(stringResource(R.string.go_to_login)) }
                 }
             )
         }
@@ -106,7 +116,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
 
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_description),   // <-- CHANGED
                 modifier = Modifier.size(24.dp).clickable {
                     if (step == 2) step = 1 else onBackClick()
                 }
@@ -115,20 +125,20 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             if (step == 1) {
-                Text("Forgot Password", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.forgot_password_title), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(
-                    text = "Enter your email and we'll send you a code to reset your password.",
+                    text = stringResource(R.string.forgot_password_subtitle),
                     fontSize = 13.sp, color = Color.Gray
                 )
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                Text(text = "Email", fontSize = 13.sp, color = Color.Black)
+                Text(text = stringResource(R.string.email_label), fontSize = 13.sp, color = Color.Black)
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    placeholder = { Text("Enter your email") },
+                    placeholder = { Text(stringResource(R.string.email_placeholder)) },
                     leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, tint = Color(0xFFB5722C)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth(),
@@ -150,7 +160,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                 Button(
                     onClick = {
                         if (!emailPattern.matches(email.trim())) {
-                            errorMessage = "Please enter a valid email address."
+                            errorMessage = emailInvalidMsg
                             return@Button
                         }
                         errorMessage = null
@@ -171,25 +181,25 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
                     } else {
-                        Text("Send Code", fontSize = 16.sp)
+                        Text(stringResource(R.string.send_code), fontSize = 16.sp)
                     }
                 }
             } else {
-                Text("Enter Code", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(stringResource(R.string.enter_code_title), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(
-                    text = "We've sent a code to $email. Enter it below along with your new password.",
+                    text = stringResource(R.string.enter_code_subtitle, email),
                     fontSize = 13.sp, color = Color.Gray
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Didn't get it? ", fontSize = 12.sp, color = Color.Gray)
+                    Text(stringResource(R.string.didnt_get_it), fontSize = 12.sp, color = Color.Gray)
                     if (resendCooldown > 0) {
-                        Text("Resend in ${resendCooldown}s", fontSize = 12.sp, color = Color.Gray)
+                        Text(stringResource(R.string.resend_in_seconds, resendCooldown), fontSize = 12.sp, color = Color.Gray)
                     } else {
                         Text(
-                            "Resend Code",
+                            stringResource(R.string.resend_code),
                             fontSize = 12.sp,
                             color = Color(0xFFB5722C),
                             fontWeight = FontWeight.Bold,
@@ -205,32 +215,31 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Live validation, same pattern as Register page
                 var codeTouched by remember { mutableStateOf(false) }
                 var passwordTouched by remember { mutableStateOf(false) }
                 var confirmTouched by remember { mutableStateOf(false) }
 
-                val codeError = if (code.isBlank()) "Code is required." else if (code.trim().length != 8) "Code must be 8 digits." else null
+                val codeError = if (code.isBlank()) codeRequiredMsg else if (code.trim().length != 8) codeMustBe8DigitsMsg else null
                 val passwordError = when {
-                    newPassword.isBlank() -> "Password is required."
-                    newPassword.length < 8 -> "At least 8 characters required."
-                    !newPassword.any { it.isLetter() } || !newPassword.any { it.isDigit() } -> "Must contain letters and numbers."
+                    newPassword.isBlank() -> passwordRequiredMsg
+                    newPassword.length < 8 -> passwordMinCharsMsg
+                    !newPassword.any { it.isLetter() } || !newPassword.any { it.isDigit() } -> passwordLettersNumbersMsg
                     else -> null
                 }
                 val confirmError = when {
-                    confirmPassword.isBlank() -> "Please confirm your password."
-                    newPassword != confirmPassword -> "Passwords do not match."
+                    confirmPassword.isBlank() -> confirmRequiredMsg
+                    newPassword != confirmPassword -> confirmMismatchMsg
                     else -> null
                 }
 
                 val isStepValid = codeError == null && passwordError == null && confirmError == null
 
-                Text(text = "Verification Code", fontSize = 13.sp, color = Color.Black)
+                Text(text = stringResource(R.string.verification_code_label), fontSize = 13.sp, color = Color.Black)
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it; codeTouched = true },
-                    placeholder = { Text("Enter 8-digit code") },
+                    placeholder = { Text(stringResource(R.string.verification_code_placeholder)) },
                     trailingIcon = {
                         if (codeTouched && codeError != null) {
                             Icon(Icons.Filled.Error, contentDescription = null, tint = Color.Red)
@@ -254,18 +263,18 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                Text(text = "New Password", fontSize = 13.sp, color = Color.Black)
+                Text(text = stringResource(R.string.new_password_label), fontSize = 13.sp, color = Color.Black)
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it; passwordTouched = true },
-                    placeholder = { Text("Enter new password") },
+                    placeholder = { Text(stringResource(R.string.new_password_placeholder)) },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C)) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = "Toggle password visibility"
+                                contentDescription = stringResource(R.string.toggle_password_visibility)
                             )
                         }
                     },
@@ -287,12 +296,12 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                Text(text = "Confirm New Password", fontSize = 13.sp, color = Color.Black)
+                Text(text = stringResource(R.string.confirm_new_password_label), fontSize = 13.sp, color = Color.Black)
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it; confirmTouched = true },
-                    placeholder = { Text("Confirm new password") },
+                    placeholder = { Text(stringResource(R.string.confirm_new_password_placeholder)) },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFFB5722C)) },
                     visualTransformation = PasswordVisualTransformation(),
                     isError = confirmTouched && confirmError != null,
@@ -346,7 +355,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onResetComplete: () -> Unit) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
                     } else {
-                        Text("Reset Password", fontSize = 16.sp)
+                        Text(stringResource(R.string.reset_password_btn), fontSize = 16.sp)
                     }
                 }
             }
