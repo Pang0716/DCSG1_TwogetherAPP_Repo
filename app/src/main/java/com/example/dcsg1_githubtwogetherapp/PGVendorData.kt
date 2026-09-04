@@ -156,20 +156,30 @@ val PG = listOf(
         photoResIds = listOf(
             R.drawable.makeup4,
             R.drawable.makeup5,
-            R.drawable.makeup3
+            R.drawable.makeup6,
         ),
     ),
     Vendor(
         "Bella Rosa Makeup Studio", "Makeup", 4.9, 112, "RM900", null,
         R.drawable.bellarose, "Tanjung Bungah", "Penang",
         capacity = "1 - 3 looks per booking",
-        highlights = "HD makeup, traditional & modern styles, touch-up kit included"
+        highlights = "HD makeup, traditional & modern styles, touch-up kit included",
+        photoResIds = listOf(
+            R.drawable.makeup7,
+            R.drawable.makeup8,
+            R.drawable.makeup9,
+        )
     ),
     Vendor(
         "Glamour Bridal Beauty", "Makeup", 4.7, 88, "RM750", null,
         R.drawable.glamourbridalmakeup, "George Town", "Penang",
         capacity = "1 - 2 looks per booking",
-        highlights = "Airbrush available, false lash application, on-location service"
+        highlights = "Airbrush available, false lash application, on-location service",
+        photoResIds = listOf(
+            R.drawable.makeup10,
+            R.drawable.makeup11,
+            R.drawable.makeup12,
+        )
     ),
 
     // Live Band
@@ -178,24 +188,35 @@ val PG = listOf(
         R.drawable.melody_liveband_png, "George Town", "Penang",
         capacity = "4 - 6 members",
         highlights = "Customisable song list, live sound system included, 2-hour set",
+        photoResIds = listOf(
+            R.drawable.liveband1,
+            R.drawable.liveband2,
+            R.drawable.liveband3,
+            R.drawable.liveband4,
+            R.drawable.liveband5,
+        )
     ),
     Vendor(
         "Harmony Strings Quartet", "Live Band", 4.7, 40, "RM1,800", null,
         R.drawable.harmony_strings_quartet_png, "Tanjung Bungah", "Penang",
         capacity = "4 members",
-        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire"
+        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire",
+        photoResIds = listOf(
+            R.drawable.liveband6,
+            R.drawable.liveband7,
+            R.drawable.liveband8,
+        )
     ),
     Vendor(
         "The Groove Collective", "Live Band", 4.6, 52, "RM2,200", null,
         R.drawable.thegroovecollective, "Butterworth", "Penang",
         capacity = "5 - 7 members",
-        highlights = "Wide song repertoire, MC-band combo package, sound & lighting included"
-    ),
-    Vendor(
-        "Silver Note Ensemble", "Live Band", 4.7, 68, "RM2,800", null,
-        R.drawable.silvernoteensemble, "George Town", "Penang",
-        capacity = "6 members",
-        highlights = "Jazz & acoustic sets, dinner background music, formal attire"
+        highlights = "Wide song repertoire, MC-band combo package, sound & lighting included",
+        photoResIds = listOf(
+            R.drawable.liveband9,
+            R.drawable.liveband10,
+            R.drawable.liveband11,
+        )
     ),
 
     //  Emcee
@@ -203,19 +224,31 @@ val PG = listOf(
         "Ace Emcee", "Emcee", 4.9, 78, "RM800", null,
         R.drawable.ace_emcee_png, "George Town", "Penang",
         capacity = "Bilingual hosting",
-        highlights = "Energetic hosting style, custom script, games & icebreakers"
+        highlights = "Energetic hosting style, custom script, games & icebreakers",
+        photoResIds = listOf(
+            R.drawable.emcee1,
+            R.drawable.emcee2,
+        )
     ),
     Vendor(
         "Voice of Joy Emcee", "Emcee", 4.6, 34, "RM650", null,
         R.drawable.voiceofjoy_emcee_png, "Komtar", "Penang",
         capacity = "Bilingual hosting",
-        highlights = "Warm hosting tone, family-friendly script, flexible timing"
+        highlights = "Warm hosting tone, family-friendly script, flexible timing",
+        photoResIds = listOf(
+            R.drawable.emcee3,
+            R.drawable.emcee4,
+        )
     ),
     Vendor(
         "Golden Voice Emcee", "Emcee", 4.8, 95, "RM950", null,
         R.drawable.goldenvoice, "Bayan Lepas", "Penang",
         capacity = "Trilingual hosting",
-        highlights = "English/Malay/Mandarin, formal & fun tone options, rehearsal included"
+        highlights = "English/Malay/Mandarin, formal & fun tone options, rehearsal included",
+        photoResIds = listOf(
+            R.drawable.emcee5,
+            R.drawable.emcee6,
+        )
     ),
 
     // Attire
@@ -247,9 +280,9 @@ val PG = listOf(
         capacity = "Bride & groom outfits",
         highlights = "Handmade beading, kebaya & baju melayu options, free fitting sessions",
         photoResIds = listOf(
-            R.drawable.attire6,
-            R.drawable.attire5,
-            R.drawable.attire6,
+            R.drawable.attire7,
+            R.drawable.attire8,
+            R.drawable.attire9,
         )
     ),
 

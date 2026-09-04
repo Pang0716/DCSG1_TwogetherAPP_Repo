@@ -1,18 +1,24 @@
 package com.example.dcsg1_githubtwogetherapp
 
-// Auto-generated placeholder vendor data for Perak.
-// Swap these out for real vendor listings when available.
 val perakVendors: List<Vendor> = listOf(
     Vendor(
-        name = "The Ipoh Convention Centre",
+        name = "WEIL Hotel Ipoh",
         category = "Venue",
         rating = 4.2,
         reviewCount = 20,
         priceFrom = "RM31,200",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.weilhotelipoh,
         locationArea = "Ipoh",
         locationState = "Perak",
-        capacity = "300 - 800 pax"
+        capacity = "300 - 800 pax",
+        highlights = "Rooftop infinity pool, panoramic Ipoh skyline views, modern minimalist ballroom",
+        photoResIds = listOf(
+            R.drawable.weillobby,
+            R.drawable.weilroom,
+            R.drawable.weilballroom,
+            R.drawable.weilpool
+        )
     ),
     Vendor(
         name = "Taiping Lens Studio",
@@ -20,10 +26,17 @@ val perakVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 123,
         priceFrom = "RM2,700",
-        imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.taipinglensstudio,
         locationArea = "Taiping",
         locationState = "Perak",
-        capacity = "Half day coverage"
+        capacity = "Half day coverage",
+        highlights = "Candid shots, drone footage, same-day sneak peek",
+        photoResIds = listOf(
+            R.drawable.photography16,
+            R.drawable.photography17,
+            R.drawable.photography18
+        )
     ),
     Vendor(
         name = "Sitiawan Bridal Makeup",
@@ -31,10 +44,17 @@ val perakVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 49,
         priceFrom = "RM2,900",
-        imageUrl = "https://images.pexels.com/photos/3065171/pexels-photo-3065171.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.sitiawanbridalmakeup,
         locationArea = "Sitiawan",
         locationState = "Perak",
-        capacity = "Bridal package"
+        capacity = "Bridal package",
+        highlights = "HD makeup, traditional & modern styles, touch-up kit included",
+        photoResIds = listOf(
+            R.drawable.makeup18,
+            R.drawable.makeup19,
+            R.drawable.makeup20
+        )
     ),
     Vendor(
         name = "Ipoh Live Band",
@@ -42,10 +62,17 @@ val perakVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 128,
         priceFrom = "RM2,600",
-        imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.ipohliveband,
         locationArea = "Ipoh",
         locationState = "Perak",
-        capacity = "Duo acoustic"
+        capacity = "Duo acoustic",
+        highlights = "Customisable song list, live sound system included, formal attire",
+        photoResIds = listOf(
+            R.drawable.liveband1,
+            R.drawable.liveband2,
+            R.drawable.liveband3
+        )
     ),
     Vendor(
         name = "Taiping Wedding Hosts",
@@ -53,10 +80,17 @@ val perakVendors: List<Vendor> = listOf(
         rating = 5.0,
         reviewCount = 136,
         priceFrom = "RM2,700",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.taipingweddinghosts,
         locationArea = "Taiping",
         locationState = "Perak",
-        capacity = "Bilingual hosting"
+        capacity = "Bilingual hosting",
+        highlights = "Bilingual hosting, warm tone, flexible timing",
+        photoResIds = listOf(
+            R.drawable.emcee15,
+            R.drawable.emcee16,
+            R.drawable.emcee17
+        )
     ),
     Vendor(
         name = "Sitiawan Wedding Attire",
@@ -64,10 +98,17 @@ val perakVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 119,
         priceFrom = "RM1,500",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.sitiawanweddingattire,
         locationArea = "Sitiawan",
         locationState = "Perak",
-        capacity = "1 outfit rental"
+        capacity = "1 outfit rental",
+        highlights = "Handmade detailing, free fitting sessions, premium fabrics",
+        photoResIds = listOf(
+            R.drawable.attire_24,
+            R.drawable.attire_25,
+            R.drawable.attire_26
+        )
     ),
     Vendor(
         name = "Ipoh Event Styling",
@@ -75,20 +116,37 @@ val perakVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 60,
         priceFrom = "RM6,400",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.ipoheventstyling,
         locationArea = "Ipoh",
         locationState = "Perak",
-        capacity = "Up to 100 pax venue"
+        capacity = "Up to 100 pax venue",
+        highlights = "Full venue transformation, premium florals, custom theme design",
+        photoResIds = listOf(
+            R.drawable.deco_20,
+            R.drawable.deco_21,
+            R.drawable.deco_22,
+            R.drawable.deco_23
+        )
     ),
     Vendor(
-        name = "Taiping Palace Hotel",
+        name = "AC Hotel by Marriott Ipoh",
         category = "Venue",
         rating = 4.5,
         reviewCount = 142,
         priceFrom = "RM35,300",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
-        locationArea = "Taiping",
+        imageUrl = null,
+        imageResId = R.drawable.achotelbymarriottipoh,
+        locationArea = "Ipoh",
         locationState = "Perak",
-        capacity = "100 - 300 pax"
+        capacity = "100 - 300 pax",
+        highlights = "Marriott-brand service standards, sleek business-style ballroom, city-centre location",
+        photoResIds = listOf(
+            R.drawable.achotelbymarriottipohlobby,
+            R.drawable.achotelbymarriottipohpool,
+            R.drawable.achotelbymarriottipohroom,
+            R.drawable.achotelbymarriottipohdining,
+            R.drawable.achotelbymarriottipohlobby1
+        )
     )
 )

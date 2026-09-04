@@ -1,7 +1,4 @@
 package com.example.dcsg1_githubtwogetherapp
-
-// Auto-generated placeholder vendor data for Pahang.
-// Swap these out for real vendor listings when available.
 val pahangVendors: List<Vendor> = listOf(
     Vendor(
         name = "Hyatt Regency Kuantan Resort",
@@ -14,7 +11,14 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Kuantan",
         locationState = "Pahang",
         capacity = "200 - 500 pax",
-        highlights = "Halal catering, elegant ballroom, resort setting"
+        highlights = "Halal catering, elegant ballroom, resort setting",
+        photoResIds = listOf(
+            R.drawable.hyattregencykuantanresortview,
+            R.drawable.hyattroom,
+            R.drawable.hyattlobby,
+            R.drawable.hyattballroom,
+            R.drawable.hyattrestaurant,
+        )
     ),
     Vendor(
         name = "Moments by Cameron Highlands",
@@ -27,7 +31,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
         capacity = "Pre-wedding + ROM",
-        highlights = "Cinematic editing, drone footage, same-day gallery preview"
+        highlights = "Cinematic editing, drone footage, same-day gallery preview",
+        photoResIds = listOf(
+            R.drawable.photography10,
+            R.drawable.photography11,
+            R.drawable.photography12,
+        )
     ),
     Vendor(
         name = "Genting Highlands Bridal Makeup",
@@ -40,7 +49,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Genting Highlands",
         locationState = "Pahang",
         capacity = "Bridal + family",
-        highlights = "Airbrush makeup, hairstyling included, trial session available"
+        highlights = "Airbrush makeup, hairstyling included, trial session available",
+        photoResIds = listOf(
+            R.drawable.makeup14,
+            R.drawable.makeup15,
+            R.drawable.makeup16,
+        )
     ),
     Vendor(
         name = "Kuantan Wedding Musicians",
@@ -53,7 +67,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Kuantan",
         locationState = "Pahang",
         capacity = "Trio band",
-        highlights = "Customisable song list, live sound system, formal attire"
+        highlights = "Customisable song list, live sound system, formal attire",
+        photoResIds = listOf(
+            R.drawable.liveband16,
+            R.drawable.liveband17,
+            R.drawable.liveband18,
+        )
     ),
     Vendor(
         name = "MC Cameron Highlands",
@@ -66,7 +85,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
         capacity = "Trilingual hosting",
-        highlights = "Trilingual hosting, custom script, rehearsal included"
+        highlights = "Trilingual hosting, custom script, rehearsal included",
+        photoResIds = listOf(
+            R.drawable.emcee10,
+            R.drawable.emcee11,
+            R.drawable.emcee12,
+        )
     ),
     Vendor(
         name = "Genting Highlands Couture House",
@@ -79,7 +103,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Genting Highlands",
         locationState = "Pahang",
         capacity = "2 outfit rentals",
-        highlights = "Custom tailoring, fitting sessions included, accessories rental"
+        highlights = "Custom tailoring, fitting sessions included, accessories rental",
+        photoResIds = listOf(
+            R.drawable.attire_13,
+            R.drawable.attire_14,
+            R.drawable.attire_15,
+        )
     ),
     Vendor(
         name = "Kuantan Event Styling",
@@ -92,7 +121,13 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Kuantan",
         locationState = "Pahang",
         capacity = "Up to 100 pax venue",
-        highlights = "Floral arch specialist, backdrop customization, setup & teardown included"
+        highlights = "Floral arch specialist, backdrop customization, setup & teardown included",
+        photoResIds = listOf(
+            R.drawable.deco_12,
+            R.drawable.deco_13,
+            R.drawable.deco_14,
+            R.drawable.deco_15,
+        )
     ),
     Vendor(
         name = "Cameron Highlands Resort",
@@ -105,6 +140,12 @@ val pahangVendors: List<Vendor> = listOf(
         locationArea = "Cameron Highlands",
         locationState = "Pahang",
         capacity = "100 - 300 pax",
-        highlights = "Highland resort views, garden ceremony, in-house catering"
+        highlights = "Highland resort views, garden ceremony, in-house catering",
+        photoResIds = listOf(
+            R.drawable.cameronhighlandlobby,
+            R.drawable.cameronhighlandroom,
+            R.drawable.cameronhighlanddining,
+            R.drawable.cameronhighlandwedding,
+        )
     )
 )

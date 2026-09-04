@@ -1,18 +1,23 @@
 package com.example.dcsg1_githubtwogetherapp
 
-// Auto-generated placeholder vendor data for Negeri Sembilan.
-// Swap these out for real vendor listings when available.
 val negeriSembilanVendors: List<Vendor> = listOf(
     Vendor(
-        name = "Seremban Wedding Hall",
+        name = "Royale Chulan Seremban",
         category = "Venue",
         rating = 4.3,
         reviewCount = 33,
         priceFrom = "RM52,800",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.royalechulanseremban,
         locationArea = "Seremban",
         locationState = "Negeri Sembilan",
-        capacity = "100 - 300 pax"
+        capacity = "100 - 300 pax",
+        photoResIds = listOf(
+            R.drawable.royaleroom,
+            R.drawable.royaleballroom,
+            R.drawable.royalepool,
+            R.drawable.royalebuffet,
+        )
     ),
     Vendor(
         name = "Port Dickson Photography Studio",
@@ -20,10 +25,17 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 111,
         priceFrom = "RM5,300",
-        imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.portdicksonphotography,
         locationArea = "Port Dickson",
         locationState = "Negeri Sembilan",
-        capacity = "Half day coverage"
+        capacity = "Half day coverage",
+        photoResIds = listOf(
+            R.drawable.photography20,
+            R.drawable.photography21,
+            R.drawable.photography22,
+            R.drawable.photography23,
+        )
     ),
     Vendor(
         name = "Seremban Beauty Bar",
@@ -31,10 +43,16 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 109,
         priceFrom = "RM3,000",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.serembanbeautybar,
         locationArea = "Seremban",
         locationState = "Negeri Sembilan",
-        capacity = "Bridal package"
+        capacity = "Bridal package",
+        photoResIds = listOf(
+            R.drawable.makeup1,
+            R.drawable.makeup2,
+            R.drawable.makeup3
+        )
     ),
     Vendor(
         name = "Port Dickson Live Band",
@@ -42,10 +60,16 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.9,
         reviewCount = 199,
         priceFrom = "RM5,000",
-        imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.portdicksonliveband,
         locationArea = "Port Dickson",
         locationState = "Negeri Sembilan",
-        capacity = "Trio band"
+        capacity = "Trio band",
+        photoResIds = listOf(
+            R.drawable.liveband6,
+            R.drawable.liveband7,
+            R.drawable.liveband8,
+        )
     ),
     Vendor(
         name = "MC Seremban",
@@ -53,10 +77,16 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 182,
         priceFrom = "RM1,300",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.mcseremban,
         locationArea = "Seremban",
         locationState = "Negeri Sembilan",
-        capacity = "Bilingual hosting"
+        capacity = "Bilingual hosting",
+        photoResIds = listOf(
+            R.drawable.emcee1,
+            R.drawable.emcee2,
+            R.drawable.emcee3,
+        )
     ),
     Vendor(
         name = "Elegance Bridal Port Dickson",
@@ -64,10 +94,16 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 222,
         priceFrom = "RM3,900",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.elegancebridalportdickson,
         locationArea = "Port Dickson",
         locationState = "Negeri Sembilan",
-        capacity = "2 outfit rentals"
+        capacity = "2 outfit rentals",
+        photoResIds = listOf(
+            R.drawable.attire_15,
+            R.drawable.attire_14,
+            R.drawable.attire_13
+        )
     ),
     Vendor(
         name = "Bloom Deco Seremban",
@@ -75,20 +111,34 @@ val negeriSembilanVendors: List<Vendor> = listOf(
         rating = 4.6,
         reviewCount = 35,
         priceFrom = "RM10,200",
-        imageUrl = "https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.bloomdecoseremban,
         locationArea = "Seremban",
         locationState = "Negeri Sembilan",
-        capacity = "Up to 300 pax venue"
+        capacity = "Up to 300 pax venue",
+        photoResIds = listOf(
+            R.drawable.deco_26,
+            R.drawable.deco_27,
+            R.drawable.deco_28,
+        )
     ),
     Vendor(
-        name = "Port Dickson Wedding Hall",
+        name = "Klana Resort Seremban",
         category = "Venue",
         rating = 4.3,
         reviewCount = 90,
         priceFrom = "RM64,900",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.klanaresortseremban,
         locationArea = "Port Dickson",
         locationState = "Negeri Sembilan",
-        capacity = "200 - 500 pax"
+        capacity = "200 - 500 pax",
+        photoResIds = listOf(
+            R.drawable.klanaresortserembanballroom,
+            R.drawable.klanaresortserembanroom,
+            R.drawable.klanaresortserembanpool,
+            R.drawable.klanaresortserembanlobby,
+            R.drawable.klanaresortserembanlounge,
+        )
     )
 )

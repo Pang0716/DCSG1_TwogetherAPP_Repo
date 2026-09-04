@@ -26,7 +26,8 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.6,
         reviewCount = 202,
         priceFrom = "RM3,100",
-        imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.shahalamlensstudio,
         locationArea = "Shah Alam",
         locationState = "Selangor",
         capacity = "Pre-wedding + ROM",
@@ -43,11 +44,17 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 122,
         priceFrom = "RM1,700",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.subangjayabeautybar ,
         locationArea = "Subang Jaya",
         locationState = "Selangor",
         capacity = "Bridal + entourage",
-        highlights = "Natural glam look, long-lasting makeup, on-site service"
+        highlights = "Natural glam look, long-lasting makeup, on-site service",
+        photoResIds = listOf(
+            R.drawable.makeup13,
+            R.drawable.makeup14,
+            R.drawable.makeup15,
+        )
     ),
     Vendor(
         name = "Klang Wedding Musicians",
@@ -55,23 +62,33 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 5.0,
         reviewCount = 20,
         priceFrom = "RM2,400",
-        imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.klangwedding,
         locationArea = "Klang",
         locationState = "Selangor",
         capacity = "Trio band",
-        highlights = "Wide song repertoire, MC-band combo package, sound & lighting included"
+        highlights = "Wide song repertoire, MC-band combo package, sound & lighting included",
+        photoResIds = listOf(
+            R.drawable.liveband12,
+            R.drawable.liveband13,
+        )
     ),
     Vendor(
-        name = "Puchong Emcee Services",
+        name = "Ever After",
         category = "Emcee",
         rating = 4.2,
         reviewCount = 52,
         priceFrom = "RM1,200",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.everafter,
         locationArea = "Puchong",
         locationState = "Selangor",
         capacity = "Trilingual hosting",
-        highlights = "Trilingual hosting, formal & fun tone options, rehearsal included"
+        highlights = "Trilingual hosting, formal & fun tone options, rehearsal included",
+        photoResIds = listOf(
+            R.drawable.emcee6,
+            R.drawable.emcee7,
+        )
     ),
     Vendor(
         name = "Cyberjaya Bridal Boutique",
@@ -79,7 +96,8 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.8,
         reviewCount = 99,
         priceFrom = "RM4,400",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.cyberjayabridalboutique,
         locationArea = "Cyberjaya",
         locationState = "Selangor",
         capacity = "2 outfit rentals",
@@ -96,7 +114,8 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 68,
         priceFrom = "RM7,800",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kajangweddingdeco,
         locationArea = "Kajang",
         locationState = "Selangor",
         capacity = "Up to 100 pax venue",
@@ -127,12 +146,13 @@ val selangorVendors: List<Vendor> = listOf(
         )
     ),
     Vendor(
-        name = "Shah Alam Lens Studio 2",
+        name = "Evermore Studio",
         category = "Photographer",
         rating = 4.9,
         reviewCount = 49,
         priceFrom = "RM5,200",
-        imageUrl = "https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.evermorestudio,
         locationArea = "Shah Alam",
         locationState = "Selangor",
         capacity = "Pre-wedding + ROM",
@@ -149,11 +169,17 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 73,
         priceFrom = "RM1,800",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.glowstudiosubangjaya,
         locationArea = "Subang Jaya",
         locationState = "Selangor",
         capacity = "Bridal package",
-        highlights = "Airbrush makeup, hairstyling included, trial session available"
+        highlights = "Airbrush makeup, hairstyling included, trial session available",
+        photoResIds = listOf(
+            R.drawable.makeup16,
+            R.drawable.makeup17,
+            R.drawable.makeup18,
+        )
     ),
     Vendor(
         name = "Harmony Band Klang",
@@ -161,11 +187,16 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 114,
         priceFrom = "RM5,100",
-        imageUrl = "https://images.pexels.com/photos/1387037/pexels-photo-1387037.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.harmonybandklang,
         locationArea = "Klang",
         locationState = "Selangor",
         capacity = "Full band",
-        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire"
+        highlights = "Classical & pop covers, ceremony & reception sets, elegant attire",
+        photoResIds = listOf(
+            R.drawable.liveband7,
+            R.drawable.liveband8,
+        )
     ),
     Vendor(
         name = "Puchong Emcee Services 2",
@@ -173,11 +204,16 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.5,
         reviewCount = 41,
         priceFrom = "RM1,000",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.puchongemceeservice,
         locationArea = "Puchong",
         locationState = "Selangor",
         capacity = "Full event hosting",
-        highlights = "Energetic hosting style, custom script, games & icebreakers"
+        highlights = "Energetic hosting style, custom script, games & icebreakers",
+        photoResIds = listOf(
+            R.drawable.emcee8,
+            R.drawable.emcee9,
+        )
     ),
     Vendor(
         name = "Elegance Bridal Cyberjaya",
@@ -185,7 +221,8 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 195,
         priceFrom = "RM2,600",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.elegancebridal,
         locationArea = "Cyberjaya",
         locationState = "Selangor",
         capacity = "2 outfit rentals",
@@ -202,7 +239,8 @@ val selangorVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 59,
         priceFrom = "RM10,600",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kajangdesignstudio,
         locationArea = "Kajang",
         locationState = "Selangor",
         capacity = "Up to 100 pax venue",

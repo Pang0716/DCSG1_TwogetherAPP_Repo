@@ -4,15 +4,22 @@ package com.example.dcsg1_githubtwogetherapp
 // Swap these out for real vendor listings when available.
 val perlisVendors: List<Vendor> = listOf(
     Vendor(
-        name = "Kangar Grand Ballroom",
+        name = "Putra Regency Hotel",
         category = "Venue",
         rating = 4.9,
         reviewCount = 222,
         priceFrom = "RM61,000",
-        imageUrl = "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.putrapalacehotel,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "100 - 300 pax"
+        capacity = "100 - 300 pax",
+        highlights = "Leading wedding venue in Perlis, halal catering, dedicated event coordination team",
+        photoResIds = listOf(
+            R.drawable.putrapalacehotellobby,
+            R.drawable.putrapalacehotelroom,
+            R.drawable.putrapalacehotelballroom
+        )
     ),
     Vendor(
         name = "Kangar Wedding Photography",
@@ -20,10 +27,18 @@ val perlisVendors: List<Vendor> = listOf(
         rating = 4.3,
         reviewCount = 43,
         priceFrom = "RM3,200",
-        imageUrl = "https://images.pexels.com/photos/1444443/pexels-photo-1444443.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kangar_wedding_photography,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "Pre-wedding + ROM"
+        capacity = "Pre-wedding + ROM",
+        highlights = "Candid shots, drone footage, same-day sneak peek",
+        photoResIds = listOf(
+            R.drawable.photography10,
+            R.drawable.photography11,
+            R.drawable.photography12,
+            R.drawable.photography13
+        )
     ),
     Vendor(
         name = "Kangar Bridal Makeup",
@@ -31,10 +46,19 @@ val perlisVendors: List<Vendor> = listOf(
         rating = 4.4,
         reviewCount = 249,
         priceFrom = "RM1,200",
-        imageUrl = "https://images.pexels.com/photos/2065200/pexels-photo-2065200.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kangar_bridal_makeup,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "Bridal + family"
+        capacity = "Bridal + family",
+        highlights = "On-site touch-up, family makeup included, premium products",
+        photoResIds = listOf(
+            R.drawable.makeup10,
+            R.drawable.makeup11,
+            R.drawable.makeup12,
+            R.drawable.makeup13,
+            R.drawable.makeup14
+        )
     ),
     Vendor(
         name = "Kangar Sound Ensemble",
@@ -42,10 +66,19 @@ val perlisVendors: List<Vendor> = listOf(
         rating = 4.8,
         reviewCount = 169,
         priceFrom = "RM5,100",
-        imageUrl = "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kangar_sound_ensemble,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "Duo acoustic"
+        capacity = "Duo acoustic",
+        highlights = "Vocalist + guitarist, sound system included, custom song list",
+        photoResIds = listOf(
+            R.drawable.liveband10,
+            R.drawable.liveband11,
+            R.drawable.liveband12,
+            R.drawable.liveband13,
+            R.drawable.liveband14
+        )
     ),
     Vendor(
         name = "MC Kangar",
@@ -53,10 +86,17 @@ val perlisVendors: List<Vendor> = listOf(
         rating = 4.8,
         reviewCount = 110,
         priceFrom = "RM1,300",
-        imageUrl = "https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.mc_kangar,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "Full event hosting"
+        capacity = "Full event hosting",
+        highlights = "Trilingual hosting, rehearsal included, custom program design",
+        photoResIds = listOf(
+            R.drawable.emcee15,
+            R.drawable.emcee16,
+            R.drawable.emcee17
+        )
     ),
     Vendor(
         name = "Kangar Bridal Boutique",
@@ -64,9 +104,17 @@ val perlisVendors: List<Vendor> = listOf(
         rating = 4.7,
         reviewCount = 20,
         priceFrom = "RM2,200",
-        imageUrl = "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+        imageUrl = null,
+        imageResId = R.drawable.kangar_bridal_boutique,
         locationArea = "Kangar",
         locationState = "Perlis",
-        capacity = "1 outfit rental"
+        capacity = "1 outfit rental",
+        highlights = "1 fitting session, basic alterations, 3-day rental",
+        photoResIds = listOf(
+            R.drawable.attire_10,
+            R.drawable.attire_11,
+            R.drawable.attire_12,
+            R.drawable.attire_13
+        )
     )
 )
